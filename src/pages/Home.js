@@ -7,13 +7,25 @@ export default function Home() {
 
 
     return (
-            <Layout style={{minHeight: '100vh'}}>
+            <Layout style={styles.layout}>
                 <CustomHeader text={"Header"} />
 
-                <Content style={{ margin: '24px 16px 0' }}>
+                <Content style={styles.content}>
                     <div style={{ padding: 24, minHeight: 360 }}>content</div>
                 </Content>
 
             </Layout>
     )
+}
+
+const styles = {
+    layout: {
+        minHeight: '100vh',
+    },
+    content: {
+        margin: '24px 16px 0',
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 }

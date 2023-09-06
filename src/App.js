@@ -28,7 +28,7 @@ function App() {
   };
 
   return (
-    <Layout>
+    <Layout hasSider={location.pathname !== '/'}>
       {location.pathname !== '/' &&
           <Navbar
               currentTab={currentTab}
