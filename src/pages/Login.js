@@ -15,8 +15,12 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate(); // route navigation 
-  const routeChange = () => {
+  const signUpRouteChange = () => {
     let path = `/signup`;
+    navigate(path);
+  }
+  const passwordResetRouteChange = () => {
+    let path = `/forgetpassword`;
     navigate(path);
   }
 
@@ -86,12 +90,14 @@ function Login() {
         />
         <div style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit" disabled={!validateForm()}>Login</Button>
+          <br /><br />
+          <Button type="link" onClick={passwordResetRouteChange}>Forgotten your password?</Button>
         </div>
         <ToastContainer />
 
         <center>
           <h3>Keen to join us as a vendor? Sign up for an account today!</h3>
-          <Button type="primary" onClick={routeChange}>Sign Up</Button>
+          <Button type="primary" onClick={signUpRouteChange}>Sign Up</Button>
         </center>
       </form>
     </div>
