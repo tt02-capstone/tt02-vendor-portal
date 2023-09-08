@@ -6,7 +6,8 @@ import {
   Button,
   Form,
   Input,
-  Spin
+  Spin,
+  Row
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -93,70 +94,70 @@ function PasswordReset() {
   return (
     <Layout style={styles.layout}>
       <CustomHeader text={"Password Reset"} />
-
-      <Spin tip="Processing Request" size="large" spinning={loading}>
-        <Content style={styles.content}>
-          <h2>Reset WithinSG account password</h2>
-          <p>Key in the new password that you would like to change to.</p>
-          <br />
-          <Form
-            {...formItemLayout}
-            form={form}
-            name="passwordReset"
-            onFinish={onFinish}
-            style={{
-              maxWidth: 600,
-            }}
-            scrollToFirstError
-          >
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[
-                {
-                  required: true,
-                  message: 'Password is required',
-                },
-              ]}
+      <Row align='middle' justify='center'>
+        <Spin tip="Processing Request" size="large" spinning={loading}>
+          <Content style={styles.content}>
+            <h2>Reset WithinSG account password</h2>
+            <p>Key in the new password that you would like to change to.</p>
+            <br />
+            <Form
+              {...formItemLayout}
+              form={form}
+              name="passwordReset"
+              onFinish={onFinish}
+              style={{
+                maxWidth: 600,
+              }}
+              scrollToFirstError
             >
-              <Input.Password />
-            </Form.Item>
-
-            <Form.Item
-              name="confirm"
-              label="Confirm Password"
-              dependencies={['password']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Password is required',
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Passwords do not match'));
+              <Form.Item
+                name="password"
+                label="Password"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Password is required',
                   },
-                }),
-              ]}
-            >
-              <Input.Password />
-            </Form.Item>
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
 
-            <Form.Item {...tailFormItemLayout}>
-              <div style={{ textAlign: "right" }}>
-                <Button type="primary" htmlType="submit" loading={loading}>
-                  Reset Password
-                </Button>
-              </div>
-            </Form.Item>
-            <ToastContainer />
-          </Form>
-        </Content>
-      </Spin>
+              <Form.Item
+                name="confirm"
+                label="Confirm Password"
+                dependencies={['password']}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Password is required',
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Passwords do not match'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+
+              <Form.Item {...tailFormItemLayout}>
+                <div style={{ textAlign: "right" }}>
+                  <Button type="primary" htmlType="submit" loading={loading}>
+                    Reset Password
+                  </Button>
+                </div>
+              </Form.Item>
+              <ToastContainer />
+            </Form>
+          </Content>
+        </Spin>
+      </Row>
     </Layout>
-
   );
 }
 

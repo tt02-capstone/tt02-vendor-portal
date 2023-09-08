@@ -6,7 +6,8 @@ import {
     Button,
     Form,
     Input,
-    Spin
+    Spin,
+    Row
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -65,25 +66,25 @@ function PasswordReset() {
         console.log('Received values of form: ', values);
         setLoading(true);
         axios.post(`${baseURL}/passwordResetStageOne/${values.email}`).then((response) => {
-                console.log(response);
-                if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-                    toast.error(response.data.errorMessage, {
-                        position: toast.POSITION.TOP_RIGHT,
-                        autoClose: 1500
-                    });
-                    setLoading(false);
-                } else {
-                    toast.success('Please check your email for the instructions to reset your password.', {
-                        position: toast.POSITION.TOP_RIGHT,
-                        autoClose: 1500
-                    });
-                    form.resetFields();
-                    setLoading(false);
-                    setTimeout(() => {
-                        navigate('/')
-                    }, 2000);
-                }
-            })
+            console.log(response);
+            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+                toast.error(response.data.errorMessage, {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 1500
+                });
+                setLoading(false);
+            } else {
+                toast.success('Please check your email for the instructions to reset your password.', {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 1500
+                });
+                form.resetFields();
+                setLoading(false);
+                setTimeout(() => {
+                    navigate('/')
+                }, 2000);
+            }
+        })
             .catch((error) => {
                 console.error("Axios Error : ", error)
             });
@@ -92,52 +93,52 @@ function PasswordReset() {
     return (
         <Layout style={styles.layout}>
             <CustomHeader text={"Forget Password"} />
-
-            <Spin tip="Processing Request" size="large" spinning={loading}>
-                <Content style={styles.content}>
-                    <h2>Have you forgotten your WithinSG account password?</h2>
-                    <p>Enter your email below and follow the instructions sent to you to reset your password.</p>
-                    <br />
-                    <Form
-                        {...formItemLayout}
-                        form={form}
-                        name="forgetPassword"
-                        onFinish={onFinish}
-                        style={{
-                            maxWidth: 600,
-                        }}
-                        scrollToFirstError
-                    >
-                        <Form.Item
-                            name="email"
-                            label="Email"
-                            rules={[
-                                {
-                                    type: 'email',
-                                    message: 'Enter a valid email address',
-                                },
-                                {
-                                    required: true,
-                                    message: 'Email is required',
-                                },
-                            ]}
+            <Row align='middle' justify='center'>
+                <Spin tip="Processing Request" size="large" spinning={loading}>
+                    <Content style={styles.content}>
+                        <h2>Have you forgotten your WithinSG account password?</h2>
+                        <p>Enter your email below and follow the instructions sent to you to reset your password.</p>
+                        <br />
+                        <Form
+                            {...formItemLayout}
+                            form={form}
+                            name="forgetPassword"
+                            onFinish={onFinish}
+                            style={{
+                                maxWidth: 600,
+                            }}
+                            scrollToFirstError
                         >
-                            <Input />
-                        </Form.Item>
+                            <Form.Item
+                                name="email"
+                                label="Email"
+                                rules={[
+                                    {
+                                        type: 'email',
+                                        message: 'Enter a valid email address',
+                                    },
+                                    {
+                                        required: true,
+                                        message: 'Email is required',
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
 
-                        <Form.Item {...tailFormItemLayout}>
-                            <div style={{ textAlign: "right" }}>
-                                <Button type="primary" htmlType="submit" loading={loading}>
-                                    Submit
-                                </Button>
-                            </div>
-                        </Form.Item>
-                        <ToastContainer />
-                    </Form>
-                </Content>
-            </Spin>
+                            <Form.Item {...tailFormItemLayout}>
+                                <div style={{ textAlign: "right" }}>
+                                    <Button type="primary" htmlType="submit" loading={loading}>
+                                        Submit
+                                    </Button>
+                                </div>
+                            </Form.Item>
+                            <ToastContainer />
+                        </Form>
+                    </Content>
+                </Spin>
+            </Row>
         </Layout>
-
     );
 }
 
