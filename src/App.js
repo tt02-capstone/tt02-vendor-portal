@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import { MailOutlined } from '@ant-design/icons';
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
+import Signup from "./pages/Signup";
 
 function App() {
 
@@ -28,8 +29,8 @@ function App() {
   };
 
   return (
-    <Layout hasSider={location.pathname !== '/'}>
-      {location.pathname !== '/' &&
+    <Layout hasSider={location.pathname !== '/' && location.pathname !== '/signup'}>
+      {location.pathname !== '/' && location.pathname !== '/signup' &&
           <Navbar
               currentTab={currentTab}
               menuItems={menuItems}
@@ -39,6 +40,7 @@ function App() {
       <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>
