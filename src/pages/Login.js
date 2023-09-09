@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { FormLabel, Button, TextField } from '@mui/material';
 import {useNavigate } from 'react-router-dom';
-import axios from "axios";
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { vendorStaffLogin } from "../redux/vendorStaffRedux";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const navigate = useNavigate(); // route navigation 
+    localStorage.removeItem("user");
 
-    const baseURL = "http://localhost:8080/vendor";
+    const navigate = useNavigate(); // route navigation 
 
     const formStyle ={
       maxWidth: "800px",
@@ -23,35 +23,32 @@ function Login() {
       return email.length > 0 && password.length > 0;
     }
   
-    function handleSubmit(event) {
+    async function handleLoginSubmit(event) {
       event.preventDefault();
       if (email && password) {
-        axios.post(`${baseURL}/vendorLogin/${email}/${password}`).then((response) => {
-          console.log(response);
-          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-            toast.error(response.data.errorMessage, {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: 1500
-            });
+        let response = await vendorStaffLogin(email, password);
+        if (response.status) {
+          console.log("vendor staff login success!");
+          toast.success('Login Successful!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+          });
+          localStorage.setItem("user", JSON.stringify(response.data));
+          navigate('/home');
 
-          } else {
-            toast.success('Login Successful!', {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: 1500
-            });
-            localStorage.setItem("user_id", JSON.stringify(response.data.user_id));
-            navigate('/home');  
-          }
-        })
-        .catch((error) => {
-          console.error("Axios Error : ", error)
-        });
+        } else {
+          console.log("vendor staff login failed!");
+          toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+          });
+        }
       }
     }
   
     return (
       <div className="Login">
-        <form onSubmit={handleSubmit} style={formStyle}>
+        <form onSubmit={handleLoginSubmit} style={formStyle}>
             <FormLabel>Email</FormLabel>
             <TextField
                 type="email"
@@ -75,8 +72,9 @@ function Login() {
             <Button fullWidth variant="contained" type="submit" disabled={!validateForm()}>
               Login
             </Button>
-
         </form>
+        
+        <ToastContainer />
       </div>
     );
   }

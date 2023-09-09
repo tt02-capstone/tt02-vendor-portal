@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import { MailOutlined } from '@ant-design/icons';
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
+import Profile from "./pages/profileAndPassword/Profile";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
 
   const menuItems = [
       {key: '/home', label: 'Home', icon: <MailOutlined />},
+      {key: '/profile', label: 'Profile', icon: <MailOutlined />},
       {key: '/', label: 'Logout',icon: <LogoutIcon />,}
   ];
 
@@ -38,6 +40,7 @@ function App() {
       }
       <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/home" element={<Home />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
