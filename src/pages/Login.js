@@ -6,9 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   Button,
-  Space
 } from 'antd';
-import { alignProperty } from "@mui/material/styles/cssUtils";
 
 function Login() {
   const [email, setEmail] = useState("");
