@@ -18,3 +18,54 @@ export async function createVendor(vendor) {
       console.error("VendorRedux createVendor Error : ", error);
     });
 }
+
+export async function addBankAccount(vendor) {
+    console.log(vendor);
+    await axios.post(`${vendorURL}/addBankAccount`, vendor)
+    .then((response) => {
+      if (response.data.httpStatusCode === 400) { // error
+          console.log('fail')
+        return false;
+      } else { // success
+        console.log("success in vendorRedux");
+        return true;
+      }
+    })
+    .catch((error) => {
+      console.error("VendorRedux createVendor Error : ", error);
+    });
+}
+
+export async function deleteBankAccount(vendor) {
+    console.log(vendor);
+    await axios.post(`${vendorURL}/deleteBankAccount`, vendor)
+    .then((response) => {
+      if (response.data.httpStatusCode === 400) { // error
+          console.log('fail')
+        return false;
+      } else { // success
+        console.log("success in vendorRedux");
+        return true;
+      }
+    })
+    .catch((error) => {
+      console.error("VendorRedux createVendor Error : ", error);
+    });
+}
+
+export async function viewAllBankAccounts(vendor) {
+    console.log(vendor);
+    await axios.post(`${vendorURL}/viewAllBankAccounts`, vendor)
+    .then((response) => {
+      if (response.data.httpStatusCode === 400) { // error
+          console.log('fail')
+        return false;
+      } else { // success
+        console.log("success in vendorRedux");
+        return true;
+      }
+    })
+    .catch((error) => {
+      console.error("VendorRedux createVendor Error : ", error);
+    });
+}

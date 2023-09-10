@@ -8,8 +8,14 @@ import React, { useEffect, useState } from "react";
 import { MailOutlined } from '@ant-design/icons';
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 
 function App() {
+  const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');
+  {/* <Elements stripe={stripePromise} >
+      
+    </Elements> */}
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +34,7 @@ function App() {
   };
 
   return (
+    
     <Layout hasSider={location.pathname !== '/'}>
       {location.pathname !== '/' &&
           <Navbar
