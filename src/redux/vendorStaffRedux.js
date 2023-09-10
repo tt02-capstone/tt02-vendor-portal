@@ -1,5 +1,6 @@
 import axios from "axios";
 
+const userURL = "http://localhost:8080/user";
 const vendorStaffURL = "http://localhost:8080/vendorStaff";
 
 export async function vendorStaffLogin(email, password) {
@@ -34,6 +35,23 @@ export async function createVendorStaff(vendorStaff) {
   })
   .catch((error) => {
     console.error("VendorStaffRedux createVendorStaff Error : ", error);
+  });
+}
+
+export async function getAllAssociatedVendorStaff(vendorId) {
+  console.log("Enter getAllAssociatedVendorStaff function");
+  return await axios.get(`${vendorStaffURL}/getAllAssociatedVendorStaff/${vendorId}`)
+  .then((response) => {
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+      console.log('failure in vendorStaffRedux :: getAllAssociatedVendorStaff')
+      return {status: false, data: response.data};
+    } else { // success
+      console.log("success in vendorStaffRedux :: getAllAssociatedVendorStaff");
+      return {status: true, data: response.data};
+    }
+  })
+  .catch((error) => {
+    console.error("vendorStaffRedux getAllAssociatedVendorStaff Error : ", error);
   });
 }
 
@@ -86,5 +104,23 @@ export async function editVendorStaffPassword(vendorStaffId, oldPassword, newPas
   })
   .catch((error) => {
     console.error("vendorStaffRedux editVendorStaffProfile Error : ", error);
+  });
+}
+
+export async function toggleVendorStaffBlock(vendorStaffId) {
+  console.log("Enter toggleVendorStaffBlock function");
+  return await axios.put(`${userURL}/toggleBlock/${vendorStaffId}`)
+  .then((response) => {
+    console.log(response);
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+      console.log('failure in vendorStaffRedux :: toggleVendorStaffBlock')
+      return {status: false, data: response.data};
+    } else { // success
+      console.log("success in vendorStaffRedux :: toggleVendorStaffBlock");
+      return {status: true, data: response.data};
+    }
+  })
+  .catch((error) => {
+    console.error("vendorStaffRedux toggleVendorStaffBlock Error : ", error);
   });
 }

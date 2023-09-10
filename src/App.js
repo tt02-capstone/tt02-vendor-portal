@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import VendorStaff from "./pages/vendor/VendorStaff";
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar";
 import {Layout, Menu} from "antd";
@@ -20,6 +21,7 @@ function App() {
   const menuItems = [
       {key: '/home', label: 'Home', icon: <MailOutlined />},
       {key: '/profile', label: 'Profile', icon: <MailOutlined />},
+      {key: '/vendorStaff', label: 'Vendor Staff', icon: <MailOutlined />},
       {key: '/', label: 'Logout',icon: <LogoutIcon />,}
   ];
 
@@ -41,6 +43,7 @@ function App() {
       <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/vendorStaff" element={<VendorStaff />} />
           <Route path="/home" element={<Home />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
