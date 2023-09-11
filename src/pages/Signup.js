@@ -74,6 +74,7 @@ function Signup() {
       is_blocked: false,
       is_master_account: true,
       position: values.poc_position,
+      user_type: 'VENDOR_STAFF',
       email_verified: false,
       vendor: {
         business_name: values.business_name,
