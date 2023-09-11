@@ -3,7 +3,7 @@ import { FormLabel, Button, TextField } from '@mui/material';
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { vendorStaffLogin } from "../redux/vendorStaffRedux";
+import { vendorPortalLogin } from "../redux/commonRedux";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ function Login() {
     async function handleLoginSubmit(event) {
       event.preventDefault();
       if (email && password) {
-        let response = await vendorStaffLogin(email, password);
+        let response = await vendorPortalLogin(email, password);
         if (response.status) {
           console.log("vendor staff login success!");
           toast.success('Login Successful!', {
