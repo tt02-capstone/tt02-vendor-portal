@@ -74,6 +74,7 @@ function Signup() {
       is_blocked: false,
       is_master_account: true,
       position: values.poc_position,
+      email_verified: false,
       vendor: {
         business_name: values.business_name,
         poc_name: values.poc_name,
@@ -208,7 +209,7 @@ function Signup() {
                         <Input placeholder="+65" />
                       </Form.Item>
                     </Col>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;
                     <Col span={19}>
                       <Form.Item
                         name="poc_mobile_num"
