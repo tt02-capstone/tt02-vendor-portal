@@ -2,11 +2,12 @@ import {Layout} from 'antd';
 import React from "react";
 import CustomHeader from "../components/CustomHeader";
 import {Content} from "antd/es/layout/layout";
+import { Navigate } from 'react-router-dom';
 
 export default function Home() {
+    const user = JSON.parse(localStorage.getItem("user"));
 
-
-    return (
+    return user ? (
             <Layout style={styles.layout}>
                 <CustomHeader text={"Header"} />
 
@@ -15,6 +16,9 @@ export default function Home() {
                 </Content>
 
             </Layout>
+    ) :
+    (
+        <Navigate to="/" />
     )
 }
 
