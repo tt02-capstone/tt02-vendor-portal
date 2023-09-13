@@ -10,6 +10,10 @@ import { MailOutlined } from '@ant-design/icons';
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
 import Profile from "./pages/profileAndPassword/Profile";
+import Signup from "./pages/Signup";
+import PasswordReset from "./pages/PasswordReset";
+import ForgetPassword from "./pages/ForgetPassword";
+import EmailVerification from "./pages/EmailVerification";
 
 function App() {
 
@@ -32,8 +36,8 @@ function App() {
   };
 
   return (
-    <Layout hasSider={location.pathname !== '/'}>
-      {location.pathname !== '/' &&
+    <Layout hasSider={location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword' && location.pathname !== '/verifyemail'}>
+      {location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword' && location.pathname !== '/verifyemail' &&
           <Navbar
               currentTab={currentTab}
               menuItems={menuItems}
@@ -45,6 +49,10 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/vendorStaff" element={<VendorStaff />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/passwordreset" element={<PasswordReset />} />
+          <Route path="/forgetpassword" element={<ForgetPassword />} />
+          <Route path="/verifyemail" element={<EmailVerification />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>
