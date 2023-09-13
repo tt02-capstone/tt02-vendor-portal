@@ -20,22 +20,22 @@ export async function vendorPortalLogin(email, password) {
   });
 }
 
-// export async function getUserProfile(userId) {
-//   console.log("Enter getUserProfile function");
-//   return await axios.get(`${userURL}/getUserProfile/${userId}`)
-//   .then((response) => {
-//     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-//       console.log('failure in commonRedux :: getUserProfile')
-//       return {status: false, data: response.data};
-//     } else { // success
-//       console.log("success in commonRedux :: getUserProfile");
-//       return {status: true, data: response.data};
-//     }
-//   })
-//   .catch((error) => {
-//     console.error("commonRedux getUserProfile Error : ", error);
-//   });
-// }
+export async function getUserProfile(userId) {
+  console.log("Enter getUserProfile function");
+  return await axios.get(`${userURL}/getUserProfile/${userId}`)
+  .then((response) => {
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+      console.log('failure in commonRedux :: getUserProfile')
+      return {status: false, data: response.data};
+    } else { // success
+      console.log("success in commonRedux :: getUserProfile");
+      return {status: true, data: response.data};
+    }
+  })
+  .catch((error) => {
+    console.error("commonRedux getUserProfile Error : ", error);
+  });
+}
 
 // export async function editUserProfile(editedUserProfile) {
 //   console.log("Enter editUserProfile function");

@@ -1,6 +1,7 @@
-// import axios from "axios";
+import axios from "axios";
 
-// const vendorStaffURL = "http://localhost:8080/vendorStaff";
+const vendorStaffURL = "http://localhost:8080/vendorStaff";
+const localURL = "http://localhost:8080/local";
 
 // export async function createVendorStaff(vendorStaff) {
 //   console.log("Enter createVendorStaff function");
@@ -19,40 +20,59 @@
 //   });
 // }
 
-// export async function getVendorStaffProfile(vendorStaffId) {
-//   console.log("Enter getVendorStaffProfile function");
-//   return await axios.get(`${vendorStaffURL}/getVendorStaffProfile/${vendorStaffId}`)
-//   .then((response) => {
-//     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-//       console.log('failure in getVendorStaffProfile :: getVendorStaffProfile')
-//       return {status: false, data: response.data};
-//     } else { // success
-//       console.log("success in getVendorStaffProfile :: getVendorStaffProfile");
-//       return {status: true, data: response.data};
-//     }
-//   })
-//   .catch((error) => {
-//     console.error("vendorStaffRedux getVendorStaffProfile Error : ", error);
-//   });
-// }
+export async function getVendorStaffProfile(vendorStaffId) {
+  console.log("Enter getVendorStaffProfile function");
+  return await axios.get(`${vendorStaffURL}/getVendorStaffProfile/${vendorStaffId}`)
+  .then((response) => {
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+      console.log('failure in getVendorStaffProfile :: getVendorStaffProfile')
+      return {status: false, data: response.data};
+    } else { // success
+      console.log("success in getVendorStaffProfile :: getVendorStaffProfile");
+      return {status: true, data: response.data};
+    }
+  })
+  .catch((error) => {
+    console.error("vendorStaffRedux getVendorStaffProfile Error : ", error);
+  });
+}
 
-// export async function editVendorStaffProfile(editedVendorStaffProfile) {
-//   console.log("Enter editVendorStaffProfile function");
-//   return await axios.put(`${vendorStaffURL}/editVendorStaffProfile`, editedVendorStaffProfile)
-//   .then((response) => {
-//     console.log(response);
-//     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-//       console.log('failure in vendorStaffRedux :: editVendorStaffProfile :: vendor')
-//       return {status: false, data: response.data};
-//     } else { // success
-//       console.log("success in vendorStaffRedux :: editVendorStaffProfile :: vendor");
-//       return {status: true, data: response.data};
-//     }
-//   })
-//   .catch((error) => {
-//     console.error("vendorStaffRedux editVendorStaffProfile :: Vendor Error : ", error);
-//   });
-// }
+export async function editLocalProfile(editedVendorStaffProfile) {
+    if (editedVendorStaffProfile.user_type === 'LOCAL') { // local
+        return await axios.put(`${localURL}/editLocalProfile`, editedVendorStaffProfile)
+        .then((response) => {
+          console.log(response);
+          if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+            console.log('failure in vendorStaffRedux :: editVendorStaffProfile :: vendor')
+            return {status: false, data: response.data};
+          } else { // success
+            console.log("success in vendorStaffRedux :: editVendorStaffProfile :: vendor");
+            console.log(response.data);
+            return {status: true, data: response.data};
+          }
+        })
+        .catch((error) => {
+          console.error("vendorStaffRedux editVendorStaffProfile :: Vendor Error : ", error);
+        });
+    } else { // vendor staff
+
+    }
+  console.log("Enter editVendorStaffProfile function");
+  return await axios.put(`${vendorStaffURL}/editVendorStaffProfile`, editedVendorStaffProfile)
+  .then((response) => {
+    console.log(response);
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+      console.log('failure in vendorStaffRedux :: editVendorStaffProfile :: vendor')
+      return {status: false, data: response.data};
+    } else { // success
+      console.log("success in vendorStaffRedux :: editVendorStaffProfile :: vendor");
+      return {status: true, data: response.data};
+    }
+  })
+  .catch((error) => {
+    console.error("vendorStaffRedux editVendorStaffProfile :: Vendor Error : ", error);
+  });
+}
 
 // export async function editVendorStaffPassword(vendorStaffId, oldPassword, newPassword) {
 //   console.log("Enter editVendorStaffPassword function");

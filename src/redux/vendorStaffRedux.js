@@ -46,6 +46,7 @@ export async function editVendorStaffProfile(editedVendorStaffProfile) {
       return {status: false, data: response.data};
     } else { // success
       console.log("success in vendorStaffRedux :: editVendorStaffProfile :: vendor");
+      console.log(response.data);
       return {status: true, data: response.data};
     }
   })

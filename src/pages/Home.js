@@ -10,7 +10,7 @@ export default function Home() {
     return user ? (
             <Layout style={styles.layout}>
                 <CustomHeader text={"Header"} />
-
+                
                 <Content style={styles.content}>
                     <div style={{ padding: 24, minHeight: 360 }}>content</div>
                 </Content>
@@ -18,6 +18,7 @@ export default function Home() {
             </Layout>
     ) :
     (
+        // <div></div>
         <Navigate to="/" />
     )
 }

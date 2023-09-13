@@ -23,7 +23,7 @@ function Login() {
     navigate(path);
   }
 
-  const baseURL = "http://localhost:8080/vendor";
+  const baseURL = "http://localhost:8080/vendorStaff";
 
   const formStyle = {
     maxWidth: "800px",
@@ -31,7 +31,7 @@ function Login() {
     padding: "20px"
   }
 
-  localStorage.removeItem("user");
+  // localStorage.removeItem("user");
 
   function validateForm() {
     return email.length > 0 && password.length > 0;
@@ -41,9 +41,9 @@ function Login() {
     event.preventDefault();
     if (email && password) {
       setLoading(true);
-      axios.post(`${baseURL}/vendorLogin/${email}/${password}`).then((response) => {
+      axios.put(`${baseURL}/vendorStaffLogin/${email}/${password}`).then((response) => {
         console.log(response);
-        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
           toast.error(response.data.errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1500
