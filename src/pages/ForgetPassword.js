@@ -59,7 +59,7 @@ const styles = {
 
 function PasswordReset() {
     const [form] = Form.useForm();
-    const baseURL = "http://localhost:8080/vendor";
+    const baseURL = "http://localhost:8080/vendorStaff";
     const navigate = useNavigate(); // route navigation 
     const [loading, setLoading] = useState(false);
     const onFinish = (values) => {

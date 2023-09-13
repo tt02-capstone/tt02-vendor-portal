@@ -23,7 +23,7 @@ function Login() {
     navigate(path);
   }
 
-  const baseURL = "http://localhost:8080/vendorStaff";
+  const baseURL = "http://localhost:8080/user";
 
   const formStyle = {
     maxWidth: "800px",
@@ -41,7 +41,7 @@ function Login() {
     event.preventDefault();
     if (email && password) {
       setLoading(true);
-      axios.put(`${baseURL}/vendorStaffLogin/${email}/${password}`).then((response) => {
+      axios.post(`${baseURL}/webLogin/${email}/${password}`).then((response) => {
         console.log(response);
         if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
           toast.error(response.data.errorMessage, {
