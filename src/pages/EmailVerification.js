@@ -21,8 +21,8 @@ const styles = {
 }
 
 function EmailVerification() {
-    const baseURL = "http://localhost:8080/vendor";
-    const [successful, setSuccessful] = useState("");
+    const baseURL = "http://localhost:8080/vendorStaff";
+    const [successful, setSuccessful] = useState(true);
     axios.get(`${baseURL}/verifyEmail/${new URLSearchParams(document.location.search)
         .get('token')}`).then((response) => {
             console.log(response);
