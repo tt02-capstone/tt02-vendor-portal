@@ -43,7 +43,7 @@ function Login() {
       setLoading(true);
       axios.post(`${baseURL}/webLogin/${email}/${password}`).then((response) => {
         console.log(response);
-        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
           toast.error(response.data.errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1500

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout } from 'antd';
 import CustomHeader from "../components/CustomHeader";
 import {
     Row
 } from 'antd';
-import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
+import { verifyEmail } from '../redux/vendorStaffRedux';
 
 const styles = {
     layout: {
@@ -21,20 +21,23 @@ const styles = {
 }
 
 function EmailVerification() {
-    const baseURL = "http://localhost:8080/vendorStaff";
     const [successful, setSuccessful] = useState(true);
-    axios.get(`${baseURL}/verifyEmail/${new URLSearchParams(document.location.search)
-        .get('token')}`).then((response) => {
-            console.log(response);
-            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-                setSuccessful(false);
-            } else {
-                setSuccessful(true);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let response = await verifyEmail(new URLSearchParams(document.location.search)
+                    .get('token'));
+                if (response.status) {
+                    setSuccessful(true);
+                } else {
+                    setSuccessful(false);
+                }
+            } catch (error) {
+                alert('An error occurred! Failed to retrieve pending applications!');
             }
-        })
-        .catch((error) => {
-            console.error("Axios Error : ", error)
-        });
+        };
+        fetchData();
+    }, []);
 
     return successful ? (
         <Layout style={styles.layout}>
