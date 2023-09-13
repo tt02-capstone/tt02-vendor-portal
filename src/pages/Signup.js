@@ -12,9 +12,9 @@ import {
   Col, Spin
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { createVendor } from '../redux/vendorRedux';
 
 const formItemLayout = {
   labelCol: {
@@ -61,56 +61,29 @@ const styles = {
 
 function Signup() {
   const [form] = Form.useForm();
-  const baseURL = "http://localhost:8080/vendor";
   const navigate = useNavigate(); // route navigation 
   const [loading, setLoading] = useState(false);
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
+  async function onFinish(values) {
     setLoading(true);
-    axios.post(`${baseURL}/createVendor`, {
-      name: values.poc_name,
-      email: values.email,
-      password: values.password,
-      is_blocked: false,
-      is_master_account: true,
-      position: values.poc_position,
-      user_type: 'VENDOR_STAFF',
-      email_verified: false,
-      vendor: {
-        business_name: values.business_name,
-        poc_name: values.poc_name,
-        poc_position: values.poc_position,
-        country_code: values.country_code,
-        poc_mobile_num: values.poc_mobile_num,
-        wallet_balance: 0,
-        application_status: 'PENDING',
-        vendor_type: values.vendor_type,
-        service_description: values.service_description
-      }
-    }).then((response) => {
-      console.log(response);
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-        toast.error(response.data.errorMessage, {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        setLoading(false);
-      } else {
-        toast.success('Application submitted!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        form.resetFields();
-        setLoading(false);
-        setTimeout(() => {
-          navigate('/')
-        }, 2000);
-      }
-    })
-      .catch((error) => {
-        console.error("Axios Error : ", error)
+    let response = await createVendor(values);
+    if (response.status) {
+      toast.success('Application submitted!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
       });
-  };
+      form.resetFields();
+      setLoading(false);
+      setTimeout(() => {
+        navigate('/')
+      }, 2000);
+    } else {
+      toast.error(response.data.errorMessage, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+      setLoading(false);
+    }
+  }
 
   return (
     <Layout style={styles.layout}>
