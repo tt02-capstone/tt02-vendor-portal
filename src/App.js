@@ -22,12 +22,18 @@ function App() {
 
   const [currentTab, setCurrentTab] = useState('/home');
 
-  const menuItems = [
+  const vendorStaffMenuItems = [
       {key: '/home', label: 'Home', icon: <MailOutlined />},
       {key: '/profile', label: 'Profile', icon: <MailOutlined />},
       {key: '/vendorStaff', label: 'Vendor Staff', icon: <MailOutlined />},
       {key: '/', label: 'Logout',icon: <LogoutIcon />,}
   ];
+
+  const localMenuItems = [
+    {key: '/home', label: 'Home', icon: <MailOutlined />},
+    {key: '/profile', label: 'Profile', icon: <MailOutlined />},
+    {key: '/', label: 'Logout',icon: <LogoutIcon />,}
+];
 
   const onClickNewTab = (tab) => {
       console.log(tab.key);
@@ -40,7 +46,8 @@ function App() {
       {location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword' && location.pathname !== '/verifyemail' &&
           <Navbar
               currentTab={currentTab}
-              menuItems={menuItems}
+              vendorStaffMenuItems={vendorStaffMenuItems}
+              localMenuItems={localMenuItems}
               onClickNewTab={onClickNewTab}
           />
       }

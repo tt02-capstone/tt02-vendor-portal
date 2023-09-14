@@ -1,42 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Spin, Form, Input, Button } from 'antd';
+import { Layout, Spin, Form, Input, Button, Row, Col, DatePicker } from 'antd';
+import dayjs, { Dayjs } from "dayjs";
+import moment from 'moment';
 import { EditFilled } from "@ant-design/icons";
 import { Navigate, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getUserProfile } from "../../redux/commonRedux";
-import { editUserPassword, editUserProfile } from "../../redux/commonRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import { ToastContainer, toast } from 'react-toastify';
 import EditPasswordModal from "./EditPasswordModal";
-import { editLocalProfile } from "../../redux/localRedux";
+import { editPassword } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
+import { editLocalProfile } from "../../redux/localRedux";
 
 export default function Profile() {
 
     const navigate = useNavigate();
+    const dateFormat = "DD-MM-YYYY";
     const { Header, Content, Sider, Footer } = Layout;
 
-    const [user, setUser] = useState(); // vendor staff or local ONLY or error
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user"))); // vendor staff or local ONLY or error
     const [isViewProfile, setIsViewProfile] = useState(true); // view or edit profile
 
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false); // change password boolean
-
-    // fetch vendor staff OR local profile details
-    useEffect(() => {
-        const fetchData = async () => {
-            let user_id = JSON.parse(localStorage.getItem("user"))["user_id"];
-            const response = await getUserProfile(user_id);
-            if (response.status) {
-                setUser(response.data);
-                console.log(response.data);
-            } else {
-                console.log("User profile data not fetched!");
-            }
-        }
-
-        fetchData();
-    }, [])
 
     // when the edit profile button is clicked
     function onClickEditProfile() {
@@ -44,58 +33,66 @@ export default function Profile() {
     }
 
     // when user submits the edit profile details form
-    // async function onSubmitVendorStaffProfileButton(values) {
-    async function onSubmitVendorStaffProfileButton() {
-
-        if (user.user_type === 'LOCAL') {
+    async function onSubmitEditProfileButton(values) {
+        let response;
+        if (user.user_type === 'VENDOR_STAFF' && user.is_master_account) {
             let obj = {
-                "user_id": 2,
-                "name": "l2",
-                "email": "l1@gmail.com",
-                "password": "password",
-                "is_blocked": false,
-                "user_type": "LOCAL",
-                "nric_num": "S9911111B",
-                "date_of_birth": "2000-01-01",
-                "country_code": "66",
-                "mobile_num": "91111112",
-                "wallet_balance": 0
-            }
-            let response = await editLocalProfile(obj);
-        } else {
-            let obj = {
-                "user_id": 1,
-                "name": "v2",
-                "email": "v1@gmail.com",
-                "password": "password",
-                "is_blocked": false,
-                "is_master_account": false,
-                "user_type": "VENDOR_STAFF",
-                "position": "pos2",
+                "user_id": user.user_id,
+                "name": values.name,
+                "email": values.email,
+                "position": values.position,
                 "vendor": {
-                    "country_code": "66"
+                    "vendor_id" : user.vendor.vendor_id,
+                    "business_name": values.business_name,
+                    "poc_name": values.poc_name,
+                    "poc_position": values.poc_position,
+                    "country_code": values.country_code,
+                    "poc_mobile_num": values.poc_mobile_num,
+                    "service_description": values.service_description,
                 }
-            };
-            let response = await editVendorStaffProfile(obj);            
+            }
+            response = await editVendorStaffProfile(obj);
+
+        } else if (user.user_type === 'VENDOR_STAFF' && !user.is_master_account) {
+          let obj = {
+            "user_id": user.user_id,
+            "name": values.name,
+            "email": values.email,
+            "position": values.position,
+            "vendor": {
+                "vendor_id" : user.vendor.vendor_id,
+            }
+          }
+            response = await editVendorStaffProfile(obj);
+
+        } else if (user.user_type === 'LOCAL') {
+            let obj = {
+                "user_id": user.user_id,
+                "name": values.name,
+                "email": values.email,
+                "date_of_birth": dayjs(values.date_of_birth).format("YYYY-MM-DD"),
+                "country_code": values.country_code,
+                "mobile_num": values.mobile_num,
+            }
+            response = await editLocalProfile(obj);
         }
         
-        // let response = await editUserProfile({...values, user_id: user.user_id, user_type: user.user_type});
-        // console.log(response);
-        // if (response.status) {
-        //     setUser(response.data);
-        //     toast.success('Vendor staff profile changed successfully!', {
-        //         position: toast.POSITION.TOP_RIGHT,
-        //         autoClose: 1500
-        //     });
-        //     setIsViewProfile(true);
+        console.log(response);
+        if (response.status) {
+            setUser(response.data);
+            toast.success('User profile changed successfully!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+            setIsViewProfile(true);
 
-        // } else {
-        //     console.log("Vendor staff profile not editted!");
-        //     toast.error(response.data.errorMessage, {
-        //         position: toast.POSITION.TOP_RIGHT,
-        //         autoClose: 1500
-        //     });
-        // }
+        } else {
+            console.log("User profile not editted!");
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
     }
 
     // when cancel edit profile details
@@ -113,31 +110,31 @@ export default function Profile() {
         setIsChangePasswordModalOpen(false);
     }
 
-    // // when user edits password
-    // async function onClickSubmitNewPassword(val) {
-    //     if (val.oldPassword && val.newPasswordOne === val.newPasswordTwo) {
-    //         let response = await editUserPassword(user.user_id, val.oldPassword, val.newPasswordOne);
-    //         if (response.status) {
-    //             toast.success('Password changed successfully!', {
-    //                 position: toast.POSITION.TOP_RIGHT,
-    //                 autoClose: 1500
-    //             });
-    //             setIsChangePasswordModalOpen(false);
+    // when user edits password
+    async function onClickSubmitNewPassword(val) {
+        if (val.oldPassword && val.newPasswordOne === val.newPasswordTwo) {
+            let response = await editPassword(user.user_id, val.oldPassword, val.newPasswordOne);
+            if (response.status) {
+                toast.success('Password changed successfully!', {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 1500
+                });
+                setIsChangePasswordModalOpen(false);
             
-    //         } else {
-    //             toast.error(response.data.errorMessage, {
-    //                 position: toast.POSITION.TOP_RIGHT,
-    //                 autoClose: 1500
-    //             });
-    //         }
+            } else {
+                toast.error(response.data.errorMessage, {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 1500
+                });
+            }
 
-    //     } else {
-    //         toast.error('New password does not match!', {
-    //             position: toast.POSITION.TOP_RIGHT,
-    //             autoClose: 1500
-    //         });
-    //     }
-    // }
+        } else {
+            toast.error('New password does not match!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+    }
 
     return user ? (
         <div>
@@ -151,20 +148,36 @@ export default function Profile() {
                             <br />
                             {user.name}
                             <br />
-                            {user.user_type === 'VENDOR_STAFF' && user.position}
-                            {user.user_type === 'LOCAL' && user.country_code}
-                            <br />
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account && <p>Master Account</p>}
-                            {user.user_type === 'VENDOR_STAFF' && !user.is_master_account && <p>Not Master Account</p>}
-                            {user.user_type === 'LOCAL' && user.mobile_num}
-                            <br />
-                            {user.user_type === 'LOCAL' && user.date_of_birth}
+
+                            {/* local specific */}
+                            {user.user_type === 'LOCAL' && user.country_code + " " + user.mobile_num}
                             {user.user_type === 'LOCAL' && <br />}
-                            {user.user_type === 'LOCAL' && user.nric_num}
+                            {user.user_type === 'LOCAL' && moment(user.date_of_birth).format('LL')}
                             {user.user_type === 'LOCAL' && <br />}
                             {user.user_type === 'LOCAL' && user.wallet_balance}
                             {user.user_type === 'LOCAL' && <br />}
-                            <CustomButton text="a" onClick={onSubmitVendorStaffProfileButton} />
+
+                            {/* vendor staff specific */}
+                            {user.user_type === 'VENDOR_STAFF' && user.position}
+                            {user.user_type === 'VENDOR_STAFF' && <br />}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account && <p>Master Account</p>}
+                            {user.user_type === 'VENDOR_STAFF' && !user.is_master_account && <p>Not Master Account</p>}
+                            {user.user_type === 'VENDOR_STAFF' && <br />}
+
+                            {/* master vendor staff specific */}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <p>Vendor Specifics</p>}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.business_name}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.poc_name}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.poc_position}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.service_description}
+                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
+
                             <CustomButton
                                 text="Edit Profile"
                                 icon={<EditFilled />}
@@ -184,83 +197,292 @@ export default function Profile() {
                 </Layout>
             }
 
-            {/* edit vendor staff profile form */}
-            {user.user_type === "VENDOR_STAFF" && !isViewProfile &&
-                <Layout style={styles.layout}>
-                    <CustomHeader text={"Header"}/>
-                    <Layout style={{ padding: '0 24px 24px' }}>
-                        <Content style={styles.content}>
-                        <Form
-                            name="basic"
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 16 }}
-                            style={{ maxWidth: 600 }}
-                            required={true}
-                            requiredMark={true}
-                            onFinish={onSubmitVendorStaffProfileButton}
-                        >
-                            <Form.Item
-                            label="Email"
-                            name="email"
-                            initialValue={user.email}
-                            rules={[{ required: true, message: 'Please enter a valid email!' }]}
-                            >
-                            <Input />
-                            </Form.Item>
+            {/* edit not master vendor staff profile form */}
+            {user.user_type === "VENDOR_STAFF" && user.is_master_account !== true && !isViewProfile &&
+                <Row align='middle' justify='center'>
+                <Spin tip="Editting Profile" size="large" spinning={loading}>
+                  <Content style={styles.content}>
+                    <Form
+                      {...formItemLayout}
+                      form={form}
+                      name="masterVendorStaffEditProfile"
+                      onFinish={onSubmitEditProfileButton}
+                      style={{
+                        maxWidth: 600,
+                      }}
+                      scrollToFirstError
+                    >
+                      <Form.Item
+                        name="email"
+                        label="Email"
+                        initialValue={user.email}
+                        rules={[{ required: true, message: 'Email is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
 
-                            <Form.Item
-                            label="Name"
-                            name="name"
-                            initialValue={user.name}
-                            rules={[{ required: true, message: 'Please enter a valid name!' }]}
-                            >
-                            <Input />
-                            </Form.Item>
+                      <Form.Item
+                        name="name"
+                        label="Name"
+                        initialValue={user.name}
+                        rules={[{ required: true, message: 'Name is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
 
-                            <Form.Item
-                            label="Position"
-                            name="position"
-                            initialValue={user.position}
-                            rules={[{ required: true, message: 'Please enter a valid position!' }]}
-                            >
-                            <Input />
-                            </Form.Item>
-
-                            <Form.Item
+                      <Form.Item
+                        name="position"
+                        label="Position"
+                        initialValue={user.position}
+                        rules={[{ required: true, message: 'Position is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
                             label="Master Account"
                             name="is_master_account"
                             initialValue={user.is_master_account ? "Yes" : "No"}
-                            rules={[{ required: true, message: 'Please enter a valid name!' }]}
                             >
-                            <Input disabled={true}/>
-                            </Form.Item>
+                        <Input disabled={true}/>
+                      </Form.Item>
 
-                            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                                <Button type="primary" htmlType="submit">
-                                    Submit
-                                </Button>
-                            </Form.Item>
-                            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                                <CustomButton 
-                                    text="Cancel"
-                                    // icon
-                                    onClick={onCancelVendorStaffProfileButton}
-                                />
-                            </Form.Item>
-                        </Form>
-                        </Content>
-                    </Layout>
-                </Layout>
+                      <Form.Item {...tailFormItemLayout}>
+                        <div style={{ textAlign: "right" }}>
+                          <Button type="primary" htmlType="submit" loading={loading}>
+                            Submit
+                          </Button>
+                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} />
+                        </div>
+                      </Form.Item>
+                      <ToastContainer />
+                    </Form>
+                  </Content>
+                </Spin>
+              </Row>
+            }
+
+            {/* edit vendor staff master profile form */}
+            {user.user_type === "VENDOR_STAFF" && user.is_master_account === true && !isViewProfile &&
+                <Row align='middle' justify='center'>
+                <Spin tip="Editting Profile" size="large" spinning={loading}>
+                  <Content style={styles.content}>
+                    <Form
+                      {...formItemLayout}
+                      form={form}
+                      name="masterVendorStaffEditProfile"
+                      onFinish={onSubmitEditProfileButton}
+                      style={{
+                        maxWidth: 600,
+                      }}
+                      scrollToFirstError
+                    >
+                      <Form.Item
+                        name="email"
+                        label="Email"
+                        initialValue={user.email}
+                        rules={[{ required: true, message: 'Email is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="name"
+                        label="Name"
+                        initialValue={user.name}
+                        rules={[{ required: true, message: 'Name is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="position"
+                        label="Position"
+                        initialValue={user.position}
+                        rules={[{ required: true, message: 'Position is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                            label="Master Account"
+                            name="is_master_account"
+                            initialValue={user.is_master_account ? "Yes" : "No"}
+                            >
+                        <Input disabled={true}/>
+                      </Form.Item>
+
+                      <Form.Item
+                        name="business_name"
+                        label="Business Name"
+                        initialValue={user.vendor.business_name}
+                        rules={[{ required: true, message: 'Business name is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="poc_name"
+                        label="POC Name"
+                        initialValue={user.vendor.poc_name}
+                        rules={[{ required: true, message: 'POC name is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+        
+                      <Form.Item
+                        name="poc_position"
+                        label="POC Position"
+                        initialValue={user.vendor.poc_position}
+                        rules={[{ required: true, message: 'POC position is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+        
+                      <Form.Item label="POC Contact No">
+                        <Input.Group>
+                          <Row>
+                            <Col span={4}>
+                              <Form.Item
+                                name="country_code"
+                                noStyle
+                                initialValue={user.vendor.country_code}
+                                rules={[{ required: true, message: 'Country code is required!' }]}
+                              >
+                                <Input />
+                              </Form.Item>
+                            </Col>
+                            &nbsp;&nbsp;&nbsp;
+                            <Col span={19}>
+                              <Form.Item
+                                name="poc_mobile_num"
+                                noStyle
+                                initialValue={user.vendor.poc_mobile_num}
+                                rules={[{ required: true, message: 'Mobile number is required!' }]}
+                              >
+                                <Input />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Input.Group>
+                      </Form.Item>
+
+                      <Form.Item
+                        name="service_description"
+                        label="Service Description"
+                        tooltip="Tell us about the service you provide"
+                        initialValue={user.vendor.service_description}
+                        rules={[{ required: true, message: 'Service description is required!'}]}
+                      >
+                        <Input.TextArea showCount maxLength={300} />
+                      </Form.Item>
+
+                      <Form.Item {...tailFormItemLayout}>
+                        <div style={{ textAlign: "right" }}>
+                          <Button type="primary" htmlType="submit" loading={loading}>
+                            Submit
+                          </Button>
+                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} />
+                        </div>
+                      </Form.Item>
+                      <ToastContainer />
+                    </Form>
+                  </Content>
+                </Spin>
+              </Row>
+            }
+
+            {/* edit local profile form */}
+            {user.user_type === "LOCAL" && !isViewProfile &&
+            <Row align='middle' justify='center'>
+            <Spin tip="Editting Profile" size="large" spinning={loading}>
+                <Content style={styles.content}>
+                    <Form
+                      {...formItemLayout}
+                      form={form}
+                      name="localEditProfile"
+                      onFinish={onSubmitEditProfileButton}
+                      style={{
+                        maxWidth: 600,
+                      }}
+                      scrollToFirstError
+                    >
+                      <Form.Item
+                        name="email"
+                        label="Email"
+                        initialValue={user.email}
+                        rules={[{ required: true, message: 'Email is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="name"
+                        label="Name"
+                        initialValue={user.name}
+                        rules={[{ required: true, message: 'Name is required!'}]}
+                      >
+                        <Input />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="date_of_birth"
+                        label="Date of Birth"
+                        initialValue={dayjs(user.date_of_birth)}
+                        rules={[{ required: true, message: 'Date of birth is required!'}]}
+                      >
+                        <DatePicker format={dateFormat} />
+                      </Form.Item>
+        
+                      <Form.Item label="Contact No">
+                        <Input.Group>
+                          <Row>
+                            <Col span={4}>
+                              <Form.Item
+                                name="country_code"
+                                noStyle
+                                initialValue={user.country_code}
+                                rules={[{ required: true, message: 'Country code is required!' }]}
+                              >
+                                <Input />
+                              </Form.Item>
+                            </Col>
+                            &nbsp;&nbsp;&nbsp;
+                            <Col span={19}>
+                              <Form.Item
+                                name="mobile_num"
+                                noStyle
+                                initialValue={user.mobile_num}
+                                rules={[{ required: true, message: 'Mobile number is required!' }]}
+                              >
+                                <Input />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Input.Group>
+                      </Form.Item>
+
+                      <Form.Item {...tailFormItemLayout}>
+                        <div style={{ textAlign: "right" }}>
+                          <Button type="primary" htmlType="submit" loading={loading}>
+                            Submit
+                          </Button>
+                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} />
+                        </div>
+                      </Form.Item>
+                      <ToastContainer />
+                    </Form>
+                  </Content>
+                </Spin>
+              </Row>
             }
 
             {/* edit password pop-up */}
-            {/* {isChangePasswordModalOpen && 
+            {isChangePasswordModalOpen && 
                 <EditPasswordModal 
                     isChangePasswordModalOpen={isChangePasswordModalOpen}
                     onClickSubmitNewPassword={onClickSubmitNewPassword}
                     onClickCancelEditPasswordButton={onClickCancelEditPasswordButton}
                 />
-            } */}
+            }
 
             {/* Edit profile & password toast */}
             <ToastContainer />
@@ -270,14 +492,48 @@ export default function Profile() {
     )
 }
 
+const formItemLayout = {
+    labelCol: {
+        xs: {
+            span: 24,
+        },
+        sm: {
+            span: 8,
+        },
+        },
+        wrapperCol: {
+        xs: {
+            span: 24,
+        },
+        sm: {
+            span: 16,
+        },
+    },
+};
+
+const tailFormItemLayout = {
+    wrapperCol: {
+        xs: {
+            span: 24,
+            offset: 0,
+        },
+        sm: {
+            span: 16,
+            offset: 8,
+        },
+    },
+};
+
 const styles = {
     layout: {
         minHeight: '100vh',
     },
     content: {
         margin: '24px 16px 0',
+        width: '100%',
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
     },
-}
+  }
+  

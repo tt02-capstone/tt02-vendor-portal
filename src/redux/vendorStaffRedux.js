@@ -1,10 +1,12 @@
 import axios from "axios";
+import { userApi, vendorStaffApi } from "./api";
 
 const vendorStaffURL = "http://localhost:8080/vendorStaff";
 
-export async function createVendorStaff(vendorStaff) {
+export async function createVendorStaff(vendorStaff) { // not intial signup
   console.log("Enter createVendorStaff function");
-  return await axios.post(`${vendorStaffURL}/createVendorStaff`, vendorStaff)
+  console.log(vendorStaff);
+  return await vendorStaffApi.post(`/createVendorStaff`, vendorStaff)
   .then((response) => {
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
       console.log('failure in vendorStaffRedux :: createVendorStaff');
@@ -19,26 +21,9 @@ export async function createVendorStaff(vendorStaff) {
   });
 }
 
-export async function getVendorStaffProfile(vendorStaffId) {
-  console.log("Enter getVendorStaffProfile function");
-  return await axios.get(`${vendorStaffURL}/getVendorStaffProfile/${vendorStaffId}`)
-  .then((response) => {
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-      console.log('failure in getVendorStaffProfile :: getVendorStaffProfile')
-      return {status: false, data: response.data};
-    } else { // success
-      console.log("success in getVendorStaffProfile :: getVendorStaffProfile");
-      return {status: true, data: response.data};
-    }
-  })
-  .catch((error) => {
-    console.error("vendorStaffRedux getVendorStaffProfile Error : ", error);
-  });
-}
-
-export async function editVendorStaffProfile(editedVendorStaffProfile) {
+export async function editVendorStaffProfile(edittedProfile) {
   console.log("Enter editVendorStaffProfile function");
-  return await axios.put(`${vendorStaffURL}/editVendorStaffProfile`, editedVendorStaffProfile)
+  return await vendorStaffApi.put(`/editVendorStaffProfile`, edittedProfile)
   .then((response) => {
     console.log(response);
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
@@ -51,31 +36,13 @@ export async function editVendorStaffProfile(editedVendorStaffProfile) {
     }
   })
   .catch((error) => {
-    console.error("vendorStaffRedux editVendorStaffProfile :: Vendor Error : ", error);
-  });
-}
-
-export async function editVendorStaffPassword(vendorStaffId, oldPassword, newPassword) {
-  console.log("Enter editVendorStaffPassword function");
-  return await axios.put(`${vendorStaffURL}/editVendorStaffPassword/${vendorStaffId}/${oldPassword}/${newPassword}`)
-  .then((response) => {
-    console.log(response);
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-      console.log('failure in vendorStaffRedux :: editVendorStaffPassword')
-      return {status: false, data: response.data};
-    } else { // success
-      console.log("success in vendorStaffRedux :: editVendorStaffPassword");
-      return {status: true, data: response.data};
-    }
-  })
-  .catch((error) => {
-    console.error("vendorStaffRedux editVendorStaffPassword Error : ", error);
+    console.error("vendorStaffRedux editVendorStaffProfile: ", error);
   });
 }
 
 export async function getAllAssociatedVendorStaff(vendorId) {
   console.log("Enter getAllAssociatedVendorStaff function");
-  return await axios.get(`${vendorStaffURL}/getAllAssociatedVendorStaff/${vendorId}`)
+  return await vendorStaffApi.get(`/getAllAssociatedVendorStaff/${vendorId}`)
   .then((response) => {
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
       console.log('failure in vendorStaffRedux :: getAllAssociatedVendorStaff')
@@ -92,7 +59,7 @@ export async function getAllAssociatedVendorStaff(vendorId) {
 
 export async function toggleVendorStaffBlock(vendorStaffId) {
   console.log("Enter toggleVendorStaffBlock function");
-  return await axios.put(`${vendorStaffURL}/toggleBlock/${vendorStaffId}`)
+  return await vendorStaffApi.put(`/toggleBlock/${vendorStaffId}`)
   .then((response) => {
     console.log(response);
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error

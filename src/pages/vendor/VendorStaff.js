@@ -163,17 +163,18 @@ export default function VendorStaff() {
     // create new vendor staff modal create button
     async function onClickSubmitVendorStaffCreate(values) {
 
-        let vendorStaffObj = {
+        let obj = {
             name: values.name,
             email: values.email,
             password: values.password,
             is_blocked: values.is_blocked === "true" ? true : false,
             position: values.position,
             is_master_account: false,
-            vendor: vendor.vendor,
+            user_type: 'VENDOR_STAFF',
+            vendor: {vendor_id: vendor.vendor.vendor_id},
         }
             
-        let response = await createVendorStaff(vendorStaffObj);
+        let response = await createVendorStaff(obj);
         if (response.status) {
             createVendorStaffForm.resetFields();
             setGetVendorStaffData(true);

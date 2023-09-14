@@ -3,7 +3,7 @@ import { FormLabel, TextField } from '@mui/material';
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { vendorPortalLogin } from "../redux/commonRedux";
+import { vendorPortalLogin } from "../redux/userRedux";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { Button } from 'antd';

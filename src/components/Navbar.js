@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Menu, Button } from "antd";
 import Sider from "antd/es/layout/Sider";
 
 function Navbar(props) {
+    
+    const user = JSON.parse(localStorage.getItem("user"));
+    const [menuItems, setMenuItems] = useState();
     const [collapsed, setCollapsed] = useState(false);
-    return (
+
+    useEffect(() => {
+        if (user && user.user_type === 'VENDOR_STAFF') {
+            setMenuItems(props.vendorStaffMenuItems);
+        } else if (user && user.user_type === 'LOCAL') {
+            setMenuItems(props.localMenuItems);
+        }
+    },[])
+
+    return user ? (
         <Sider
             theme="dark"
             breakpoint="lg"
@@ -21,10 +33,13 @@ function Navbar(props) {
                 defaultSelectedKeys={['1']}
                 mode="inline"
                 selectedKeys={[props.currentTab]}
-                items={props.menuItems}
+                items={menuItems}
                 onClick={props.onClickNewTab}
             />
         </Sider>
+    ) :
+    (
+        <></>
     )
 }
 
