@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { createVendor } from '../redux/vendorRedux';
+import TermsAndConditionsModal from '../components/TermsAndConditionsModal';
 
 const formItemLayout = {
   labelCol: {
@@ -63,6 +64,14 @@ function Signup() {
   const [form] = Form.useForm();
   const navigate = useNavigate(); // route navigation 
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const showTermsAndConditionsModal = () => {
+    setModalVisible(true);
+  };
+  const hideModal = () => {
+    setModalVisible(false);
+  };
+
   async function onFinish(values) {
     setLoading(true);
     let response = await createVendor(values);
@@ -261,7 +270,8 @@ function Signup() {
                 {...tailFormItemLayout}
               >
                 <Checkbox>
-                  I have read and agree with the <a href="">terms and conditions</a>
+                  I have read and agree with the <a href="#" onClick={showTermsAndConditionsModal}>terms and conditions</a>
+                  <TermsAndConditionsModal visible={modalVisible} onClose={hideModal} />
                 </Checkbox>
               </Form.Item>
               <Form.Item {...tailFormItemLayout}>
