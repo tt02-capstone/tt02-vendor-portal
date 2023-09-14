@@ -110,6 +110,30 @@ function Signup() {
     return Promise.resolve();
   };
 
+  const validateCountryCode = (rule, value) => {
+    const regex = /^\+\d+$/;
+    if (!regex.test(value)) {
+      return Promise.reject('Please enter a valid country code (e.g., "+65")');
+    }
+    return Promise.resolve();
+  };
+
+  const validateContactNo = (rule, value) => {
+    const regex = /^[0-9]*$/;
+    if (!regex.test(value)) {
+      return Promise.reject('Contact no should contain numbers only');
+    }
+    return Promise.resolve();
+  };
+
+  const validateOnlyAlphabets = (rule, value) => {
+    const regex = /^[A-Za-z]+$/;
+    if (!regex.test(value)) {
+      return Promise.reject('Field should contain letters only');
+    }
+    return Promise.resolve();
+  };
+
   return (
     <Layout style={styles.layout}>
       <CustomHeader text={"Vendor Registration"} />
@@ -178,6 +202,7 @@ function Signup() {
                     required: true,
                     message: 'POC name is required',
                   },
+                  { validator: validateOnlyAlphabets },
                 ]}
               >
                 <Input />
@@ -191,6 +216,7 @@ function Signup() {
                     required: true,
                     message: 'POC position is required',
                   },
+                  { validator: validateOnlyAlphabets },
                 ]}
               >
                 <Input />
@@ -203,7 +229,10 @@ function Signup() {
                       <Form.Item
                         name="country_code"
                         noStyle
-                        rules={[{ required: true, message: 'Country code is required' }]}
+                        rules={[
+                          { required: true, message: 'Country code is required' },
+                          { validator: validateCountryCode },
+                        ]}
                       >
                         <Input placeholder="+65" />
                       </Form.Item>
@@ -213,7 +242,10 @@ function Signup() {
                       <Form.Item
                         name="poc_mobile_num"
                         noStyle
-                        rules={[{ required: true, message: 'Contact number is required' }]}
+                        rules={[
+                          { required: true, message: 'Contact number is required' },
+                          { validator: validateContactNo },
+                        ]}
                       >
                         <Input />
                       </Form.Item>
