@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
-import CustomHeader from "../components/CustomHeader";
+import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
 import {
   Button,
@@ -14,8 +14,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createVendor } from '../redux/vendorRedux';
-import TermsAndConditionsModal from '../components/TermsAndConditionsModal';
+import { createVendor } from '../../redux/vendorRedux';
+import TermsAndConditionsModal from './TermsAndConditionsModal';
 
 const formItemLayout = {
   labelCol: {
