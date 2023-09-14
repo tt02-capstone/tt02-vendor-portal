@@ -94,6 +94,22 @@ function Signup() {
     }
   }
 
+  const validatePassword = (_, value) => {
+    if (value.length < 8) {
+      return Promise.reject('Password must be at least 8 characters long');
+    }
+
+    if (!/[a-zA-Z]/.test(value)) {
+      return Promise.reject('Password must contain at least one alphabet character');
+    }
+
+    if (!/[!@#$%^&*()_+[\]{};':"\\|,.<>?`~]/.test(value)) {
+      return Promise.reject('Password must contain at least one special character');
+    }
+
+    return Promise.resolve();
+  };
+
   return (
     <Layout style={styles.layout}>
       <CustomHeader text={"Vendor Registration"} />
@@ -231,6 +247,7 @@ function Signup() {
                     required: true,
                     message: 'Password is required',
                   },
+                  { validator: validatePassword },
                 ]}
               >
                 <Input.Password />
