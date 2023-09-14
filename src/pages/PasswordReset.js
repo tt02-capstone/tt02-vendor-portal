@@ -12,7 +12,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { passwordResetStageTwo } from '../redux/vendorStaffRedux';
+import { passwordResetStageTwo, passwordResetStageThree } from '../redux/userRedux';
 
 const formItemLayout = {
   labelCol: {
@@ -58,19 +58,43 @@ const styles = {
 }
 
 function PasswordReset() {
-  const [form] = Form.useForm();
+  const [otpForm] = Form.useForm();
+  const [passwordResetForm] = Form.useForm();
   const navigate = useNavigate(); // route navigation 
   const [loading, setLoading] = useState(false);
-  async function onFinish(values) {
+  const [email, setEmail] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
+
+  async function handleOtpVerification(values) {
     setLoading(true);
-    let response = await passwordResetStageTwo(new URLSearchParams(document.location.search)
-      .get('token'), values.password);
+    let response = await passwordResetStageTwo(values.email, values.otp);
+    if (response.status) {
+      toast.success('OTP verified successfully.', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+      setEmail(values.email);
+      setLoading(false);
+      setOtpVerified(true);
+    } else {
+      toast.error(response.data.errorMessage, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+      setLoading(false);
+      setOtpVerified(false);
+    }
+  }
+
+  async function handlePasswordReset(values) {
+    setLoading(true);
+    let response = await passwordResetStageThree(email, values.password);
     if (response.status) {
       toast.success('Password changed successfully.', {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1500
       });
-      form.resetFields();
+      passwordResetForm.resetFields();
       setLoading(false);
       setTimeout(() => {
         navigate('/')
@@ -89,65 +113,119 @@ function PasswordReset() {
       <CustomHeader text={"Password Reset"} />
       <Row align='middle' justify='center'>
         <Spin tip="Processing Request" size="large" spinning={loading}>
-          <Content style={styles.content}>
-            <h2>Reset WithinSG account password</h2>
-            <p>Key in the new password that you would like to change to.</p>
-            <br />
-            <Form
-              {...formItemLayout}
-              form={form}
-              name="passwordReset"
-              onFinish={onFinish}
-              style={{
-                maxWidth: 600,
-              }}
-              scrollToFirstError
-            >
-              <Form.Item
-                name="password"
-                label="Password"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Password is required',
-                  },
-                ]}
+          {!otpVerified ? (
+            <Content style={styles.content}>
+              <h2>Reset WithinSG account password</h2>
+              <p>Key in the One-Time Password (OTP) sent to your email.</p>
+              <br />
+              <Form
+                {...formItemLayout}
+                form={otpForm}
+                name="otpVerification"
+                onFinish={handleOtpVerification}
+                style={{
+                  maxWidth: 600,
+                }}
+                scrollToFirstError
               >
-                <Input.Password />
-              </Form.Item>
-
-              <Form.Item
-                name="confirm"
-                label="Confirm Password"
-                dependencies={['password']}
-                rules={[
-                  {
-                    required: true,
-                    message: 'Password is required',
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue('password') === value) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(new Error('Passwords do not match'));
+                <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Email is required",
                     },
-                  }),
-                ]}
-              >
-                <Input.Password />
-              </Form.Item>
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
 
-              <Form.Item {...tailFormItemLayout}>
-                <div style={{ textAlign: "right" }}>
-                  <Button type="primary" htmlType="submit" loading={loading}>
-                    Reset Password
-                  </Button>
-                </div>
-              </Form.Item>
-              <ToastContainer />
-            </Form>
-          </Content>
+                <Form.Item
+                  name="otp"
+                  label="OTP"
+                  rules={[
+                    {
+                      required: true,
+                      message: "OTP is required",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+
+                <Form.Item {...tailFormItemLayout}>
+                  <div style={{ textAlign: "right" }}>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                      Verify OTP
+                    </Button>
+                  </div>
+                </Form.Item>
+                <ToastContainer />
+              </Form>
+            </Content>
+          ) : (
+            <Content style={styles.content}>
+              <h2>Reset WithinSG account password</h2>
+              <p>Key in the new password that you would like to change to.</p>
+              <br />
+              <Form
+                {...formItemLayout}
+                form={passwordResetForm}
+                name="passwordReset"
+                onFinish={handlePasswordReset}
+                style={{
+                  maxWidth: 600,
+                }}
+                scrollToFirstError
+              >
+                <Form.Item
+                  name="password"
+                  label="Password"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Password is required',
+                    },
+                  ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+
+                <Form.Item
+                  name="confirm"
+                  label="Confirm Password"
+                  dependencies={['password']}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Password is required',
+                    },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue('password') === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('Passwords do not match'));
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+
+                <Form.Item {...tailFormItemLayout}>
+                  <div style={{ textAlign: "right" }}>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                      Reset Password
+                    </Button>
+                  </div>
+                </Form.Item>
+                <ToastContainer />
+              </Form>
+            </Content>
+          )}
+
         </Spin>
       </Row>
     </Layout>
