@@ -166,7 +166,6 @@ export default function VendorStaff() {
         let obj = {
             name: values.name,
             email: values.email,
-            password: values.password,
             is_blocked: values.is_blocked === "true" ? true : false,
             position: values.position,
             is_master_account: false,

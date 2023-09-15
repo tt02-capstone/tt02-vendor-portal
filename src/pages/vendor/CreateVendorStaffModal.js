@@ -42,15 +42,6 @@ export default function CreateVendorStaffModal(props) {
                     </Form.Item>
 
                     <Form.Item
-                    label="Password"
-                    name="password"
-                    placeholder="Password"
-                    rules={[{ required: true, message: 'Please enter staff temporary password!' }]}
-                    >
-                    <Input.Password placeholder="Password"/>
-                    </Form.Item>
-
-                    <Form.Item
                         label="Current Login Access"
                         name="is_blocked"
                         rules={[{ required: true, message: 'Please select a login access right!' }]}
