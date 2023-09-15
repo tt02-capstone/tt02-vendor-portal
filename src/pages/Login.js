@@ -3,10 +3,10 @@ import { FormLabel, TextField } from '@mui/material';
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { vendorPortalLogin } from "../redux/userRedux";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { Button } from 'antd';
+import { alignProperty } from "@mui/material/styles/cssUtils";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -68,7 +68,12 @@ function Login() {
   }
 
   return (
-    <div className="Login">
+    <div className="Login" style={{backgroundColor: "white"}}>
+      <img src="/login_logo.png"
+        alt="image" 
+        width='50%'
+        height='50%'
+        style={{alignSelf: 'center'}} />
       <form onSubmit={handleSubmit} style={formStyle}>
         <FormLabel>Email</FormLabel>
         <TextField
