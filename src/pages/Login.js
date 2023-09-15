@@ -3,7 +3,6 @@ import { FormLabel, TextField } from '@mui/material';
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { vendorPortalLogin } from "../redux/userRedux";
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { Button } from 'antd';
@@ -27,7 +26,7 @@ function Login() {
 
   const formStyle = {
     maxWidth: "800px",
-    margin: "10% auto",
+    margin: "0% auto",
     padding: "20px"
   }
 
@@ -69,6 +68,8 @@ function Login() {
 
   return (
     <div className="Login">
+      <br /><br /><br />
+      <center><h1>WithinSG Vendor Portal</h1></center>
       <form onSubmit={handleSubmit} style={formStyle}>
         <FormLabel>Email</FormLabel>
         <TextField

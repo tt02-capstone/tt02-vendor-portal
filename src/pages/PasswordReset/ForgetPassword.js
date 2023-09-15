@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
-import CustomHeader from "../components/CustomHeader";
+import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
 import {
     Button,
@@ -10,9 +10,9 @@ import {
     Row
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { passwordResetStageOne } from '../../redux/userRedux';
 
 const formItemLayout = {
     labelCol: {
@@ -59,36 +59,29 @@ const styles = {
 
 function PasswordReset() {
     const [form] = Form.useForm();
-    const baseURL = "http://localhost:8080/vendorStaff";
     const navigate = useNavigate(); // route navigation 
     const [loading, setLoading] = useState(false);
-    const onFinish = (values) => {
-        console.log('Received values of form: ', values);
+    async function onFinish(values) {
         setLoading(true);
-        axios.post(`${baseURL}/passwordResetStageOne/${values.email}`).then((response) => {
-            console.log(response);
-            if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-                toast.error(response.data.errorMessage, {
-                    position: toast.POSITION.TOP_RIGHT,
-                    autoClose: 1500
-                });
-                setLoading(false);
-            } else {
-                toast.success('Please check your email for the instructions to reset your password.', {
-                    position: toast.POSITION.TOP_RIGHT,
-                    autoClose: 1500
-                });
-                form.resetFields();
-                setLoading(false);
-                setTimeout(() => {
-                    navigate('/')
-                }, 2000);
-            }
-        })
-            .catch((error) => {
-                console.error("Axios Error : ", error)
+        let response = await passwordResetStageOne(values.email);
+        if (response.status) {
+            toast.success('Please check your email for the instructions to reset your password.', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
             });
-    };
+            form.resetFields();
+            setLoading(false);
+            setTimeout(() => {
+                navigate('/')
+            }, 2000);
+        } else {
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+            setLoading(false);
+        }
+    }
 
     return (
         <Layout style={styles.layout}>

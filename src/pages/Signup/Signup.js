@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
-import CustomHeader from "../components/CustomHeader";
+import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
 import {
   Button,
@@ -12,9 +12,10 @@ import {
   Col, Spin
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { createVendor } from '../../redux/vendorRedux';
+import TermsAndConditionsModal from './TermsAndConditionsModal';
 
 const formItemLayout = {
   labelCol: {
@@ -61,55 +62,76 @@ const styles = {
 
 function Signup() {
   const [form] = Form.useForm();
-  const baseURL = "http://localhost:8080/vendor";
   const navigate = useNavigate(); // route navigation 
   const [loading, setLoading] = useState(false);
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
+  const [modalVisible, setModalVisible] = useState(false);
+  const showTermsAndConditionsModal = () => {
+    setModalVisible(true);
+  };
+  const hideModal = () => {
+    setModalVisible(false);
+  };
+
+  async function onFinish(values) {
     setLoading(true);
-    axios.post(`${baseURL}/createVendor`, {
-      name: values.poc_name,
-      email: values.email,
-      password: values.password,
-      is_blocked: false,
-      is_master_account: true,
-      position: values.poc_position,
-      user_type: 'VENDOR_STAFF',
-      email_verified: false,
-      vendor: {
-        business_name: values.business_name,
-        poc_name: values.poc_name,
-        poc_position: values.poc_position,
-        country_code: values.country_code,
-        poc_mobile_num: values.poc_mobile_num,
-        wallet_balance: 0,
-        application_status: 'PENDING',
-        vendor_type: values.vendor_type,
-        service_description: values.service_description
-      }
-    }).then((response) => {
-      console.log(response);
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-        toast.error(response.data.errorMessage, {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        setLoading(false);
-      } else {
-        toast.success('Application submitted!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        form.resetFields();
-        setLoading(false);
-        setTimeout(() => {
-          navigate('/')
-        }, 2000);
-      }
-    })
-      .catch((error) => {
-        console.error("Axios Error : ", error)
+    let response = await createVendor(values);
+    if (response.status) {
+      toast.success('Application submitted!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
       });
+      form.resetFields();
+      setLoading(false);
+      setTimeout(() => {
+        navigate('/')
+      }, 2000);
+    } else {
+      toast.error(response.data.errorMessage, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+      setLoading(false);
+    }
+  }
+
+  const validatePassword = (_, value) => {
+    if (value.length < 8) {
+      return Promise.reject('Password must be at least 8 characters long');
+    }
+
+    if (!/[a-zA-Z]/.test(value)) {
+      return Promise.reject('Password must contain at least one alphabet character');
+    }
+
+    if (!/[!@#$%^&*()_+[\]{};':"\\|,.<>?`~]/.test(value)) {
+      return Promise.reject('Password must contain at least one special character');
+    }
+
+    return Promise.resolve();
+  };
+
+  const validateCountryCode = (rule, value) => {
+    const regex = /^\+\d+$/;
+    if (!regex.test(value)) {
+      return Promise.reject('Please enter a valid country code (e.g., "+65")');
+    }
+    return Promise.resolve();
+  };
+
+  const validateContactNo = (rule, value) => {
+    const regex = /^[0-9]*$/;
+    if (!regex.test(value)) {
+      return Promise.reject('Contact no should contain numbers only');
+    }
+    return Promise.resolve();
+  };
+
+  const validateOnlyAlphabets = (rule, value) => {
+    const regex = /^[A-Za-z]+$/;
+    if (!regex.test(value)) {
+      return Promise.reject('Field should contain letters only');
+    }
+    return Promise.resolve();
   };
 
   return (
@@ -180,6 +202,7 @@ function Signup() {
                     required: true,
                     message: 'POC name is required',
                   },
+                  { validator: validateOnlyAlphabets },
                 ]}
               >
                 <Input />
@@ -193,6 +216,7 @@ function Signup() {
                     required: true,
                     message: 'POC position is required',
                   },
+                  { validator: validateOnlyAlphabets },
                 ]}
               >
                 <Input />
@@ -205,7 +229,10 @@ function Signup() {
                       <Form.Item
                         name="country_code"
                         noStyle
-                        rules={[{ required: true, message: 'Country code is required' }]}
+                        rules={[
+                          { required: true, message: 'Country code is required' },
+                          { validator: validateCountryCode },
+                        ]}
                       >
                         <Input placeholder="+65" />
                       </Form.Item>
@@ -215,7 +242,10 @@ function Signup() {
                       <Form.Item
                         name="poc_mobile_num"
                         noStyle
-                        rules={[{ required: true, message: 'Contact number is required' }]}
+                        rules={[
+                          { required: true, message: 'Contact number is required' },
+                          { validator: validateContactNo },
+                        ]}
                       >
                         <Input />
                       </Form.Item>
@@ -249,6 +279,7 @@ function Signup() {
                     required: true,
                     message: 'Password is required',
                   },
+                  { validator: validatePassword },
                 ]}
               >
                 <Input.Password />
@@ -288,7 +319,8 @@ function Signup() {
                 {...tailFormItemLayout}
               >
                 <Checkbox>
-                  I have read and agree with the <a href="">terms and conditions</a>
+                  I have read and agree with the <a href="#" onClick={showTermsAndConditionsModal}>terms and conditions</a>
+                  <TermsAndConditionsModal visible={modalVisible} onClose={hideModal} />
                 </Checkbox>
               </Form.Item>
               <Form.Item {...tailFormItemLayout}>

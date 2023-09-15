@@ -10,9 +10,9 @@ import { MailOutlined } from '@ant-design/icons';
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
 import Profile from "./pages/profileAndPassword/Profile";
-import Signup from "./pages/Signup";
-import PasswordReset from "./pages/PasswordReset";
-import ForgetPassword from "./pages/ForgetPassword";
+import Signup from "./pages/Signup/Signup";
+import PasswordReset from "./pages/PasswordReset/PasswordReset";
+import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
 
 function App() {
