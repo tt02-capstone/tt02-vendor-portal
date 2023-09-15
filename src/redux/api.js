@@ -26,3 +26,7 @@ export const vendorStaffApi = axios.create({
 export const bookingApi = axios.create({
     baseURL: HOST_WITH_PORT + '/booking'
 })
+
+export const attractionApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/attraction'
+})

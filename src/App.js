@@ -14,6 +14,7 @@ import Signup from "./pages/Signup/Signup";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
+import AttractionManageTicket from "./pages/attraction/AttractionManageTicket";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
       {key: '/home', label: 'Home', icon: <MailOutlined />},
       {key: '/profile', label: 'Profile', icon: <MailOutlined />},
       {key: '/vendorStaff', label: 'Vendor Staff', icon: <MailOutlined />},
+      {key: '/attractions', label: 'Attractions', icon: <MailOutlined />},
       {key: '/', label: 'Logout',icon: <LogoutIcon />,}
   ];
 
@@ -60,6 +62,7 @@ function App() {
           <Route path="/passwordreset" element={<PasswordReset />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />
           <Route path="/verifyemail" element={<EmailVerification />} />
+          <Route path="/attractions" element={<AttractionManageTicket />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>
