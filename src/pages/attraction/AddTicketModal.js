@@ -1,5 +1,6 @@
 import { React , useEffect} from 'react';
 import { Modal, Form, Input, Button, Select, DatePicker } from "antd";
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -34,7 +35,10 @@ export default function AddTicketModal(props) {
                         name="startDate"
                         rules={[{ required: true, message: 'Please select a start date!' }]}
                     >
-                        <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
+                        <DatePicker 
+                            style={{ width: '100%' }} 
+                            format="YYYY-MM-DD" 
+                            disabledDate={(current) => current && current < moment().startOf('day')}/>
                     </Form.Item>
 
                     <Form.Item
@@ -42,7 +46,10 @@ export default function AddTicketModal(props) {
                         name="endDate"
                         rules={[{ required: true, message: 'Please select an end date!' }]}
                     >
-                        <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
+                        <DatePicker 
+                            style={{ width: '100%' }} 
+                            format="YYYY-MM-DD"
+                            disabledDate={(current) => current && current < moment().startOf('day')} />
                     </Form.Item>
 
                     <Form.Item
@@ -77,7 +84,16 @@ export default function AddTicketModal(props) {
                         label="Ticket Count"
                         name="ticketCount"
                         rules={[
-                            { required: true, message: 'Please enter the ticket count!' }
+                            { required: true, message: 'Please enter the ticket count!' },
+                            {
+                                validator: (_, value) => {
+                                    const intValue = parseInt(value, 10);
+                                    if (!Number.isNaN(intValue) && intValue >= 0) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('Ticket count must be a non-negative integer!'));
+                                }
+                            }
                         ]}
                     >
                         <Input type="number" />

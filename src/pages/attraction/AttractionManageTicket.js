@@ -3,7 +3,7 @@ import { React , useEffect, useState , useRef } from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link } from 'react-router-dom';
-import { getAttractionList, getTicketEnumByAttraction, createTickets } from '../../redux/attractionManageTicketRedux';
+import { getAttractionList, getTicketEnumByAttraction, createTickets, updateTicketPerDay } from '../../redux/attractionManageTicketRedux';
 import  { Table, Input, Button, Space } from 'antd';
 import AddTicketModal from './AddTicketModal';
 import EditTicketModal from './EditTicketModal';
@@ -13,49 +13,68 @@ export default function AttractionManageTicket() {
     const user = JSON.parse(localStorage.getItem("user"));
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [addModal, setAddModal] = useState(false);
     const [editModal, setEditModal] = useState(false);
     const [ticketType, setTicketType] = useState(null);
     const [attr_id, setAttrId] = useState(null);
 
-    const showModal = () => {
-        setIsModalVisible(true);
+    const showAddModal = () => {
+        setAddModal(true);
     };
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
+    const addModalCancel = () => {
+        setAddModal(false);
     };
 
-    const handleSubmit = async (values) => {
+    const addModalSubmit = async (values) => {
         values.ticketCount = Number(values.ticketCount);
         values.startDate = values.startDate.format('YYYY-MM-DD');
         values.endDate = values.endDate.format('YYYY-MM-DD');
 
-        let ticketList = await createTickets(values.startDate,values.endDate,values.ticketType,values.ticketCount,attr_id)
-        console.log(values);
-        setIsModalVisible(false); 
+        let createTicket = await createTickets(values.startDate,values.endDate,values.ticketType,values.ticketCount,attr_id)
+        let updatedAttrList = await getAttractionList(user.user_id);
+
+        setData(updatedAttrList);
+        setAddModal(false); 
 
         toast.success('Added Tickets', {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1000
         });
-
-        window.location.reload();
     };
 
     const showEditModal = () => {
         setEditModal(true);
     }
 
-    const editModalSubmit = (values) => {
-        values.ticketCount = Number(values.ticketCount);
-        values.ticketDate = values.ticketDate.format('YYYY-MM-DD');
-        console.log(values);
+    const editModalCancel = () => {
         setEditModal(false);
     }
 
-    const editModalCancel = () => {
+    const editModalSubmit = async (values) => {
+        const requestBody = {
+            ticket_type: values.ticketType,
+            ticket_count: Number(values.ticketCount),
+            ticket_date: values.ticketDate.format('YYYY-MM-DD')
+        }
+
+        let updateTicket = await updateTicketPerDay(attr_id,requestBody);
+        let updatedAttrList = await getAttractionList(user.user_id);
+
+        setData(updatedAttrList);
         setEditModal(false);
+
+        if (!updateTicket.error) {
+            toast.success('Updated Ticket Information', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1000
+            });
+        } else {
+            toast.error('Update Failed! ' + updateTicket.error, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1000
+            });
+        } 
     }
 
     useEffect(() => {
@@ -83,7 +102,14 @@ export default function AttractionManageTicket() {
 
         const priceListString = formatPriceList.join('\n');
 
-        const ticketListString = ticketList.map(item => {
+        const validTicketList = ticketList.filter(item => {
+            const today = new Date();
+            const todayFormatted = today.toISOString().split('T')[0];
+
+            return item.ticket_date >= todayFormatted && item.ticket_count > 0;
+        });
+
+        const ticketListString = validTicketList.map(item => {
             return `${item.ticket_date} - ${item.ticket_type} = ${item.ticket_count} Left`;
         }).join('\n');
 
@@ -147,7 +173,7 @@ export default function AttractionManageTicket() {
             width: 230
         },
         {
-            title: 'Add / Edit Tickets',
+            title: 'Add or Edit Tickets',
             key: 'add_edit',
             dataIndex: 'add_edit',
             width: 160,
@@ -168,17 +194,15 @@ export default function AttractionManageTicket() {
 
     const addTicket = async (record) => {
         let ticketList = await getTicketEnumByAttraction(record.attraction_id);
-        setTicketType(ticketList);
-        setAttrId(record.attraction_id);
-        console.log(record);
-        console.log(ticketList)
-        showModal()
+        setTicketType(ticketList); // get the ticket type for the the attraction selected 
+        setAttrId(record.attraction_id); // get attr id 
+        showAddModal()
     }
 
     const editTicket = async (record) => {
         let ticketList = await getTicketEnumByAttraction(record.attraction_id);
         setTicketType(ticketList);
-        console.log(record)
+        setAttrId(record.attraction_id); // get attr id 
         showEditModal()
     }
 
@@ -190,9 +214,9 @@ export default function AttractionManageTicket() {
                 <h1>List of Attractions</h1>
                 <Table dataSource={datasource} columns={columns} style={{ width : '98%' }} />
                 <AddTicketModal
-                    isVisible={isModalVisible}
-                    onCancel={handleCancel}
-                    onSubmit={handleSubmit}
+                    isVisible={addModal}
+                    onCancel={addModalCancel}
+                    onSubmit={addModalSubmit}
                     value={ticketType}
                 />
                 <EditTicketModal

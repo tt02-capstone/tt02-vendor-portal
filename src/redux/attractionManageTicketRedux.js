@@ -13,23 +13,26 @@ export async function getAttractionList(vendor_id) {
 
 export async function createTickets(start_date,end_date,ticket_type,ticket_count,attraction_id) {
     try {
-        const response = await attractionApi.post(`/createTicketsPerDay/${start_date}/${end_date}/${ticket_type}/${ticket_count}/${attraction_id}`)
+        const response = await attractionApi.post(`/createTicketsPerDay/${start_date}/${end_date}/${ticket_type}/${ticket_count}/${attraction_id}`);
         if (response.data != []) {
             return response.data;
         }    
     } catch (error) {
-        console.error("Update ticket per day error!");
+        console.error("Create attraction ticket error!");
     }
 }
 
-export async function updateTicketPerDay(attraction_id) {
+export async function updateTicketPerDay(attraction_id,requestBody) {
     try {
-        const response = await attractionApi.put(`/updateTicketsPerDay/${attraction_id}`)
-        if (response.data != []) {
-            return response.data;
-        }    
+        const attrTicketList = await attractionApi.put(`/updateTicketsPerDay/${attraction_id}`,requestBody)
+        console.log(attrTicketList.data)
+        if (attrTicketList.data.httpStatusCode = 404) {
+            return {error : attrTicketList.data.errorMessage};
+        }  else {
+            return attrTicketList.data;
+        }
     } catch (error) {
-        console.error("Update ticker per day error!");
+        console.error("Update attraction ticket error!");
     }
 }
 

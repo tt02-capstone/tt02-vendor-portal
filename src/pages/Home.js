@@ -6,6 +6,7 @@ import { Navigate } from 'react-router-dom';
 
 export default function Home() {
     const user = JSON.parse(localStorage.getItem("user"));
+    console.log(user);
 
     return user ? (
             <Layout style={styles.layout}>
@@ -18,7 +19,6 @@ export default function Home() {
             </Layout>
     ) :
     (
-        // <div></div>
         <Navigate to="/" />
     )
 }
