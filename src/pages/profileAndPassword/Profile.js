@@ -12,6 +12,9 @@ import { editPassword } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
 import { editLocalProfile } from "../../redux/localRedux";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
+import CustomFileUpload from "../../components/CustomFileUpload";
+import AWS from 'aws-sdk';
+window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const { Text } = Typography;
 
@@ -156,12 +159,73 @@ export default function Profile() {
         }
     }
 
+    // upload file
+    const S3BUCKET ='tt02/user';
+    const TT02REGION ='ap-southeast-1';
+    const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
+    const SECRET_ACCESS_KEY ='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';
+
+    const [file, setFile] = useState(null);
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      setFile(file);
+    };
+
+    const uploadFile = async () => {
+      const S3_BUCKET = S3BUCKET;
+      const REGION = TT02REGION;
+
+      AWS.config.update({
+        accessKeyId: ACCESS_KEY,
+        secretAccessKey: SECRET_ACCESS_KEY,
+      });
+      const s3 = new AWS.S3({
+        params: { Bucket: S3_BUCKET },
+        region: REGION,
+      });
+
+      const params = {
+        Bucket: S3_BUCKET,
+        Key: file.name,
+        Body: file,
+      };
+
+      var upload = s3
+        .putObject(params)
+        .on("httpUploadProgress", (evt) => {
+          console.log(
+            "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+          );
+        })
+        .promise();
+
+      await upload.then((err, data) => {
+        console.log(err);
+        toast.success('Upload successful!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
+        setFile(null);
+      });
+    };
+
+    useEffect(() => {
+      if (file) {
+        let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
+        str = str + '/' + 'user';
+        str = str + '/' + file.name;
+        console.log("useEffect", str);
+      }
+    }, [file]);
+
     return user ? (
         <div>
             {/* view profile data */}
             {isViewProfile && 
                 <Layout style={styles.layout}>
                     <CustomHeader items={viewProfileBreadcrumbItems}/>
+                    {/* <CustomFileUpload handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
+                    {file && file.name}
                     <Content style={styles.content}>
                       <Divider orientation="left" style={{fontSize: '150%' }} >User Profile</Divider>
                         <Row>
