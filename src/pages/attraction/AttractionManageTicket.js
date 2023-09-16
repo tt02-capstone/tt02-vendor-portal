@@ -8,6 +8,8 @@ import  { Table, Input, Button, Space } from 'antd';
 import AddTicketModal from './AddTicketModal';
 import EditTicketModal from './EditTicketModal';
 import { ToastContainer, toast } from 'react-toastify';
+import { SearchOutlined } from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
 
 export default function AttractionManageTicket() {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -104,7 +106,11 @@ export default function AttractionManageTicket() {
 
         const validTicketList = ticketList.filter(item => {
             const today = new Date();
-            const todayFormatted = today.toISOString().split('T')[0];
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0'); // format to me current timezone 
+
+            const todayFormatted = `${year}-${month}-${day}`;
 
             return item.ticket_date >= todayFormatted && item.ticket_count > 0;
         });
@@ -127,50 +133,176 @@ export default function AttractionManageTicket() {
         };
     });
 
+    // table filters 
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
     const columns = [
         {
             title: 'Name',
             dataIndex: 'name',
-            key: 'name'
+            key: 'name',
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            ...getColumnSearchProps('name')
         },
         {
             title: 'Address',
             dataIndex: 'address',
-            key: 'address'
+            key: 'address',
+            sorter: (a, b) => a.address.localeCompare(b.address),
+            ...getColumnSearchProps('address')
         },
         {
             title: 'Age Group',
             dataIndex: 'age_group',
             key: 'age_group',
-            width: 350
+            width: 350,
+            sorter: (a, b) => a.age_group.localeCompare(b.age_group),
+            ...getColumnSearchProps('age_group')
         },
         {
             title: 'Category',
             dataIndex: 'category',
-            key: 'category'
+            key: 'category',
+            sorter: (a, b) => a.category.localeCompare(b.category),
+            ...getColumnSearchProps('category')
         },
         {
             title: 'Description',
             dataIndex: 'description',
             key: 'description', 
-            width: 750
+            width: 750,
+            sorter: (a, b) => a.description.localeCompare(b.description),
+            ...getColumnSearchProps('description')
         },
         {
             title: 'Status',
             dataIndex: 'status',
-            key: 'status'
+            key: 'status',
+            sorter: (a, b) => a.status.localeCompare(b.status),
+            ...getColumnSearchProps('status')
         },
         {
             title: 'Price List',
             dataIndex: 'price_list',
             key: 'price_list', 
-            width: 220
+            width: 220,
+            sorter: (a, b) => a.price_list.localeCompare(b.price_list),
+            ...getColumnSearchProps('price_list'),
         },
         {
             title: 'Ticket List',
             dataIndex: 'ticket_list',
             key: 'ticket_list',
-            width: 230
+            width: 230,
+            sorter: (a, b) => a.price_list.localeCompare(b.ticket_list),
+            ...getColumnSearchProps('ticket_list'),
         },
         {
             title: 'Add or Edit Tickets',
