@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Radio, Space, Table, Tag } from 'antd';
+import { Table, Pagination } from 'antd';
 
 export default function CustomTablePagination(props) {
 
     // data --> actual data to be put in table. Must be in [{}, {}] format
+    // style --> css
     // title --> table header
     // column --> header for each column
     // e.g.
@@ -24,13 +25,16 @@ export default function CustomTablePagination(props) {
     // ];
 
     const pagination = {
+        pageSize: 10,
     }
 
     return(
         <div>
             <Table
+                style={props.style}
                 title={() => props.title}
                 bordered={true}
+                tableLayout="fixed"
                 columns={props.column}
                 pagination={pagination} 
                 dataSource={props.data} />

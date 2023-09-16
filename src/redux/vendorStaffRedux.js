@@ -1,7 +1,4 @@
-import axios from "axios";
 import { userApi, vendorStaffApi } from "./api";
-
-const vendorStaffURL = "http://localhost:8080/vendorStaff";
 
 export async function createVendorStaff(vendorStaff) { // not intial signup
   console.log("Enter createVendorStaff function");

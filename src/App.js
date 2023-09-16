@@ -6,14 +6,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar";
 import {Layout, Menu} from "antd";
 import React, { useEffect, useState } from "react";
-import { MailOutlined } from '@ant-design/icons';
-import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
 import Profile from "./pages/profileAndPassword/Profile";
 import Signup from "./pages/Signup/Signup";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
+import { HomeOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { Logout } from "@mui/icons-material";
 
 function App() {
 
@@ -23,16 +23,16 @@ function App() {
   const [currentTab, setCurrentTab] = useState('/home');
 
   const vendorStaffMenuItems = [
-      {key: '/home', label: 'Home', icon: <MailOutlined />},
-      {key: '/profile', label: 'Profile', icon: <MailOutlined />},
-      {key: '/vendorStaff', label: 'Vendor Staff', icon: <MailOutlined />},
-      {key: '/', label: 'Logout',icon: <LogoutIcon />,}
+      {key: '/home', label: 'Home', icon: <HomeOutlined />},
+      {key: '/profile', label: 'Profile', icon: <UserOutlined />},
+      {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined />},
+      {key: '/', label: 'Logout',icon: <Logout />,}
   ];
 
   const localMenuItems = [
-    {key: '/home', label: 'Home', icon: <MailOutlined />},
-    {key: '/profile', label: 'Profile', icon: <MailOutlined />},
-    {key: '/', label: 'Logout',icon: <LogoutIcon />,}
+    {key: '/home', label: 'Home', icon: <HomeOutlined />},
+    {key: '/profile', label: 'Profile', icon: <UserOutlined />},
+    {key: '/', label: 'Logout',icon: <Logout />,}
 ];
 
   const onClickNewTab = (tab) => {
