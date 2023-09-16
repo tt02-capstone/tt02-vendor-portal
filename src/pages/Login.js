@@ -24,7 +24,7 @@ function Login() {
     navigate(path);
   }
 
-  const baseURL = "http://localhost:8080/vendor";
+  const baseURL = "http://localhost:8080/vendorStaff";
 
   const formStyle = {
     maxWidth: "800px",

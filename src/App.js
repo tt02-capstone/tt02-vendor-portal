@@ -11,6 +11,7 @@ import {Footer} from "antd/es/layout/layout";
 import Signup from "./pages/Signup";
 import PasswordReset from "./pages/PasswordReset";
 import ForgetPassword from "./pages/ForgetPassword";
+import AttractionManagement from "./pages/attractions/AttractionManagement";
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
 
   const menuItems = [
       {key: '/home', label: 'Home', icon: <MailOutlined />},
+      {key: '/attractionmanagement', label: 'Attractions Management',icon: <MailOutlined />,},
       {key: '/', label: 'Logout',icon: <LogoutIcon />,}
   ];
 
@@ -45,6 +47,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />
+          <Route path="/attractionmanagement" element={<AttractionManagement />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>
