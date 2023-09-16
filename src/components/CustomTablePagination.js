@@ -32,7 +32,6 @@ export default function CustomTablePagination(props) {
         <div>
             <Table
                 style={props.style}
-                title={() => props.title}
                 bordered={true}
                 tableLayout="fixed"
                 columns={props.column}
