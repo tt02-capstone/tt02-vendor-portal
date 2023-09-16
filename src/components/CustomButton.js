@@ -11,6 +11,7 @@ export default function CustomButton(props) {
     return(
         <Button 
             type="primary"
+            style={props.style}
             onClick={props.onClick}
             icon={props.icon}>
         {props.text}

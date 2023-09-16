@@ -1,18 +1,21 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import VendorStaff from "./pages/vendor/VendorStaff";
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar";
 import {Layout, Menu} from "antd";
 import React, { useEffect, useState } from "react";
-import { MailOutlined } from '@ant-design/icons';
-import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
-import Signup from "./pages/Signup";
-import PasswordReset from "./pages/PasswordReset";
-import ForgetPassword from "./pages/ForgetPassword";
 import AttractionManagement from "./pages/attractions/AttractionManagement";
 import BookingManagement from "./pages/bookings/BookingManagement";
+import Profile from "./pages/profileAndPassword/Profile";
+import Signup from "./pages/Signup/Signup";
+import PasswordReset from "./pages/PasswordReset/PasswordReset";
+import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
+import EmailVerification from "./pages/EmailVerification";
+import { HomeOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { Logout } from "@mui/icons-material";
 
 function App() {
 
@@ -21,12 +24,20 @@ function App() {
 
   const [currentTab, setCurrentTab] = useState('/home');
 
-  const menuItems = [
-      {key: '/home', label: 'Home', icon: <MailOutlined />},
-      {key: '/attractionmanagement', label: 'Attractions Management',icon: <MailOutlined />,},
-      {key: '/bookingmanagement', label: 'Booking Management',icon: <MailOutlined />,},
-      {key: '/', label: 'Logout',icon: <LogoutIcon />,}
+  const vendorStaffMenuItems = [
+      {key: '/home', label: 'Home', icon: <HomeOutlined />},
+      {key: '/profile', label: 'Profile', icon: <UserOutlined />},
+      {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined />},
+      {key: '/attractionmanagement', label: 'Attractions Management',icon: <UsergroupAddOutlined />,},
+      {key: '/bookingmanagement', label: 'Booking Management',icon: <UsergroupAddOutlined />,},
+      {key: '/', label: 'Logout',icon: <Logout />,}
   ];
+
+  const localMenuItems = [
+    {key: '/home', label: 'Home', icon: <HomeOutlined />},
+    {key: '/profile', label: 'Profile', icon: <UserOutlined />},
+    {key: '/', label: 'Logout',icon: <Logout />,}
+];
 
   const onClickNewTab = (tab) => {
       console.log(tab.key);
@@ -35,22 +46,26 @@ function App() {
   };
 
   return (
-    <Layout hasSider={location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword'}>
-      {location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword' &&
+    <Layout hasSider={location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword' && location.pathname !== '/verifyemail'}>
+      {location.pathname !== '/' && location.pathname !== '/signup' && location.pathname !== '/passwordreset' && location.pathname !== '/forgetpassword' && location.pathname !== '/verifyemail' &&
           <Navbar
               currentTab={currentTab}
-              menuItems={menuItems}
+              vendorStaffMenuItems={vendorStaffMenuItems}
+              localMenuItems={localMenuItems}
               onClickNewTab={onClickNewTab}
           />
       }
       <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/vendorStaff" element={<VendorStaff />} />
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />
           <Route path="/attractionmanagement" element={<AttractionManagement />} />
           <Route path="/bookingmanagement" element={<BookingManagement />} />
+          <Route path="/verifyemail" element={<EmailVerification />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>

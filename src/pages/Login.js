@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import { FormLabel, TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {
-  Button,
-  Space
-} from 'antd';
-import { alignProperty } from "@mui/material/styles/cssUtils";
+import axios from "axios";
+import 'react-toastify/dist/ReactToastify.css';
+import { Button } from 'antd';
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate(); // route navigation 
   const signUpRouteChange = () => {
@@ -28,11 +26,11 @@ function Login() {
 
   const formStyle = {
     maxWidth: "800px",
-    margin: "10% auto",
+    margin: "0% auto",
     padding: "20px"
   }
 
-  localStorage.removeItem("user");
+  // localStorage.removeItem("user");
 
   function validateForm() {
     return email.length > 0 && password.length > 0;
@@ -41,14 +39,15 @@ function Login() {
   function handleSubmit(event) {
     event.preventDefault();
     if (email && password) {
+      setLoading(true);
       axios.post(`${baseURL}/webLogin/${email}/${password}`).then((response) => {
         console.log(response);
-        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
+        if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
           toast.error(response.data.errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1500
           });
-
+          setLoading(false);
         } else {
           toast.success('Login Successful!', {
             position: toast.POSITION.TOP_RIGHT,
@@ -58,6 +57,7 @@ function Login() {
           setTimeout(() => {
             navigate('/home')
           }, 700);
+          setLoading(false);
         }
       })
         .catch((error) => {
@@ -67,7 +67,9 @@ function Login() {
   }
 
   return (
-    <div className="Login">
+    <div className="Login" style={{backgroundColor: "white"}}>
+      <br /><br /><br />
+      <center><h1>WithinSG Vendor Portal</h1></center>
       <form onSubmit={handleSubmit} style={formStyle}>
         <FormLabel>Email</FormLabel>
         <TextField
@@ -89,7 +91,7 @@ function Login() {
           sx={{ mb: 3 }}
         />
         <div style={{ textAlign: "right" }}>
-          <Button type="primary" htmlType="submit" disabled={!validateForm()}>Login</Button>
+          <Button type="primary" htmlType="submit" loading={loading} disabled={!validateForm()}>Login</Button>
           <br /><br />
           <Button type="link" onClick={passwordResetRouteChange}>Forgotten your password?</Button>
         </div>

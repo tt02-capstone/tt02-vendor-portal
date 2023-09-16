@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
-import CustomHeader from "../components/CustomHeader";
+import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
 import {
   Button,
@@ -12,9 +12,12 @@ import {
   Col, Spin
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { createVendor } from '../../redux/vendorRedux';
+import TermsAndConditionsModal from './TermsAndConditionsModal';
+import { validateContactNo, validateCountryCode, validateOnlyAlphabets, validatePassword } from '../../helper/validation';
+import CustomButton from '../../components/CustomButton';
 
 const formItemLayout = {
   labelCol: {
@@ -61,55 +64,38 @@ const styles = {
 
 function Signup() {
   const [form] = Form.useForm();
-  const baseURL = "http://localhost:8080/vendor";
   const navigate = useNavigate(); // route navigation 
   const [loading, setLoading] = useState(false);
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-    setLoading(true);
-    axios.post(`${baseURL}/createVendor`, {
-      name: values.poc_name,
-      email: values.email,
-      password: values.password,
-      is_blocked: false,
-      is_master_account: true,
-      position: values.poc_position,
-      vendor: {
-        business_name: values.business_name,
-        poc_name: values.poc_name,
-        poc_position: values.poc_position,
-        country_code: values.country_code,
-        poc_mobile_num: values.poc_mobile_num,
-        wallet_balance: 0,
-        application_status: 'PENDING',
-        vendor_type: values.vendor_type,
-        service_description: values.service_description
-      }
-    }).then((response) => {
-      console.log(response);
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404) {
-        toast.error(response.data.errorMessage, {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        setLoading(false);
-      } else {
-        toast.success('Application submitted!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        form.resetFields();
-        setLoading(false);
-        setTimeout(() => {
-          navigate('/')
-        }, 2000);
-      }
-    })
-      .catch((error) => {
-        console.error("Axios Error : ", error)
-      });
+  const [modalVisible, setModalVisible] = useState(false);
+  const showTermsAndConditionsModal = () => {
+    setModalVisible(true);
+  };
+  const hideModal = () => {
+    setModalVisible(false);
   };
 
+  async function onFinish(values) {
+    setLoading(true);
+    let response = await createVendor(values);
+    if (response.status) {
+      toast.success('Application submitted!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+      form.resetFields();
+      setLoading(false);
+      setTimeout(() => {
+        navigate('/')
+      }, 2000);
+    } else {
+      toast.error(response.data.errorMessage, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+      setLoading(false);
+    }
+  }
+  
   return (
     <Layout style={styles.layout}>
       <CustomHeader text={"Vendor Registration"} />
@@ -167,7 +153,7 @@ function Signup() {
                   },
                 ]}
               >
-                <Input.TextArea showCount maxLength={100} />
+                <Input.TextArea showCount maxLength={300} />
               </Form.Item>
 
               <Form.Item
@@ -178,6 +164,7 @@ function Signup() {
                     required: true,
                     message: 'POC name is required',
                   },
+                  { validator: validateOnlyAlphabets },
                 ]}
               >
                 <Input />
@@ -191,6 +178,7 @@ function Signup() {
                     required: true,
                     message: 'POC position is required',
                   },
+                  { validator: validateOnlyAlphabets },
                 ]}
               >
                 <Input />
@@ -203,17 +191,23 @@ function Signup() {
                       <Form.Item
                         name="country_code"
                         noStyle
-                        rules={[{ required: true, message: 'Country code is required' }]}
+                        rules={[
+                          { required: true, message: 'Country code is required' },
+                          { validator: validateCountryCode },
+                        ]}
                       >
                         <Input placeholder="+65" />
                       </Form.Item>
                     </Col>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;
                     <Col span={19}>
                       <Form.Item
                         name="poc_mobile_num"
                         noStyle
-                        rules={[{ required: true, message: 'Contact number is required' }]}
+                        rules={[
+                          { required: true, message: 'Contact number is required' },
+                          { validator: validateContactNo },
+                        ]}
                       >
                         <Input />
                       </Form.Item>
@@ -247,6 +241,7 @@ function Signup() {
                     required: true,
                     message: 'Password is required',
                   },
+                  { validator: validatePassword },
                 ]}
               >
                 <Input.Password />
@@ -286,12 +281,14 @@ function Signup() {
                 {...tailFormItemLayout}
               >
                 <Checkbox>
-                  I have read and agree with the <a href="">terms and conditions</a>
+                  I have read and agree with the <a href="#" onClick={showTermsAndConditionsModal}>terms and conditions</a>
+                  <TermsAndConditionsModal visible={modalVisible} onClose={hideModal} />
                 </Checkbox>
               </Form.Item>
               <Form.Item {...tailFormItemLayout}>
                 <div style={{ textAlign: "right" }}>
-                  <Button type="primary" htmlType="submit" loading={loading}>
+                  <CustomButton text="Back" style={{width: '75px'}} onClick={() => {return navigate('/')}}/>
+                  <Button type="primary" htmlType="submit" style={{marginLeft: '20px'}} loading={loading}>
                     Submit Application
                   </Button>
                 </div>

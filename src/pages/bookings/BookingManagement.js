@@ -74,27 +74,28 @@ export default function BookingManagement() {
         },
     ];
 
-    useEffect(() => {
-        if (getAttractionBookingsData) {
-            const fetchData = async () => {
-                const response = await getAttractionBookingListByVendor(vendor.vendor.vendor_id);
-                if (response.status) {
-                    var tempData = response.data.map((val) => ({
-                        ...val,
-                        key: val.user_id,
-                    }));
-                    setAttractionBookingsData(tempData);
-                    setGetAttractionBookingsData(false);
-                    console.log(response.data)
-                } else {
-                    console.log("List of attraction bookings not fetched!");
-                }
-            }
+    // useEffect(() => {
+    //     if (getAttractionBookingsData) {
+    //         console.log("vendor vendor vendor",vendor.vendor.vendor_id)
+    //         const fetchData = async () => {
+    //             const response = await getAttractionBookingListByVendor(vendor.vendor.vendor_id);
+    //             if (response.status) {
+    //                 var tempData = response.data.map((val) => ({
+    //                     ...val,
+    //                     key: val.user_id,
+    //                 }));
+    //                 setAttractionBookingsData(tempData);
+    //                 setGetAttractionBookingsData(false);
+    //                 console.log(response.data)
+    //             } else {
+    //                 console.log("List of attraction bookings not fetched!");
+    //             }
+    //         }
 
-            fetchData();
-            setGetAttractionBookingsData(false);
-        }
-    }, [getAttractionBookingsData]);
+    //         fetchData();
+    //         setGetAttractionBookingsData(false);
+    //     }
+    // }, [getAttractionBookingsData]);
 
     // View Booking 
     const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false); // boolean to open modal
@@ -115,15 +116,15 @@ export default function BookingManagement() {
         setIsViewAttractionBookingModalOpen(false);
     }
 
-    async function getBooking(vendor, selectedBookingId) {
-        try {
-            let response = await getAttractionBookingByVendor(vendor.vendor_id, selectedBookingId);
-            setSelectedBooking(response.data);
-            // setPriceList(response.data.price_list);
-        } catch (error) {
-            alert('An error occurred! Failed to retrieve booking!');
-        }
-    }
+    // async function getBooking(vendor, selectedBookingId) {
+    //     try {
+    //         let response = await getAttractionBookingByVendor(vendor.vendor_id, selectedBookingId);
+    //         setSelectedBooking(response.data);
+    //         // setPriceList(response.data.price_list);
+    //     } catch (error) {
+    //         alert('An error occurred! Failed to retrieve booking!');
+    //     }
+    // }
 
     return vendor ? (
         <div>
@@ -132,19 +133,20 @@ export default function BookingManagement() {
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
-                        {/* pagination */}
-                        <CustomTablePagination
+                        {/* <CustomTablePagination
                             title="Attraction Bookings"
                             column={bookingsColumns}
                             data={attractionBookingsData}
                         />
 
-                        {/* Modal to view attraction */}
+                        
                         <ViewAttractionBookingModal
                             isViewAttractionBookingModalOpen={isViewAttractionBookingModalOpen}
                             onClickCancelViewAttractionBookingModal={onClickCancelViewAttractionBookingModal}
                             bookingId={selectedBookingId}
-                        />
+                        /> */}
+
+                        placeholder
 
                     </Content>
                 </Layout>

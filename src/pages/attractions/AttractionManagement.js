@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag } from 'antd';
 import { Content } from "antd/es/layout/layout";
-import { EditFilled } from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,7 +12,6 @@ import EditAttractionModal from "./EditAttractionModal";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
-import { PropaneSharp } from "@mui/icons-material";
 
 export default function AttractionManagement() {
 
@@ -199,8 +197,10 @@ export default function AttractionManagement() {
 
     useEffect(() => { 
         if (getAttractionsData) { 
+            console.log("vendor vendor vendor",vendor.vendor.vendor_id)
             const fetchData = async () => {
                 const response = await getAttractionListByVendor(vendor.vendor.vendor_id);
+                console.log("response", response.data);
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
                         ...val,

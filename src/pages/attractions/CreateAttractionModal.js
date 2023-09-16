@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Space, Button, Select, InputNumber, Upload } from "antd";
 import { MinusCircleOutlined, PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
-import { uploadImageToImgur } from "../../redux/attractionRedux";
 
 
 export default function CreateAttractionModal(props) {
@@ -22,25 +21,6 @@ export default function CreateAttractionModal(props) {
     // function uploadImage() {
     //     console.log("uploadImage function");
     // }
-
-    async function uploadImage(image) {
-        console.log("HERE! uploadImage function", image);
-
-        try {
-            let response = await uploadImageToImgur(image);
-            console.log('Image successfully uploaded', response)
-
-            const imageURL = response.data.data.link;
-            const updatedURLs = [...uploadedImageURLs, imageURL]; // Append the new URL to the existing list
-            setUploadedImageURLs(updatedURLs); // Update the state with the new list of URLs
-
-            return uploadedImageURLs; 
-
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            return uploadedImageURLs; // Return the current list of URLs in case of an error
-        }
-    }
 
     return (
         <div>
@@ -126,10 +106,8 @@ export default function CreateAttractionModal(props) {
                         <Input />
                     </Form.Item>
 
-                    <Form.Item label="Image Upload">
+                    {/* <Form.Item label="Image Upload">
                         <Form.Item name="image" valuePropName="fileList" getValueFromEvent={normFile} noStyle>
-                            {/* <Upload.Dragger name="image" action={uploadImage(normFile)}
-                            > */}
                                 <Upload.Dragger name="files" customRequest={({ file }) => {
                                     const updatedURLs = uploadImage(file); // Call uploadImage when a file is uploaded
                                     console.log('Updated URLs:', updatedURLs);
@@ -141,7 +119,7 @@ export default function CreateAttractionModal(props) {
                                 <p className="ant-upload-hint">Support for a single or bulk upload.</p>
                             </Upload.Dragger>
                         </Form.Item>
-                    </Form.Item>
+                    </Form.Item> */}
 
                     <Form.Item
                         label="Suggested Duration"
