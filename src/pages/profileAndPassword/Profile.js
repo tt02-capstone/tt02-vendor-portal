@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Spin, Form, Input, Button, Row, Col, DatePicker } from 'antd';
+import { Layout, Spin, Form, Input, Button, Row, Col, DatePicker, Divider, Typography } from 'antd';
 import dayjs, { Dayjs } from "dayjs";
 import moment from 'moment';
-import { EditFilled } from "@ant-design/icons";
 import { Navigate, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import CustomHeader from "../../components/CustomHeader";
@@ -12,12 +11,36 @@ import EditPasswordModal from "./EditPasswordModal";
 import { editPassword } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
 import { editLocalProfile } from "../../redux/localRedux";
+import { UserOutlined, KeyOutlined } from "@ant-design/icons";
+import CustomFileUpload from "../../components/CustomFileUpload";
+import AWS from 'aws-sdk';
+window.Buffer = window.Buffer || require("buffer").Buffer;
+
+const { Text } = Typography;
 
 export default function Profile() {
 
     const navigate = useNavigate();
     const dateFormat = "DD-MM-YYYY";
     const { Header, Content, Sider, Footer } = Layout;
+
+    const viewProfileBreadcrumbItems = [
+      {
+        title: 'Profile',
+      },
+      {
+        title: 'View Profile',
+      },
+    ];
+
+    const editProfileBreadcrumbItems = [
+      {
+        title: 'Profile',
+      },
+      {
+        title: 'Edit Profile'
+      }
+    ];
 
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -136,72 +159,151 @@ export default function Profile() {
         }
     }
 
+    // upload file
+    const S3BUCKET ='tt02/user';
+    const TT02REGION ='ap-southeast-1';
+    const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
+    const SECRET_ACCESS_KEY ='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';
+
+    const [file, setFile] = useState(null);
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      setFile(file);
+    };
+
+    const uploadFile = async () => {
+      const S3_BUCKET = S3BUCKET;
+      const REGION = TT02REGION;
+
+      AWS.config.update({
+        accessKeyId: ACCESS_KEY,
+        secretAccessKey: SECRET_ACCESS_KEY,
+      });
+      const s3 = new AWS.S3({
+        params: { Bucket: S3_BUCKET },
+        region: REGION,
+      });
+
+      const params = {
+        Bucket: S3_BUCKET,
+        Key: file.name,
+        Body: file,
+      };
+
+      var upload = s3
+        .putObject(params)
+        .on("httpUploadProgress", (evt) => {
+          console.log(
+            "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+          );
+        })
+        .promise();
+
+      await upload.then((err, data) => {
+        console.log(err);
+        toast.success('Upload successful!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
+        setFile(null);
+      });
+    };
+
+    useEffect(() => {
+      if (file) {
+        let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
+        str = str + '/' + 'user';
+        str = str + '/' + file.name;
+        console.log("useEffect", str);
+      }
+    }, [file]);
+
     return user ? (
         <div>
             {/* view profile data */}
             {isViewProfile && 
                 <Layout style={styles.layout}>
-                    <CustomHeader text={"Header"}/>
-                    <Layout style={{ padding: '0 24px 24px' }}>
-                        <Content style={styles.content}>
-                            {user.email}
-                            <br />
-                            {user.name}
-                            <br />
-
-                            {/* local specific */}
-                            {user.user_type === 'LOCAL' && user.country_code + " " + user.mobile_num}
-                            {user.user_type === 'LOCAL' && <br />}
-                            {user.user_type === 'LOCAL' && moment(user.date_of_birth).format('LL')}
-                            {user.user_type === 'LOCAL' && <br />}
-                            {user.user_type === 'LOCAL' && user.wallet_balance}
-                            {user.user_type === 'LOCAL' && <br />}
-
-                            {/* vendor staff specific */}
-                            {user.user_type === 'VENDOR_STAFF' && user.position}
-                            {user.user_type === 'VENDOR_STAFF' && <br />}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account && <p>Master Account</p>}
-                            {user.user_type === 'VENDOR_STAFF' && !user.is_master_account && <p>Not Master Account</p>}
-                            {user.user_type === 'VENDOR_STAFF' && <br />}
-
-                            {/* master vendor staff specific */}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <p>Vendor Specifics</p>}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.business_name}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.poc_name}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.poc_position}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && user.vendor.service_description}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && <br/>}
-
+                    <CustomHeader items={viewProfileBreadcrumbItems}/>
+                    {/* <CustomFileUpload handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
+                    {file && file.name}
+                    <Content style={styles.content}>
+                      <Divider orientation="left" style={{fontSize: '150%' }} >User Profile</Divider>
+                        <Row>
+                          <Col span={8} style={{fontSize: '150%'}}>Name: {user.name}</Col>
+                          <Col span={8} style={{fontSize: '150%'}}>Email: {user.email}</Col>
+                          <Col span={8} style={{fontSize: '150%'}}>
                             <CustomButton
-                                text="Edit Profile"
-                                icon={<EditFilled />}
-                                onClick={onClickEditProfile}
+                              text="Edit Profile"
+                              icon={<UserOutlined />}
+                              onClick={onClickEditProfile}
                             />
-                            <br />
-                            <br />
-                            <CustomButton
+                          </Col>
+                        </Row>
+
+                        {/* local specific */}
+                        {user.user_type === 'LOCAL' &&
+                          <div>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Mobile number: {user.country_code + " " + user.mobile_num}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Date of birth: {moment(user.date_of_birth).format('LL')}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>
+                                <CustomButton
+                                  text="Edit Password"
+                                  icon={<KeyOutlined />}
+                                  onClick={onClickEditPasswordButton}
+                                />
+                              </Col>
+                            </Row>
+                            <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${user.wallet_balance}</Col>
+                            </Row>
+                          </div>
+                        }
+                        
+
+                        {/* vendor staff specific */}
+                        {user.user_type === 'VENDOR_STAFF' && 
+                          <Row>
+                            <Col span={8} style={{fontSize: '150%'}}>Position in {user.vendor.business_name}: {user.position}</Col>
+                            {user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: Yes</Col>}
+                            {!user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: No</Col>}
+                            <Col span={8} style={{fontSize: '150%'}}>
+                              <CustomButton
                                 text="Edit Password"
-                                icon={<EditFilled />}
+                                icon={<KeyOutlined />}
                                 onClick={onClickEditPasswordButton}
-                            />
-                            
-                            {/* other items to be displayed in the future */}
-                        </Content>
-                    </Layout>
+                              />
+                          </Col>
+                          </Row>
+                        }
+
+                        {/* master vendor staff specific */}
+                        {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && 
+                          <div>
+                            <Divider orientation="left" style={{fontSize: '150%'}}>Vendor Profile</Divider>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Business name: {user.vendor.business_name}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge name: {user.vendor.poc_name}</Col>   
+                            </Row>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge position: {user.vendor.poc_position}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge contact number: {user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}</Col>   
+                            </Row>
+                        </div>
+                        }
+                        
+                        {/* other items to be displayed in the future */}
+                    </Content>
                 </Layout>
             }
 
             {/* edit not master vendor staff profile form */}
             {user.user_type === "VENDOR_STAFF" && user.is_master_account !== true && !isViewProfile &&
+               <Layout style={styles.layout}>
+                <CustomHeader items={editProfileBreadcrumbItems}/>
                 <Row align='middle' justify='center'>
-                <Spin tip="Editting Profile" size="large" spinning={loading}>
-                  <Content style={styles.content}>
+                 <Content style={styles.formContent}>
                     <Form
                       {...formItemLayout}
                       form={form}
@@ -257,144 +359,146 @@ export default function Profile() {
                       <ToastContainer />
                     </Form>
                   </Content>
-                </Spin>
-              </Row>
+                </Row>
+              </Layout>
             }
 
             {/* edit vendor staff master profile form */}
             {user.user_type === "VENDOR_STAFF" && user.is_master_account === true && !isViewProfile &&
-                <Row align='middle' justify='center'>
-                <Spin tip="Editting Profile" size="large" spinning={loading}>
-                  <Content style={styles.content}>
-                    <Form
-                      {...formItemLayout}
-                      form={form}
-                      name="masterVendorStaffEditProfile"
-                      onFinish={onSubmitEditProfileButton}
-                      style={{
-                        maxWidth: 600,
-                      }}
-                      scrollToFirstError
-                    >
-                      <Form.Item
-                        name="email"
-                        label="Email"
-                        initialValue={user.email}
-                        rules={[{ required: true, message: 'Email is required!'}]}
+                <Layout style={styles.layout}>
+                  <CustomHeader items={editProfileBreadcrumbItems}/>
+                  <Row align='middle' justify='center'>
+                    <Content style={styles.formContent}>
+                      <Form
+                        {...formItemLayout}
+                        form={form}
+                        name="masterVendorStaffEditProfile"
+                        onFinish={onSubmitEditProfileButton}
+                        style={{
+                          maxWidth: 600,
+                        }}
+                        scrollToFirstError
                       >
-                        <Input />
-                      </Form.Item>
+                        <Form.Item
+                          name="email"
+                          label="Email"
+                          initialValue={user.email}
+                          rules={[{ required: true, message: 'Email is required!'}]}
+                        >
+                          <Input />
+                        </Form.Item>
 
-                      <Form.Item
-                        name="name"
-                        label="Name"
-                        initialValue={user.name}
-                        rules={[{ required: true, message: 'Name is required!'}]}
-                      >
-                        <Input />
-                      </Form.Item>
+                        <Form.Item
+                          name="name"
+                          label="Name"
+                          initialValue={user.name}
+                          rules={[{ required: true, message: 'Name is required!'}]}
+                        >
+                          <Input />
+                        </Form.Item>
 
-                      <Form.Item
-                        name="position"
-                        label="Position"
-                        initialValue={user.position}
-                        rules={[{ required: true, message: 'Position is required!'}]}
-                      >
-                        <Input />
-                      </Form.Item>
-                      <Form.Item
-                            label="Master Account"
-                            name="is_master_account"
-                            initialValue={user.is_master_account ? "Yes" : "No"}
-                            >
-                        <Input disabled={true}/>
-                      </Form.Item>
-
-                      <Form.Item
-                        name="business_name"
-                        label="Business Name"
-                        initialValue={user.vendor.business_name}
-                        rules={[{ required: true, message: 'Business name is required!'}]}
-                      >
-                        <Input />
-                      </Form.Item>
-
-                      <Form.Item
-                        name="poc_name"
-                        label="POC Name"
-                        initialValue={user.vendor.poc_name}
-                        rules={[{ required: true, message: 'POC name is required!'}]}
-                      >
-                        <Input />
-                      </Form.Item>
-        
-                      <Form.Item
-                        name="poc_position"
-                        label="POC Position"
-                        initialValue={user.vendor.poc_position}
-                        rules={[{ required: true, message: 'POC position is required!'}]}
-                      >
-                        <Input />
-                      </Form.Item>
-        
-                      <Form.Item label="POC Contact No">
-                        <Input.Group>
-                          <Row>
-                            <Col span={4}>
-                              <Form.Item
-                                name="country_code"
-                                noStyle
-                                initialValue={user.vendor.country_code}
-                                rules={[{ required: true, message: 'Country code is required!' }]}
+                        <Form.Item
+                          name="position"
+                          label="Position"
+                          initialValue={user.position}
+                          rules={[{ required: true, message: 'Position is required!'}]}
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                              label="Master Account"
+                              name="is_master_account"
+                              initialValue={user.is_master_account ? "Yes" : "No"}
                               >
-                                <Input />
-                              </Form.Item>
-                            </Col>
-                            &nbsp;&nbsp;&nbsp;
-                            <Col span={19}>
-                              <Form.Item
-                                name="poc_mobile_num"
-                                noStyle
-                                initialValue={user.vendor.poc_mobile_num}
-                                rules={[{ required: true, message: 'Mobile number is required!' }]}
-                              >
-                                <Input />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        </Input.Group>
-                      </Form.Item>
+                          <Input disabled={true}/>
+                        </Form.Item>
 
-                      <Form.Item
-                        name="service_description"
-                        label="Service Description"
-                        tooltip="Tell us about the service you provide"
-                        initialValue={user.vendor.service_description}
-                        rules={[{ required: true, message: 'Service description is required!'}]}
-                      >
-                        <Input.TextArea showCount maxLength={300} />
-                      </Form.Item>
+                        <Form.Item
+                          name="business_name"
+                          label="Business Name"
+                          initialValue={user.vendor.business_name}
+                          rules={[{ required: true, message: 'Business name is required!'}]}
+                        >
+                          <Input />
+                        </Form.Item>
 
-                      <Form.Item {...tailFormItemLayout}>
-                        <div style={{ textAlign: "right" }}>
-                          <Button type="primary" htmlType="submit" loading={loading}>
-                            Submit
-                          </Button>
-                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} />
-                        </div>
-                      </Form.Item>
+                        <Form.Item
+                          name="poc_name"
+                          label="POC Name"
+                          initialValue={user.vendor.poc_name}
+                          rules={[{ required: true, message: 'POC name is required!'}]}
+                        >
+                          <Input />
+                        </Form.Item>
+          
+                        <Form.Item
+                          name="poc_position"
+                          label="POC Position"
+                          initialValue={user.vendor.poc_position}
+                          rules={[{ required: true, message: 'POC position is required!'}]}
+                        >
+                          <Input />
+                        </Form.Item>
+          
+                        <Form.Item label="POC Contact No">
+                          <Input.Group>
+                            <Row>
+                              <Col span={4}>
+                                <Form.Item
+                                  name="country_code"
+                                  noStyle
+                                  initialValue={user.vendor.country_code}
+                                  rules={[{ required: true, message: 'Country code is required!' }]}
+                                >
+                                  <Input />
+                                </Form.Item>
+                              </Col>
+                              &nbsp;&nbsp;&nbsp;
+                              <Col span={19}>
+                                <Form.Item
+                                  name="poc_mobile_num"
+                                  noStyle
+                                  initialValue={user.vendor.poc_mobile_num}
+                                  rules={[{ required: true, message: 'Mobile number is required!' }]}
+                                >
+                                  <Input />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          </Input.Group>
+                        </Form.Item>
+
+                        <Form.Item
+                          name="service_description"
+                          label="Service Description"
+                          tooltip="Tell us about the service you provide"
+                          initialValue={user.vendor.service_description}
+                          rules={[{ required: true, message: 'Service description is required!'}]}
+                        >
+                          <Input.TextArea showCount maxLength={300} />
+                        </Form.Item>
+
+                        <Form.Item {...tailFormItemLayout}>
+                          <div style={{ textAlign: "right" }}>
+                            <Button type="primary" htmlType="submit" loading={loading}>
+                              Submit
+                            </Button>
+                            <CustomButton text="Cancel" style={{marginLeft: '20px'}}onClick={onCancelVendorStaffProfileButton} />
+                          </div>
+                        </Form.Item>
                       <ToastContainer />
                     </Form>
                   </Content>
-                </Spin>
-              </Row>
+                </Row>
+              </Layout>
             }
 
             {/* edit local profile form */}
             {user.user_type === "LOCAL" && !isViewProfile &&
-            <Row align='middle' justify='center'>
-            <Spin tip="Editting Profile" size="large" spinning={loading}>
-                <Content style={styles.content}>
+            <Layout style={styles.layout}>
+              <CustomHeader items={editProfileBreadcrumbItems}/>
+              <Row align='middle' justify='center'>
+                <Content style={styles.formContent}>
                     <Form
                       {...formItemLayout}
                       form={form}
@@ -429,7 +533,7 @@ export default function Profile() {
                         initialValue={dayjs(user.date_of_birth)}
                         rules={[{ required: true, message: 'Date of birth is required!'}]}
                       >
-                        <DatePicker format={dateFormat} />
+                        <DatePicker style={{width: '100%'}} format={dateFormat} />
                       </Form.Item>
         
                       <Form.Item label="Contact No">
@@ -460,19 +564,19 @@ export default function Profile() {
                         </Input.Group>
                       </Form.Item>
 
-                      <Form.Item {...tailFormItemLayout}>
-                        <div style={{ textAlign: "right" }}>
-                          <Button type="primary" htmlType="submit" loading={loading}>
+                      <Form.Item>
+                        <div style={{ textAlign: "right", justifyContent: 'flex-end'}}>
+                          <Button type="primary" htmlType="submit">
                             Submit
                           </Button>
-                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} />
+                          <CustomButton text="Cancel" style={{marginLeft: '20px'}} onClick={onCancelVendorStaffProfileButton} />
                         </div>
                       </Form.Item>
                       <ToastContainer />
                     </Form>
                   </Content>
-                </Spin>
-              </Row>
+                </Row>
+              </Layout>
             }
 
             {/* edit password pop-up */}
@@ -490,6 +594,24 @@ export default function Profile() {
     ) : (
         <div></div>
     )
+}
+
+
+const styles = {
+  layout: {
+    minHeight: '100vh',
+    minWidth: '90vw',
+  },
+  content: {
+    margin: '1vh 3vh 1vh 3vh',
+  },
+  formContent: {
+    margin: '3% 40% 3% 10%',
+    width: '100%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
 }
 
 const formItemLayout = {
@@ -523,17 +645,3 @@ const tailFormItemLayout = {
         },
     },
 };
-
-const styles = {
-    layout: {
-        minHeight: '100vh',
-    },
-    content: {
-        margin: '24px 16px 0',
-        width: '100%',
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-  }
-  

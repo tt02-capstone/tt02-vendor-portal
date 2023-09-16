@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Form, Input, Button, Select } from "antd";
+import { Modal, Form, Input, Button, Select, Spin, Row } from "antd";
 
 export default function CreateVendorStaffModal(props) {
 
@@ -8,12 +8,16 @@ export default function CreateVendorStaffModal(props) {
     return(
         <div>
             <Modal
-                title="Create New Vendor Staff"
+                title="Create New Staff"
                 centered
                 open={props.isCreateVendorStaffModalOpen}
                 onCancel={props.onClickCancelVendorStaffModal}
                 footer={[]} // hide default buttons of modal
             >
+                <Row align='middle' justify='center'>
+                    <Spin tip="Creating" size="small" spinning={props.loading}></Spin>
+                </Row>
+
                 <Form 
                     name="basic"
                     form={props.form}
@@ -26,6 +30,7 @@ export default function CreateVendorStaffModal(props) {
                 >
                     <Form.Item
                     label="Staff Name"
+                    labelAlign="left"
                     name="name"
                     rules={[{ required: true, message: 'Please enter new staff name!' }]}
                     >
@@ -34,6 +39,7 @@ export default function CreateVendorStaffModal(props) {
 
                     <Form.Item
                     label="Staff Email"
+                    labelAlign="left"
                     name="email"
                     placeholder="Staff Email"
                     rules={[{ required: true, message: 'Please enter new staff email!' }]}
@@ -43,6 +49,7 @@ export default function CreateVendorStaffModal(props) {
 
                     <Form.Item
                         label="Current Login Access"
+                        labelAlign="left"
                         name="is_blocked"
                         rules={[{ required: true, message: 'Please select a login access right!' }]}
                     >
@@ -50,13 +57,14 @@ export default function CreateVendorStaffModal(props) {
                             placeholder="Please select a login access right"
                             allowClear
                         >
-                            <Option value="false">Allow Login</Option>
-                            <Option value="true">Deny Login</Option>
+                            <Option value="false">Allow</Option>
+                            <Option value="true">Deny</Option>
                         </Select>
                     </Form.Item>
 
                     <Form.Item
                     label="Position"
+                    labelAlign="left"
                     name="position"
                     placeholder="Position"
                     rules={[{ required: true, message: 'Please enter staff position!' }]}
@@ -64,8 +72,8 @@ export default function CreateVendorStaffModal(props) {
                     <Input placeholder="Position"/>
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                    <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
+                        <Button type="primary" htmlType="submit" loading={props.loading}>
                             Create
                         </Button>
                     </Form.Item>

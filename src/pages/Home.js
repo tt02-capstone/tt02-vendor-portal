@@ -8,9 +8,15 @@ export default function Home() {
     const user = JSON.parse(localStorage.getItem("user"));
     console.log(user);
 
+    const breadcrumbItems = [
+        {
+          title: 'Home',
+        },
+      ];
+
     return user ? (
             <Layout style={styles.layout}>
-                <CustomHeader text={"Header"} />
+                <CustomHeader items={breadcrumbItems} />
                 
                 <Content style={styles.content}>
                     <div style={{ padding: 24, minHeight: 360 }}>content</div>

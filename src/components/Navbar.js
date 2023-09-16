@@ -29,6 +29,7 @@ function Navbar(props) {
         >
             {/*<div className="demo-logo-vertical" />*/}
             <Menu
+                style={{fontSize: '100%'}}
                 theme="dark"
                 defaultSelectedKeys={['1']}
                 mode="inline"

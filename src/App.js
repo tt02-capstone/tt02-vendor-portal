@@ -6,15 +6,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar";
 import {Layout, Menu} from "antd";
 import React, { useEffect, useState } from "react";
-import { MailOutlined } from '@ant-design/icons';
-import LogoutIcon from '@mui/icons-material/Logout';
 import {Footer} from "antd/es/layout/layout";
+import AttractionManagement from "./pages/attractions/AttractionManagement";
+import BookingManagement from "./pages/bookings/BookingManagement";
 import Profile from "./pages/profileAndPassword/Profile";
 import Signup from "./pages/Signup/Signup";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
 import AttractionManageTicket from "./pages/attraction/AttractionManageTicket";
+import { HomeOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { Logout } from "@mui/icons-material";
 
 function App() {
 
@@ -24,19 +26,19 @@ function App() {
   const [currentTab, setCurrentTab] = useState('/home');
 
   const vendorStaffMenuItems = [
-      {key: '/home', label: 'Home', icon: <MailOutlined />},
-      {key: '/profile', label: 'Profile', icon: <MailOutlined />},
-      {key: '/vendorStaff', label: 'Vendor Staff', icon: <MailOutlined />},
-      {key: '/attractions', label: 'Attractions', icon: <MailOutlined />},
-      {key: '/', label: 'Logout',icon: <LogoutIcon />,}
+      {key: '/home', label: 'Home', icon: <HomeOutlined />},
+      {key: '/profile', label: 'Profile', icon: <UserOutlined />},
+      {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined />},
+      {key: '/attraction', label: 'Attractions Management',icon: <UsergroupAddOutlined />,},
+      {key: '/bookingmanagement', label: 'Booking Management',icon: <UsergroupAddOutlined />,},
+      {key: '/', label: 'Logout',icon: <Logout />,}
   ];
 
   const localMenuItems = [
-    {key: '/home', label: 'Home', icon: <MailOutlined />},
-    {key: '/profile', label: 'Profile', icon: <MailOutlined />},
-    {key: '/', label: 'Logout',icon: <LogoutIcon />,}
-  ];
-
+    {key: '/home', label: 'Home', icon: <HomeOutlined />},
+    {key: '/profile', label: 'Profile', icon: <UserOutlined />},
+    {key: '/', label: 'Logout',icon: <Logout />,}
+];
 
   const onClickNewTab = (tab) => {
     console.log(tab.key);
@@ -67,8 +69,10 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />
+          {/* <Route path="/attraction" element={<AttractionManagement />} /> */}
+          <Route path="/bookingmanagement" element={<BookingManagement />} />
           <Route path="/verifyemail" element={<EmailVerification />} />
-          <Route path="/attractions" element={<AttractionManageTicket />} />
+          <Route path="/attraction" element={<AttractionManageTicket />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>

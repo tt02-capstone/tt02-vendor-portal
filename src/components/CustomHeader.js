@@ -1,10 +1,37 @@
 import React, { useState } from "react";
+import { Breadcrumb } from "antd";
 import {Header} from "antd/es/layout/layout";
 
 const CustomHeader = (props) => {
+    
+    // const breadCrumbItems = [
+    //     {
+    //         title: 'Home',
+    //     },
+    //     {
+    //         title: 'Application Center',
+    //         href: '',
+    //     },
+    //     {
+    //         title: 'Application List',
+    //         href: '',
+    //     },
+    //     {
+    //         title: 'An Application',
+    //     },
+    // ]
+    
     return(
-        <Header style={{ background: 'white', textAlign: 'left', fontSize: 20, border: '1px solid #ccc' }}>
-            {props.text}
+        <Header style={{ minHeight: '8vh', background: 'white', textAlign: 'center' }}>
+            <Breadcrumb
+                separator=">"
+                items={props.items}
+                style={{
+                    fontSize: '130%',
+                    paddingLeft: '10px',
+                    paddingTop: '25px'
+                }}
+            />
         </Header>
     )
 }

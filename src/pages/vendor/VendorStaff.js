@@ -9,6 +9,7 @@ import { Navigate } from 'react-router-dom';
 import CreateVendorStaffModal from "./CreateVendorStaffModal";
 import CustomButton from '../../components/CustomButton'
 import CustomTablePagination from "../../components/CustomTablePagination";
+import { UserAddOutlined }  from "@ant-design/icons";
 
 export default function VendorStaff() {
 
@@ -16,16 +17,17 @@ export default function VendorStaff() {
     const { Header, Content, Sider, Footer } = Layout;
     const vendor = JSON.parse(localStorage.getItem("user"));
 
+    const breadcrumbItems = [
+        {
+          title: 'Users',
+        },
+      ];
+
     // vendor staff table pagination
     const [getVendorStaffData, setGetVendorStaffData] = useState(true);
     const [vendorStaffData, setVendorStaffData] = useState([]); // list of vendor staff
 
     const vendorStaffColumns = [
-        {
-            title: 'Id',
-            dataIndex: 'user_id',
-            key: 'user_id',
-        },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -150,6 +152,7 @@ export default function VendorStaff() {
     // form inputs for vendor staff creation
     const [createVendorStaffForm] = Form.useForm();
     const [isCreateVendorStaffModalOpen, setIsCreateVendorStaffModalOpen] = useState(false); // boolean to open modal
+    const [createLoading, setCreateLoading] = useState(false);
     
     // create new vendor staff modal open button
     function onClickOpenCreateVendorStaffModal() {
@@ -162,6 +165,7 @@ export default function VendorStaff() {
 
     // create new vendor staff modal create button
     async function onClickSubmitVendorStaffCreate(values) {
+        setCreateLoading(true);
 
         let obj = {
             name: values.name,
@@ -178,7 +182,8 @@ export default function VendorStaff() {
             createVendorStaffForm.resetFields();
             setGetVendorStaffData(true);
             setIsCreateVendorStaffModalOpen(false);
-            toast.success('Vendor staff successfully created!', {
+            setCreateLoading(false);
+            toast.success('Staff successfully created!', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
             });
@@ -186,6 +191,7 @@ export default function VendorStaff() {
         } else {
             console.log("Vendor staff creation failed!");
             console.log(response.data);
+            setCreateLoading(false);
             toast.error(response.data.errorMessage, {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
@@ -196,18 +202,20 @@ export default function VendorStaff() {
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
-                    <CustomHeader text={"Header"}/>
+                    <CustomHeader items={breadcrumbItems}/>
                     <Layout style={{ padding: '0 24px 24px' }}>
                         <Content style={styles.content}>
                             <CustomButton 
-                                text="Create Vendor Staff"
-                                // icon=
+                                text="Create"
+                                style={{marginLeft: '3px', marginBottom: '20px'}}
+                                icon={<UserAddOutlined />}
                                 onClick={onClickOpenCreateVendorStaffModal}
                             />
 
                             {/* pagination */}
                             <CustomTablePagination
                                 title="Vendor Staff"
+                                style={styles.table}
                                 column={vendorStaffColumns}
                                 data={vendorStaffData}
                             />
@@ -215,6 +223,7 @@ export default function VendorStaff() {
                             {/* Modal to create new vendor staff account */}
                             <CreateVendorStaffModal
                                 form={createVendorStaffForm}
+                                loading={createLoading}
                                 isCreateVendorStaffModalOpen={isCreateVendorStaffModalOpen}
                                 onClickCancelVendorStaffModal={onClickCancelVendorStaffModal}
                                 onClickSubmitVendorStaffCreate={onClickSubmitVendorStaffCreate}
@@ -234,6 +243,7 @@ export default function VendorStaff() {
 const styles = {
     layout: {
         minHeight: '100vh',
+        minWidth: '90vw'
     },
     content: {
         margin: '24px 16px 0',
@@ -241,4 +251,7 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
     },
+    table: {
+        
+    }
 }

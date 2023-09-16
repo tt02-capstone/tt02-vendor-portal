@@ -17,6 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { createVendor } from '../../redux/vendorRedux';
 import TermsAndConditionsModal from './TermsAndConditionsModal';
 import { validateContactNo, validateCountryCode, validateOnlyAlphabets, validatePassword } from '../../helper/validation';
+import CustomButton from '../../components/CustomButton';
 
 const formItemLayout = {
   labelCol: {
@@ -286,7 +287,8 @@ function Signup() {
               </Form.Item>
               <Form.Item {...tailFormItemLayout}>
                 <div style={{ textAlign: "right" }}>
-                  <Button type="primary" htmlType="submit" loading={loading}>
+                  <CustomButton text="Back" style={{width: '75px'}} onClick={() => {return navigate('/')}}/>
+                  <Button type="primary" htmlType="submit" style={{marginLeft: '20px'}} loading={loading}>
                     Submit Application
                   </Button>
                 </div>
