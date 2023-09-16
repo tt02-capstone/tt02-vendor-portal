@@ -162,77 +162,75 @@ export default function Profile() {
             {isViewProfile && 
                 <Layout style={styles.layout}>
                     <CustomHeader items={viewProfileBreadcrumbItems}/>
-                    <Layout style={{ padding: '0 1vw 1vw' }}>
-                        <Content style={styles.content}>
-                          <Divider orientation="left" style={{fontSize: '150%' }} >User Profile</Divider>
+                    <Content style={styles.content}>
+                      <Divider orientation="left" style={{fontSize: '150%' }} >User Profile</Divider>
+                        <Row>
+                          <Col span={8} style={{fontSize: '150%'}}>Name: {user.name}</Col>
+                          <Col span={8} style={{fontSize: '150%'}}>Email: {user.email}</Col>
+                          <Col span={8} style={{fontSize: '150%'}}>
+                            <CustomButton
+                              text="Edit Profile"
+                              icon={<UserOutlined />}
+                              onClick={onClickEditProfile}
+                            />
+                          </Col>
+                        </Row>
+
+                        {/* local specific */}
+                        {user.user_type === 'LOCAL' &&
+                          <div>
                             <Row>
-                              <Col span={8} style={{fontSize: '150%'}}>Name: {user.name}</Col>
-                              <Col span={8} style={{fontSize: '150%'}}>Email: {user.email}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Mobile number: {user.country_code + " " + user.mobile_num}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Date of birth: {moment(user.date_of_birth).format('LL')}</Col>
                               <Col span={8} style={{fontSize: '150%'}}>
                                 <CustomButton
-                                  text="Edit Profile"
-                                  icon={<UserOutlined />}
-                                  onClick={onClickEditProfile}
+                                  text="Edit Password"
+                                  icon={<KeyOutlined />}
+                                  onClick={onClickEditPasswordButton}
                                 />
                               </Col>
                             </Row>
+                            <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${user.wallet_balance}</Col>
+                            </Row>
+                          </div>
+                        }
+                        
 
-                            {/* local specific */}
-                            {user.user_type === 'LOCAL' &&
-                              <div>
-                                <Row>
-                                  <Col span={8} style={{fontSize: '150%'}}>Mobile number: {user.country_code + " " + user.mobile_num}</Col>
-                                  <Col span={8} style={{fontSize: '150%'}}>Date of birth: {moment(user.date_of_birth).format('LL')}</Col>
-                                  <Col span={8} style={{fontSize: '150%'}}>
-                                    <CustomButton
-                                      text="Edit Password"
-                                      icon={<KeyOutlined />}
-                                      onClick={onClickEditPasswordButton}
-                                    />
-                                  </Col>
-                                </Row>
-                                <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
-                                <Row>
-                                  <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${user.wallet_balance}</Col>
-                                </Row>
-                              </div>
-                            }
-                            
+                        {/* vendor staff specific */}
+                        {user.user_type === 'VENDOR_STAFF' && 
+                          <Row>
+                            <Col span={8} style={{fontSize: '150%'}}>Position in {user.vendor.business_name}: {user.position}</Col>
+                            {user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: Yes</Col>}
+                            {!user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: No</Col>}
+                            <Col span={8} style={{fontSize: '150%'}}>
+                              <CustomButton
+                                text="Edit Password"
+                                icon={<KeyOutlined />}
+                                onClick={onClickEditPasswordButton}
+                              />
+                          </Col>
+                          </Row>
+                        }
 
-                            {/* vendor staff specific */}
-                            {user.user_type === 'VENDOR_STAFF' && 
-                              <Row>
-                                <Col span={8} style={{fontSize: '150%'}}>Position in {user.vendor.business_name}: {user.position}</Col>
-                                {user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: Yes</Col>}
-                                {!user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: No</Col>}
-                                <Col span={8} style={{fontSize: '150%'}}>
-                                  <CustomButton
-                                    text="Edit Password"
-                                    icon={<KeyOutlined />}
-                                    onClick={onClickEditPasswordButton}
-                                  />
-                              </Col>
-                              </Row>
-                            }
-
-                            {/* master vendor staff specific */}
-                            {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && 
-                              <div>
-                                <Divider orientation="left" style={{fontSize: '150%'}}>Vendor Profile</Divider>
-                                <Row>
-                                  <Col span={8} style={{fontSize: '150%'}}>Business name: {user.vendor.business_name}</Col>
-                                  <Col span={8} style={{fontSize: '150%'}}>Person-in-charge name: {user.vendor.poc_name}</Col>   
-                                </Row>
-                                <Row>
-                                  <Col span={8} style={{fontSize: '150%'}}>Person-in-charge position: {user.vendor.poc_position}</Col>
-                                  <Col span={8} style={{fontSize: '150%'}}>Person-in-charge contact number: {user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}</Col>   
-                                </Row>
-                            </div>
-                            }
-                            
-                            {/* other items to be displayed in the future */}
-                        </Content>
-                    </Layout>
+                        {/* master vendor staff specific */}
+                        {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && 
+                          <div>
+                            <Divider orientation="left" style={{fontSize: '150%'}}>Vendor Profile</Divider>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Business name: {user.vendor.business_name}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge name: {user.vendor.poc_name}</Col>   
+                            </Row>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge position: {user.vendor.poc_position}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge contact number: {user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}</Col>   
+                            </Row>
+                        </div>
+                        }
+                        
+                        {/* other items to be displayed in the future */}
+                    </Content>
                 </Layout>
             }
 
