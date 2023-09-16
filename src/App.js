@@ -35,12 +35,18 @@ function App() {
     {key: '/home', label: 'Home', icon: <MailOutlined />},
     {key: '/profile', label: 'Profile', icon: <MailOutlined />},
     {key: '/', label: 'Logout',icon: <LogoutIcon />,}
-];
+  ];
+
 
   const onClickNewTab = (tab) => {
-      console.log(tab.key);
+    console.log(tab.key);
+    if (tab.key == '/') {
+      localStorage.removeItem("user");
+      navigate(tab.key);
+    } else {
       setCurrentTab(tab.key);
       navigate(tab.key);
+    }
   };
 
   return (
