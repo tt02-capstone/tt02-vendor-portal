@@ -15,7 +15,7 @@ import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
 import AttractionManageTicket from "./pages/attraction/AttractionManageTicket";
-import { HomeOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, UsergroupAddOutlined, BarsOutlined } from '@ant-design/icons';
 import { Logout } from "@mui/icons-material";
 
 function App() {
@@ -38,7 +38,7 @@ function App() {
     {key: '/home', label: 'Home', icon: <HomeOutlined />},
     {key: '/profile', label: 'Profile', icon: <UserOutlined />},
     {key: '/', label: 'Logout',icon: <Logout />,}
-];
+  ];
 
   const onClickNewTab = (tab) => {
     console.log(tab.key);
@@ -69,10 +69,10 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
           <Route path="/forgetpassword" element={<ForgetPassword />} />
-          {/* <Route path="/attraction" element={<AttractionManagement />} /> */}
           <Route path="/bookingmanagement" element={<BookingManagement />} />
           <Route path="/verifyemail" element={<EmailVerification />} />
-          <Route path="/attraction" element={<AttractionManageTicket />} />
+          <Route path="/attraction" element={<AttractionManagement />} />
+          <Route path="/attraction/ViewTicket" element={<AttractionManageTicket />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>

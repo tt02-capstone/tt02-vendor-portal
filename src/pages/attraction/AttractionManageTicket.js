@@ -20,6 +20,15 @@ export default function AttractionManageTicket() {
     const [ticketType, setTicketType] = useState(null);
     const [attr_id, setAttrId] = useState(null);
 
+    const viewTicketBreadCrumb = [
+        {
+          title: 'Attractions',
+        },
+        {
+          title: 'View Tickets',
+        },
+    ];
+
     const showAddModal = () => {
         setAddModal(true);
     };
@@ -340,10 +349,10 @@ export default function AttractionManageTicket() {
 
     return user ? (
         <Layout style={styles.layout}>
-             <CustomHeader text={"Attractions"}/>
+             <CustomHeader items={viewTicketBreadCrumb}/>
              <Content style={styles.content}>
              <div>
-                <h1>List of Attractions</h1>
+                <h1>Attraction Ticket Details</h1>
                 <Table dataSource={datasource} columns={columns} style={{ width : '98%' }} />
                 <AddTicketModal
                     isVisible={addModal}
@@ -370,12 +379,10 @@ export default function AttractionManageTicket() {
 const styles = {
     layout: {
         minHeight: '100vh',
+        minWidth: '90vw',   
         backgroundColor: 'white'
     },
     content: {
-        margin: '20px 30px 0',
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center'
+        margin: '1vh 3vh 1vh 3vh',
     },
 }

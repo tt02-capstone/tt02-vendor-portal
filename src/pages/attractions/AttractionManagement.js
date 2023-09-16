@@ -364,6 +364,10 @@ export default function AttractionManagement() {
         }
     }, [isEditAttractionModalOpen]);
 
+    const redirectToTickets = () => {
+        navigate('/attraction/ViewTicket');
+    }
+
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
@@ -376,6 +380,11 @@ export default function AttractionManagement() {
                             // icon=
                             onClick={onClickOpenCreateAttractionModal}
                         />
+
+                        <CustomButton
+                            text="View Tickets"
+                            onClick={redirectToTickets}
+                        />  
 
                         {/* pagination */}
                         <CustomTablePagination
