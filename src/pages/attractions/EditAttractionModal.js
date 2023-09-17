@@ -13,7 +13,7 @@ export default function EditAttractionModal(props) {
 
     async function getAttraction(vendor, props) {
         try {
-            let response = await getAttractionByVendor(vendor.vendor_id, props.attractionId);
+            let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
         } catch (error) {
@@ -28,7 +28,7 @@ export default function EditAttractionModal(props) {
 
     useEffect(() => {
         if (props.isEditAttractionModalOpen) {
-            getAttraction(vendor.vendor, props);
+            getAttraction(vendor, props);
         }
     }, [props.isEditAttractionModalOpen]);
 

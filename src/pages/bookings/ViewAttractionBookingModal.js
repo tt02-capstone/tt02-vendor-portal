@@ -138,7 +138,7 @@ export default function ViewAttractionBookingModal(props) {
 
         return (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
-                <div style={{ fontWeight: 'bold', minWidth: '160px' }}>{label}:</div>
+                <div style={{ fontWeight: 'bold', minWidth: '200px' }}>{label}:</div>
                 <div>
                     {color ? (
                         <Tag color={color}>{value}</Tag>
@@ -166,13 +166,14 @@ export default function ViewAttractionBookingModal(props) {
                     {renderProperty('Customer Email', getCustomerEmail(selectedAttractionBooking))}
                     {renderProperty('Customer Number', getCustomerMobileNumber(selectedAttractionBooking))}
                     {renderProperty('Attraction Name', selectedAttractionBooking.attraction ? selectedAttractionBooking.attraction.name : '')}
-                    {/* {renderProperty('Attraction Category', selectedAttractionBooking.attraction ? selectedAttractionBooking.attraction.attraction_category : '', getAttractionCategoryColor(selectedAttractionBooking.attraction.attraction_category))} */}
+                    {renderProperty('Attraction Category', selectedAttractionBooking.attraction ? selectedAttractionBooking.attraction.attraction_category : '', selectedAttractionBooking.attraction ? getAttractionCategoryColor(selectedAttractionBooking.attraction.attraction_category) : '')}
                     {renderProperty('Booking Status', selectedAttractionBooking.status, getBookingStatusColor(selectedAttractionBooking.status))}
                     {renderProperty('Last Updated', formatDate(selectedAttractionBooking.last_update))}
                     {renderProperty('Start Date', formatStartEndDate(selectedAttractionBooking.start_datetime))}
                     {renderProperty('End Date', formatStartEndDate(selectedAttractionBooking.end_datetime))}
                     {renderProperty('Payment Status', selectedAttractionBooking.payment ? (selectedAttractionBooking.payment.is_paid ? 'PAID' : 'UNPAID') : '', getPaymentStatusColor(selectedAttractionBooking.payment ? (selectedAttractionBooking.payment.is_paid ? 'PAID' : 'UNPAID') : ''))}
                     {renderProperty('Amount User Paid', selectedAttractionBooking.payment ? `$${selectedAttractionBooking.payment.payment_amount.toFixed(2)}` : '')}
+                    {renderProperty('Commission Percentage', selectedAttractionBooking.payment ? `${(selectedAttractionBooking.payment.comission_percentage * 100).toFixed(0)}%` : '')}
                     {renderProperty('Amount Vendor Earns', calculateVendorEarns(selectedAttractionBooking.payment))}
                 </div>
             </Modal>

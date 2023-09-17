@@ -12,10 +12,20 @@ import { editPassword } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
 import { editLocalProfile } from "../../redux/localRedux";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
+import CustomFileUpload from "../../components/CustomFileUpload";
+import AWS from 'aws-sdk';
+import AddBankAccountModal from "./AddBankAccountsModal";
+import { loadStripe  } from '@stripe/stripe-js';
+import { useStripe } from '@stripe/react-stripe-js';
+import { vendorStaffApi } from "../../redux/api";
+
+window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const { Text } = Typography;
 
 export default function Profile() {
+
+    const stripe = useStripe();
 
     const navigate = useNavigate();
     const dateFormat = "DD-MM-YYYY";
@@ -46,7 +56,8 @@ export default function Profile() {
     const [isViewProfile, setIsViewProfile] = useState(true); // view or edit profile
 
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false); // change password boolean
-
+    const [isBAModalOpen, setIsBAModalOpen] = useState(false);
+    const [bankAccounts, setBankAccounts] = useState([]); // bank accounts
     // when the edit profile button is clicked
     function onClickEditProfile() {
         setIsViewProfile(false);
@@ -130,6 +141,15 @@ export default function Profile() {
         setIsChangePasswordModalOpen(false);
     }
 
+    function onClickManageBAButton() {
+      setIsBAModalOpen(true);
+    }
+
+  // close edit password modal
+    function onClickCancelManageBAButton() {
+     setIsBAModalOpen(false);
+    }
+
     // when user edits password
     async function onClickSubmitNewPassword(val) {
         if (val.oldPassword && val.newPasswordOne === val.newPasswordTwo) {
@@ -156,12 +176,130 @@ export default function Profile() {
         }
     }
 
+    async function onClickSubmitNewBankAccount(bankAccountDetails) {
+
+      const token = await stripe.createToken('bank_account',{
+        
+          country: 'SG',
+          currency: 'sgd',
+          routing_number: bankAccountDetails.routingNumber,
+          account_number: bankAccountDetails.bankAccountNumber,
+        
+      });
+
+      console.log(token)
+
+      const userId = parseInt(user.user_id);
+
+      const bank_account_token = token.token.id
+
+      const response = await vendorStaffApi.post(`/addBankAccount/${userId}/${bank_account_token}`)
+      if (response.status) {
+        toast.success('Bank account successfully!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+        setIsBAModalOpen(false);
+    
+    } else {
+        toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+    }
+
+  }
+
+    // upload file
+    const S3BUCKET ='tt02/user';
+    const TT02REGION ='ap-southeast-1';
+    const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
+    const SECRET_ACCESS_KEY ='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';
+
+    const [file, setFile] = useState(null);
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      setFile(file);
+    };
+
+    const uploadFile = async () => {
+      const S3_BUCKET = S3BUCKET;
+      const REGION = TT02REGION;
+
+      AWS.config.update({
+        accessKeyId: ACCESS_KEY,
+        secretAccessKey: SECRET_ACCESS_KEY,
+      });
+      const s3 = new AWS.S3({
+        params: { Bucket: S3_BUCKET },
+        region: REGION,
+      });
+
+      const params = {
+        Bucket: S3_BUCKET,
+        Key: file.name,
+        Body: file,
+      };
+
+      var upload = s3
+        .putObject(params)
+        .on("httpUploadProgress", (evt) => {
+          console.log(
+            "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+          );
+        })
+        .promise();
+
+      await upload.then((err, data) => {
+        console.log(err);
+        toast.success('Upload successful!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
+        setFile(null);
+      });
+    };
+
+    useEffect(() => {
+      if (file) {
+        let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
+        str = str + '/' + 'user';
+        str = str + '/' + file.name;
+        console.log("useEffect", str);
+      }
+
+      async function getBankAccounts() {
+  
+        const userId = parseInt(user.user_id);
+  
+        const response = await vendorStaffApi.get(`/getBankAccounts/${userId}`)
+        if (response.status) {
+          const bankAccounts = response.data;
+          //console.log(bankAccounts);
+          setBankAccounts(bankAccounts);
+      
+      } else {
+          toast.error(response.data.errorMessage, {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 1500
+          });
+      }
+  
+    }
+
+    getBankAccounts();
+
+
+    }, [file]);
+
     return user ? (
         <div>
             {/* view profile data */}
             {isViewProfile && 
                 <Layout style={styles.layout}>
                     <CustomHeader items={viewProfileBreadcrumbItems}/>
+                    {/* <CustomFileUpload handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
+                    {file && file.name}
                     <Content style={styles.content}>
                       <Divider orientation="left" style={{fontSize: '150%' }} >User Profile</Divider>
                         <Row>
@@ -211,7 +349,9 @@ export default function Profile() {
                                 onClick={onClickEditPasswordButton}
                               />
                           </Col>
+                          
                           </Row>
+                          
                         }
 
                         {/* master vendor staff specific */}
@@ -228,6 +368,19 @@ export default function Profile() {
                             </Row>
                         </div>
                         }
+
+                        <h3>List of Bank Accounts</h3>
+                        <ul>
+                        {bankAccounts.map((account) => (
+                              <li key={account.account}>Bank Account Number: *****{account.last4}</li>
+                        ))}
+                      </ul>
+
+                        <CustomButton
+                                text="Add Bank Account"
+                                icon={<KeyOutlined />}
+                                onClick={onClickManageBAButton}
+                              />
                         
                         {/* other items to be displayed in the future */}
                     </Content>
@@ -524,7 +677,17 @@ export default function Profile() {
                 />
             }
 
+
+            {isBAModalOpen && 
+                <AddBankAccountModal 
+                    isBAModalOpen={isBAModalOpen}
+                    onClickSubmitNewBankAccount={onClickSubmitNewBankAccount}
+                    onClickCancelManageBAButton={onClickCancelManageBAButton}
+                />
+            }
+
             {/* Edit profile & password toast */}
+            
             <ToastContainer />
         </div>
     ) : (
