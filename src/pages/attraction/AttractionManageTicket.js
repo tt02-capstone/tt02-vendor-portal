@@ -117,7 +117,7 @@ export default function AttractionManageTicket() {
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0'); // format to me current timezone 
+            const day = String(today.getDate()).padStart(2, '0'); // format to current timezone 
 
             const todayFormatted = `${year}-${month}-${day}`;
 
