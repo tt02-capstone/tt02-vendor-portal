@@ -28,37 +28,116 @@ export default function BookingManagement() {
             dataIndex: 'booking_id',
             key: 'booking_id',
         },
-        // display either tourist or local name
-        // {
-        //     title: 'Attraction',
-        //     dataIndex: '',
-        //     key: '',
-        // },
+        {
+            title: 'Customer Name',
+            dataIndex: 'customerName',
+            key: 'customerName',
+            render: (text, record) => {
+                if (record.tourist_user) {
+                    return record.tourist_user.name; 
+                } else if (record.local_user) {
+                    return record.local_user.name; 
+                } else {
+                    return '';
+                }
+            },
+        },
+        {
+            title: 'Customer Type',
+            dataIndex: 'customerType',
+            key: 'customerType',
+            render: (text, record) => {
+                if (record.tourist_user) {
+                    return 'Tourist'; 
+                } else if (record.local_user) {
+                    return 'Local'; 
+                } else {
+                    return '';
+                }
+            },
+        },
+        {
+            title: 'Attraction',
+            dataIndex: 'attraction', 
+            key: 'attraction',
+            render: (attraction) => {
+                return attraction ? attraction.name : '';
+            },
+        },
         {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
+            render: (status) => {
+                let color = '';
+                switch (status) {
+                    case 'UPCOMING':
+                        color = 'processing';
+                        break;
+                    case 'ONGOING':
+                        color = 'warning';
+                        break;
+                    case 'COMPLETED':
+                        color = 'success';
+                        break;
+                    case 'CANCELLED':
+                        color = 'error';
+                        break;
+                }
+    
+                return <Tag color={color}>{status}</Tag>;
+            },
         },
         {
             title: 'Last Updated',
             dataIndex: 'last_update',
             key: 'last_update',
+            render: (lastUpdate) => {
+                const dateObj = new Date(lastUpdate);
+                const formattedDate = dateObj.toLocaleDateString(); // Format the date as per the user's locale
+                const formattedTime = dateObj.toLocaleTimeString(); // Format the time as per the user's locale
+                return `${formattedDate} ${formattedTime}`;
+            },
         },
         {
-            title: 'Start Time',
+            title: 'Start Date',
             dataIndex: 'start_datetime',
             key: 'start_datetime',
+            render: (startTime) => {
+                return startTime ? new Date(startTime).toLocaleDateString() : '';
+            },
         },
         {
-            title: 'End Time',
+            title: 'End Date',
             dataIndex: 'end_datetime',
             key: 'end_datetime',
+            render: (endTime) => {
+                return endTime ? new Date(endTime).toLocaleDateString() : '';
+            },
         },
-        // {
-        //     title: 'Payment Status',
-        //     dataIndex: '',
-        //     key: '',
-        // },
+        {
+            title: 'Payment Status',
+            dataIndex: 'payment',
+            key: 'payment',
+            render: (payment) => {
+                let color = '';
+                if (payment && payment.is_paid) {
+                    color = 'green';
+                } else {
+                    color = 'red';
+                }
+    
+                return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
+            },
+        },
+        {
+            title: 'Amount Earned',
+            dataIndex: 'payment',
+            key: 'payment',
+            render: (payment) => {
+                return `$${(payment.payment_amount * (1 - payment.comission_percentage)).toFixed(2)}`
+            },
+        },
         {
             title: 'Action(s)',
             dataIndex: 'operation',
@@ -74,28 +153,30 @@ export default function BookingManagement() {
         },
     ];
 
-    // useEffect(() => {
-    //     if (getAttractionBookingsData) {
-    //         console.log("vendor vendor vendor",vendor.vendor.vendor_id)
-    //         const fetchData = async () => {
-    //             const response = await getAttractionBookingListByVendor(vendor.vendor.vendor_id);
-    //             if (response.status) {
-    //                 var tempData = response.data.map((val) => ({
-    //                     ...val,
-    //                     key: val.user_id,
-    //                 }));
-    //                 setAttractionBookingsData(tempData);
-    //                 setGetAttractionBookingsData(false);
-    //                 console.log(response.data)
-    //             } else {
-    //                 console.log("List of attraction bookings not fetched!");
-    //             }
-    //         }
+    useEffect(() => {
+        if (getAttractionBookingsData) {
+            console.log("user id", vendor.user_id)
+            console.log("vendor vendor vendor",vendor.vendor.vendor_id)
+            const fetchData = async () => {
+                const response = await getAttractionBookingListByVendor(vendor.vendor.vendor_id);
+                console.log("response data", response.data)
+                if (response.status) {
+                    var tempData = response.data.map((val) => ({ // an object is returned! but need array. i guess bc only 1 attraction?? 
+                        ...val,
+                        key: val.user_id,
+                    }));
+                    setAttractionBookingsData(tempData);
+                    setGetAttractionBookingsData(false);
+                    console.log(response.data)
+                } else {
+                    console.log("List of attraction bookings not fetched!");
+                }
+            }
 
-    //         fetchData();
-    //         setGetAttractionBookingsData(false);
-    //     }
-    // }, [getAttractionBookingsData]);
+            fetchData();
+            setGetAttractionBookingsData(false);
+        }
+    }, [getAttractionBookingsData]);
 
     // View Booking 
     const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false); // boolean to open modal
@@ -116,15 +197,15 @@ export default function BookingManagement() {
         setIsViewAttractionBookingModalOpen(false);
     }
 
-    // async function getBooking(vendor, selectedBookingId) {
-    //     try {
-    //         let response = await getAttractionBookingByVendor(vendor.vendor_id, selectedBookingId);
-    //         setSelectedBooking(response.data);
-    //         // setPriceList(response.data.price_list);
-    //     } catch (error) {
-    //         alert('An error occurred! Failed to retrieve booking!');
-    //     }
-    // }
+    async function getBooking(vendor, selectedBookingId) {
+        try {
+            let response = await getAttractionBookingByVendor(vendor.vendor_id, selectedBookingId);
+            setSelectedBooking(response.data);
+            // setPriceList(response.data.price_list);
+        } catch (error) {
+            alert('An error occurred! Failed to retrieve booking!');
+        }
+    }
 
     return vendor ? (
         <div>
@@ -133,7 +214,7 @@ export default function BookingManagement() {
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
-                        {/* <CustomTablePagination
+                        <CustomTablePagination
                             title="Attraction Bookings"
                             column={bookingsColumns}
                             data={attractionBookingsData}
@@ -144,9 +225,7 @@ export default function BookingManagement() {
                             isViewAttractionBookingModalOpen={isViewAttractionBookingModalOpen}
                             onClickCancelViewAttractionBookingModal={onClickCancelViewAttractionBookingModal}
                             bookingId={selectedBookingId}
-                        /> */}
-
-                        placeholder
+                        />
 
                     </Content>
                 </Layout>

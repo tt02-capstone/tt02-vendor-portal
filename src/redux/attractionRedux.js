@@ -5,7 +5,7 @@ const attractionURL = "http://localhost:8080/attraction";
 export async function getAttractionListByVendor(vendorStaffId) {
   return await attractionApi.get(`${attractionURL}/getAttractionListByVendor/${vendorStaffId}`)
   .then((response) => {
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
+    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) { // error
       return {status: false, data: response.data};
     } else { // success
       return {status: true, data: response.data};
