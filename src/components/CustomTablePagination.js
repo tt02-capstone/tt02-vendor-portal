@@ -33,7 +33,7 @@ export default function CustomTablePagination(props) {
             <Table
                 style={props.style}
                 bordered={true}
-                tableLayout="fixed"
+                tableLayout={props.tableLayout}
                 columns={props.column}
                 pagination={pagination} 
                 dataSource={props.data} />

@@ -65,21 +65,21 @@ export default function EditAttractionModal(props) {
             >
                 <Form
                     name="editAttraction"
-                    form={form} 
+                    form={form}
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 600 }}
                     required={true}
                     requiredMark={true}
-                    onFinish={props.onClickSubmitEditAttraction} 
+                    onFinish={props.onClickSubmitEditAttraction}
                 >
                     <Form.Item
                         label="Name"
                         name="name"
-                        rules={[{ required: true, message: 'Please enter name of attraction!' }, 
+                        rules={[{ required: true, message: 'Please enter name of attraction!' },
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
                     >
-                        <Input placeholder="Name" />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item
@@ -88,7 +88,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter description of attraction!' },
                         { max: 800, message: 'Description should not exceed 800 characters!' }]}
                     >
-                        <Input placeholder="Description" />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item
@@ -97,7 +97,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter address of attraction!' },
                         { max: 100, message: 'Address should not exceed 100 characters!' },]}
                     >
-                        <Input placeholder="Address" />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item
@@ -106,7 +106,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter opening hours of attraction!' },
                         { max: 100, message: 'Opening Hours should not exceed 100 characters!' },]}
                     >
-                        <Input placeholder="Opening Hours" />
+                        <Input placeholder="10am - 5pm" />
                     </Form.Item>
 
                     <Form.Item
@@ -115,7 +115,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter target age group of attraction!' },
                         { max: 50, message: 'Age Group should not exceed 50 characters!' },]}
                     >
-                        <Input placeholder="Address" />
+                        <Input placeholder="18 and older" />
                     </Form.Item>
 
                     <Form.Item
@@ -124,12 +124,12 @@ export default function EditAttractionModal(props) {
                         rules={[
                             { required: true, message: 'Please enter contact number of attraction!' },
                             {
-                                pattern: /^(\+\d{2}[- ]?)?\d{8}$/, 
+                                pattern: /^(\+\d{2}[- ]?)?\d{8}$/,
                                 message: 'Please enter a valid contact number!',
                             },
                         ]}
                     >
-                        <Input placeholder="Contact Number" />
+                        <Input />
                     </Form.Item>
 
                     {/* img list */}
@@ -157,7 +157,7 @@ export default function EditAttractionModal(props) {
                             },
                         ]}
                     >
-                        <InputNumber placeholder="Suggested Duration" />
+                        <InputNumber suffix="Hours" />
                     </Form.Item>
 
                     <Form.Item
@@ -204,11 +204,28 @@ export default function EditAttractionModal(props) {
                                 <>
                                     {fields.map(({ key, name, ...restField }) => (
                                         <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                                            <div style={{ width: 130, margin: '0 8px' }}>
+                                            <div style={{ width: 110, margin: '0 8px' }}>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'ticket_type']}
-                                                    rules={[{ required: true, message: 'Missing ticket type' }]}
+                                                    rules={[
+                                                        { required: true, message: 'Missing ticket type' },
+                                                        ({ getFieldValue }) => ({
+                                                            validator(_, value) {
+                                                                const allTicketTypes = getFieldValue('price_list').map(
+                                                                    (item) => item.ticket_type
+                                                                );
+                                                                if (
+                                                                    allTicketTypes.filter(
+                                                                        (type) => type === value
+                                                                    ).length === 1
+                                                                ) {
+                                                                    return Promise.resolve();
+                                                                }
+                                                                return Promise.reject('Duplicate ticket types are not allowed.');
+                                                            },
+                                                        }),
+                                                    ]}
                                                 >
                                                     <Select>
                                                         <Option value='CHILD'>Child</Option>
@@ -219,20 +236,20 @@ export default function EditAttractionModal(props) {
                                                     </Select>
                                                 </Form.Item>
                                             </div>
-                                            <div style={{ width: 130, margin: '0 2px' }}>
+                                            <div style={{ width: 130, margin: '0 1px' }}>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'local_amount']}
                                                     rules={[{ required: true, message: 'Missing local price' }]}
                                                 >
-                                                    <InputNumber placeholder="Local Price" />
+                                                    <InputNumber placeholder="Local Price" style={{ width: '110px' }} />
                                                 </Form.Item>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'tourist_amount']}
                                                     rules={[{ required: true, message: 'Missing tourist price' }]}
                                                 >
-                                                    <InputNumber placeholder="Tourist Price" />
+                                                    <InputNumber placeholder="Tourist Price" style={{ width: '110px' }} />
                                                 </Form.Item>
                                             </div>
                                             <MinusCircleOutlined onClick={() => remove(name)} />

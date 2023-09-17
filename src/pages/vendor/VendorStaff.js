@@ -218,6 +218,7 @@ export default function VendorStaff() {
                                 style={styles.table}
                                 column={vendorStaffColumns}
                                 data={vendorStaffData}
+                                tableLayout="fixed"
                             />
 
                             {/* Modal to create new vendor staff account */}

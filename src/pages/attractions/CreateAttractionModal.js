@@ -8,6 +8,7 @@ export default function CreateAttractionModal(props) {
     const { TextArea } = Input;
     const { Option } = Select;
     const [uploadedImageURLs, setUploadedImageURLs] = useState([]);
+    const [selectedTicketTypes, setSelectedTicketTypes] = useState([]);
 
     const normFile = (e) => {
         console.log('Upload event:', e);
@@ -16,6 +17,18 @@ export default function CreateAttractionModal(props) {
             return e;
         }
         return e?.fileList;
+    };
+
+    const checkDuplicateTicketType = (_, value, allFields) => {
+        if (value && value.length > 1) {
+            const allTicketTypes = allFields.map((field) => field.ticket_type);
+            const uniqueTicketTypes = new Set(allTicketTypes);
+
+            if (uniqueTicketTypes.size !== allTicketTypes.length) {
+                return Promise.reject('Duplicate ticket types are not allowed.');
+            }
+        }
+        return Promise.resolve();
     };
 
     // function uploadImage() {
@@ -44,9 +57,9 @@ export default function CreateAttractionModal(props) {
                     <Form.Item
                         label="Name"
                         name="name"
-                        rules={[{ required: true, message: 'Please enter name of attraction!' }, 
+                        rules={[{ required: true, message: 'Please enter name of attraction!' },
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
-                        
+
                     >
                         <Input />
                     </Form.Item>
@@ -98,7 +111,7 @@ export default function CreateAttractionModal(props) {
                         rules={[
                             { required: true, message: 'Please enter contact number of attraction!' },
                             {
-                                pattern: /^(\+\d{2}[- ]?)?\d{8}$/, 
+                                pattern: /^(\+\d{2}[- ]?)?\d{8}$/,
                                 message: 'Please enter a valid contact number!',
                             },
                         ]}
@@ -137,7 +150,7 @@ export default function CreateAttractionModal(props) {
                             },
                         ]}
                     >
-                        <InputNumber/>
+                        <InputNumber suffix="Hours" />
                     </Form.Item>
 
                     <Form.Item
@@ -180,47 +193,76 @@ export default function CreateAttractionModal(props) {
                         label="Price List"
                         name="prices"
                     >
-                        <Form.List name="price_list">
+                        <Form.List
+                            name="price_list"
+                            initialValue={[{ ticket_type: '', local_amount: 0, tourist_amount: 0 }]}
+                        >
                             {(fields, { add, remove }) => (
                                 <>
                                     {fields.map(({ key, name, ...restField }) => (
-                                        <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                                            <div style={{ width: 130, margin: '0 8px' }}>
+                                        <Space
+                                            key={key}
+                                            style={{ display: 'flex', marginBottom: 8 }}
+                                            align="baseline"
+                                        >
+                                            <div style={{ width: 110, margin: '0 8px' }}>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'ticket_type']}
-                                                    rules={[{ required: true, message: 'Missing ticket type' }]}
+                                                    rules={[
+                                                        { required: true, message: 'Missing ticket type' },
+                                                        ({ getFieldValue }) => ({
+                                                            validator(_, value) {
+                                                                const allTicketTypes = getFieldValue('price_list').map(
+                                                                    (item) => item.ticket_type
+                                                                );
+                                                                if (
+                                                                    allTicketTypes.filter(
+                                                                        (type) => type === value
+                                                                    ).length === 1
+                                                                ) {
+                                                                    return Promise.resolve();
+                                                                }
+                                                                return Promise.reject('Duplicate ticket types are not allowed.');
+                                                            },
+                                                        }),
+                                                    ]}
                                                 >
                                                     <Select>
-                                                        <Option value='CHILD'>Child</Option>
-                                                        <Option value='TEENAGER'>Teenager</Option>
-                                                        <Option value='ADULT'>Adult</Option>
-                                                        <Option value='SENIOR'>Senior</Option>
-                                                        <Option value='ALL'>All</Option>
+                                                        <Option value="CHILD">Child</Option>
+                                                        <Option value="TEENAGER">Teenager</Option>
+                                                        <Option value="ADULT">Adult</Option>
+                                                        <Option value="SENIOR">Senior</Option>
+                                                        <Option value="ALL">All</Option>
                                                     </Select>
                                                 </Form.Item>
                                             </div>
-                                            <div style={{ width: 130, margin: '0 2px' }}>
+                                            <div style={{ width: 130, margin: '0 1px' }}>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'local_amount']}
                                                     rules={[{ required: true, message: 'Missing local price' }]}
                                                 >
-                                                    <InputNumber placeholder="Local Price" />
+                                                    <InputNumber placeholder="Local Price" style={{ width: '110px' }} />
                                                 </Form.Item>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'tourist_amount']}
                                                     rules={[{ required: true, message: 'Missing tourist price' }]}
                                                 >
-                                                    <InputNumber placeholder="Tourist Price" />
+                                                    <InputNumber placeholder="Tourist Price" style={{ width: '110px' }} />
                                                 </Form.Item>
                                             </div>
                                             <MinusCircleOutlined onClick={() => remove(name)} />
                                         </Space>
                                     ))}
                                     <Form.Item>
-                                        <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                        <Button
+                                            type="dashed"
+                                            onClick={() => add()}
+                                            block
+                                            icon={<PlusOutlined />}
+                                        >
                                             Add field
                                         </Button>
                                     </Form.Item>

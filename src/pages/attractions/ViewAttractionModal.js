@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Select, Tag } from "antd";
+import { Modal, Select, Tag, Badge } from "antd";
 import { getAttractionByVendor } from "../../redux/attractionRedux";
 
 export default function ViewAttractionModal(props) {
@@ -32,10 +32,10 @@ export default function ViewAttractionModal(props) {
 
     const formattedPriceList = priceList.map((item, index) => {
         const itemStyle = {
-            margin: 0,  
-            padding: 0, 
+            margin: 0,
+            padding: 0,
         };
-    
+
         return (
             <p key={index} style={index === 0 ? { marginTop: 0 } : itemStyle}>
                 {index === 0 ? null : <br />}
@@ -59,10 +59,10 @@ export default function ViewAttractionModal(props) {
             case 'TIER_5':
                 return 'yellow';
             default:
-                return 'default'; 
+                return 'default';
         }
     }
-    
+
     function getCategoryColor(attractionCategory) {
         switch (attractionCategory) {
             case 'HISTORICAL':
@@ -78,30 +78,38 @@ export default function ViewAttractionModal(props) {
             case 'ENTERTAINMENT':
                 return 'cyan';
             default:
-                return 'default'; 
+                return 'default';
         }
-    }    
+    }
 
     function renderProperty(label, value, color) {
 
-        const formattedValue = typeof value === 'string' && value.includes('_')
+        let formattedValue = typeof value === 'string' && value.includes('_')
         ? value.split('_').join(' ')
         : typeof value === 'string' && label === 'Contact Number'
         ? value.replace(/(\d{4})(\d{4})/, '$1 $2')
-        : typeof value === 'string' && label === 'Location Area'
+        : typeof value === 'string' && label === 'Area'
         ? value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
-        : label === 'Average Rating' && value === 0
+        : label === 'Avg Rating' && value === 0
         ? 'N/A'
         : value;
+               
+        if (label === 'Suggested Duration') {
+            formattedValue += ' Hours';
+        }
 
         return (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 'bold', minWidth: '160px' }}>{label}:</div>
                 <div>
-                    {color ? (
-                        <Tag color={color}>{formattedValue}</Tag>
+                    {label === 'Is Published?' ? (
+                        <Badge status={value ? 'success' : 'error'} text={value ? 'Yes' : 'No'} />
                     ) : (
-                        formattedValue
+                        color ? (
+                            <Tag color={color}>{formattedValue}</Tag>
+                        ) : (
+                            formattedValue
+                        )
                     )}
                 </div>
             </div>
@@ -122,15 +130,15 @@ export default function ViewAttractionModal(props) {
 
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderProperty('Description', selectedAttraction.description)}
+                    {renderProperty('Category', selectedAttraction.attraction_category, getCategoryColor(selectedAttraction.attraction_category))}
                     {renderProperty('Address', selectedAttraction.address)}
+                    {renderProperty('Area', selectedAttraction.generic_location)}
                     {renderProperty('Opening Hours', selectedAttraction.opening_hours)}
                     {renderProperty('Age Group', selectedAttraction.age_group)}
                     {renderProperty('Contact Number', selectedAttraction.contact_num)}
                     {renderProperty('Is Published?', selectedAttraction.is_published ? "Yes" : "No")}
                     {renderProperty('Suggested Duration', selectedAttraction.suggested_duration)}
-                    {renderProperty('Average Rating', selectedAttraction.avg_rating_tier)}
-                    {renderProperty('Category', selectedAttraction.attraction_category, getCategoryColor(selectedAttraction.attraction_category))}
-                    {renderProperty('Location Area', selectedAttraction.generic_location)}
+                    {renderProperty('Avg Rating', selectedAttraction.avg_rating_tier)}
                     {renderProperty('Price Tier', selectedAttraction.estimated_price_tier, getPriceTierColor(selectedAttraction.estimated_price_tier))}
                     {renderProperty('Pricing', formattedPriceList)}
                 </div>

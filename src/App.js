@@ -14,7 +14,7 @@ import Signup from "./pages/Signup/Signup";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
-import { HomeOutlined, UserOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, UsergroupAddOutlined, CalendarOutlined, BankOutlined } from '@ant-design/icons';
 import { Logout } from "@mui/icons-material";
 
 function App() {
@@ -28,8 +28,8 @@ function App() {
       {key: '/home', label: 'Home', icon: <HomeOutlined />},
       {key: '/profile', label: 'Profile', icon: <UserOutlined />},
       {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined />},
-      {key: '/attractionmanagement', label: 'Attractions Management',icon: <UsergroupAddOutlined />,},
-      {key: '/bookingmanagement', label: 'Booking Management',icon: <UsergroupAddOutlined />,},
+      {key: '/attractionmanagement', label: 'Attractions',icon: <BankOutlined />,},
+      {key: '/bookingmanagement', label: 'Bookings',icon: <CalendarOutlined />,},
       {key: '/', label: 'Logout',icon: <Logout />,}
   ];
 

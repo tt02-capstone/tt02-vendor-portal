@@ -218,6 +218,7 @@ export default function BookingManagement() {
                             title="Attraction Bookings"
                             column={bookingsColumns}
                             data={attractionBookingsData}
+                            tableLayout="auto"
                         />
 
                         

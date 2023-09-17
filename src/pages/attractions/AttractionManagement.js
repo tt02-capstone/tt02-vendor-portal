@@ -12,6 +12,8 @@ import EditAttractionModal from "./EditAttractionModal";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
+import { PlusOutlined }  from "@ant-design/icons";
+
 
 export default function AttractionManagement() {
 
@@ -77,6 +79,11 @@ export default function AttractionManagement() {
             }
         },
         {
+            title: 'Area',
+            dataIndex: 'generic_location',
+            key: 'generic_location',
+        },
+        {
             title: 'Address',
             dataIndex: 'address',
             key: 'address',
@@ -85,11 +92,6 @@ export default function AttractionManagement() {
             title: 'Opening Hours',
             dataIndex: 'opening_hours',
             key: 'opening_hours',
-        },
-        {
-            title: 'Age Group',
-            dataIndex: 'age_group',
-            key: 'age_group',
         },
         {
             title: 'Contact Num',
@@ -109,14 +111,9 @@ export default function AttractionManagement() {
             }
         },
         {
-            title: 'Average Rating',
+            title: 'Avg Rating',
             dataIndex: 'avg_rating_tier',
             key: 'avg_rating_tier',
-        },
-        {
-            title: 'Location Area',
-            dataIndex: 'generic_location',
-            key: 'generic_location',
         },
         {
             title: 'Price Tier',
@@ -373,7 +370,8 @@ export default function AttractionManagement() {
 
                         <CustomButton
                             text="Create Attraction"
-                            // icon=
+                            style={{marginLeft: '3px', marginBottom: '20px'}}
+                            icon={<PlusOutlined />}
                             onClick={onClickOpenCreateAttractionModal}
                         />
 
@@ -382,6 +380,7 @@ export default function AttractionManagement() {
                             title="Attractions"
                             column={attractionsColumns}
                             data={formattedAttractionsData}
+                            tableLayout="auto"
                         />
 
                         {/* Modal to create new attraction */}
