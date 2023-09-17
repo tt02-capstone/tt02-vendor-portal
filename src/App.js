@@ -14,7 +14,7 @@ import Signup from "./pages/Signup/Signup";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
-import AttractionManageTicket from "./pages/attraction/AttractionManageTicket";
+import AttractionManageTicket from "./pages/attractions/AttractionManageTicket";
 import { HomeOutlined, UserOutlined, UsergroupAddOutlined, BarsOutlined } from '@ant-design/icons';
 import { Logout } from "@mui/icons-material";
 import { loadStripe } from '@stripe/stripe-js';
@@ -33,7 +33,7 @@ function App() {
       {key: '/home', label: 'Home', icon: <HomeOutlined />},
       {key: '/profile', label: 'Profile', icon: <UserOutlined />},
       {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined />},
-      {key: '/attraction', label: 'Attractions Management',icon: <UsergroupAddOutlined />,},
+      {key: '/attraction', label: 'Attraction Management',icon: <UsergroupAddOutlined />,},
       {key: '/bookingmanagement', label: 'Booking Management',icon: <UsergroupAddOutlined />,},
       {key: '/', label: 'Logout',icon: <Logout />,}
   ];
@@ -80,7 +80,7 @@ function App() {
           <Route path="/bookingmanagement" element={<BookingManagement />} />
           <Route path="/verifyemail" element={<EmailVerification />} />
           <Route path="/attraction" element={<AttractionManagement />} />
-          <Route path="/attraction/ViewTicket" element={<AttractionManageTicket />} />
+          <Route path="/attraction/viewTicket" element={<AttractionManageTicket />} />
       </Routes>
         {/*<Footer style={{ textAlign: 'center' }}>TT02 Captsone ©2023</Footer>*/}
     </Layout>

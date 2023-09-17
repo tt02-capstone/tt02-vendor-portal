@@ -22,7 +22,7 @@ export default function AttractionManageTicket() {
 
     const viewTicketBreadCrumb = [
         {
-          title: 'Attractions',
+          title: 'Attraction',
         },
         {
           title: 'View Tickets',
@@ -379,8 +379,7 @@ export default function AttractionManageTicket() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '90vw',   
-        backgroundColor: 'white'
+        minWidth: '90vw'
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
