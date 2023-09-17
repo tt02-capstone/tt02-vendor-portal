@@ -14,11 +14,18 @@ import { editLocalProfile } from "../../redux/localRedux";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
 import CustomFileUpload from "../../components/CustomFileUpload";
 import AWS from 'aws-sdk';
+import AddBankAccountModal from "./AddBankAccountsModal";
+import { loadStripe  } from '@stripe/stripe-js';
+import { useStripe } from '@stripe/react-stripe-js';
+import { vendorStaffApi } from "../../redux/api";
+
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const { Text } = Typography;
 
 export default function Profile() {
+
+    const stripe = useStripe();
 
     const navigate = useNavigate();
     const dateFormat = "DD-MM-YYYY";
@@ -49,7 +56,7 @@ export default function Profile() {
     const [isViewProfile, setIsViewProfile] = useState(true); // view or edit profile
 
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false); // change password boolean
-
+    const [isBAModalOpen, setIsBAModalOpen] = useState(false);
     // when the edit profile button is clicked
     function onClickEditProfile() {
         setIsViewProfile(false);
@@ -133,6 +140,15 @@ export default function Profile() {
         setIsChangePasswordModalOpen(false);
     }
 
+    function onClickManageBAButton() {
+      setIsBAModalOpen(true);
+    }
+
+  // close edit password modal
+    function onClickCancelManageBAButton() {
+     setIsBAModalOpen(false);
+    }
+
     // when user edits password
     async function onClickSubmitNewPassword(val) {
         if (val.oldPassword && val.newPasswordOne === val.newPasswordTwo) {
@@ -158,6 +174,40 @@ export default function Profile() {
             });
         }
     }
+
+    async function onClickSubmitNewBankAccount(bankAccountDetails) {
+
+      const token = await stripe.createToken('bank_account',{
+        
+          country: 'SG',
+          currency: 'sgd',
+          routing_number: bankAccountDetails.routingNumber,
+          account_number: bankAccountDetails.bankAccountNumber,
+        
+      });
+
+      console.log(token)
+
+      const userId = parseInt(user.user_id);
+
+      const bank_account_token = token.token.id
+
+      const response = await vendorStaffApi.post(`/addBankAccount/${userId}/${bank_account_token}`)
+      if (response.status) {
+        toast.success('Bank account successfully!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+        setIsBAModalOpen(false);
+    
+    } else {
+        toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+    }
+
+  }
 
     // upload file
     const S3BUCKET ='tt02/user';
@@ -275,7 +325,9 @@ export default function Profile() {
                                 onClick={onClickEditPasswordButton}
                               />
                           </Col>
+                          
                           </Row>
+                          
                         }
 
                         {/* master vendor staff specific */}
@@ -292,6 +344,12 @@ export default function Profile() {
                             </Row>
                         </div>
                         }
+
+                        <CustomButton
+                                text="Manage Bank Accounts"
+                                icon={<KeyOutlined />}
+                                onClick={onClickManageBAButton}
+                              />
                         
                         {/* other items to be displayed in the future */}
                     </Content>
@@ -588,7 +646,17 @@ export default function Profile() {
                 />
             }
 
+
+            {isBAModalOpen && 
+                <AddBankAccountModal 
+                    isBAModalOpen={isBAModalOpen}
+                    onClickSubmitNewBankAccount={onClickSubmitNewBankAccount}
+                    onClickCancelManageBAButton={onClickCancelManageBAButton}
+                />
+            }
+
             {/* Edit profile & password toast */}
+            
             <ToastContainer />
         </div>
     ) : (
