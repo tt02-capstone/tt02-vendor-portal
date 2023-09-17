@@ -197,9 +197,9 @@ export default function AttractionManagement() {
 
     useEffect(() => { 
         if (getAttractionsData) { 
-            console.log("vendor vendor vendor",vendor.vendor.vendor_id)
+            console.log("vendor vendor vendor",vendor.user_id)
             const fetchData = async () => {
-                const response = await getAttractionListByVendor(vendor.vendor.vendor_id);
+                const response = await getAttractionListByVendor(vendor.user_id);
                 console.log("response", response.data);
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
@@ -251,7 +251,7 @@ export default function AttractionManagement() {
             price_list: values.price_list,
         }
 
-        let response = await createAttraction(vendor.vendor.vendor_id, attractionObj);
+        let response = await createAttraction(vendor.user_id, attractionObj);
         if (response.status) {
             createAttractionForm.resetFields();
             setGetAttractionsData(true);
@@ -324,7 +324,7 @@ export default function AttractionManagement() {
             price_list: values.price_list,
         }
 
-        let response = await updateAttraction(vendor.vendor.vendor_id, attractionObj);
+        let response = await updateAttraction(vendor.user_id, attractionObj);
         if (response.status) {
             setIsEditAttractionModalOpen(false);
             setGetAttractionsData(true);
@@ -345,7 +345,7 @@ export default function AttractionManagement() {
 
     async function getAttraction(vendor, selectedAttractionId) {
         try {
-            let response = await getAttractionByVendor(vendor.vendor_id, selectedAttractionId);          
+            let response = await getAttractionByVendor(vendor.user_id, selectedAttractionId);          
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
         } catch (error) {
@@ -365,7 +365,7 @@ export default function AttractionManagement() {
     }, [isEditAttractionModalOpen]);
 
     const redirectToTickets = () => {
-        navigate('/attraction/ViewTicket');
+        navigate('/attraction/viewTicket');
     }
 
     return vendor ? (
