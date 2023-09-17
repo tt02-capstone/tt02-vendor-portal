@@ -17,8 +17,12 @@ import EmailVerification from "./pages/EmailVerification";
 import AttractionManageTicket from "./pages/attraction/AttractionManageTicket";
 import { HomeOutlined, UserOutlined, UsergroupAddOutlined, BarsOutlined } from '@ant-design/icons';
 import { Logout } from "@mui/icons-material";
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 
 function App() {
+
+  const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,7 +67,11 @@ function App() {
       }
       <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={
+          <Elements stripe={stripePromise}>
+            <Profile />
+          </Elements>
+          } />
           <Route path="/vendorStaff" element={<VendorStaff />} />
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
