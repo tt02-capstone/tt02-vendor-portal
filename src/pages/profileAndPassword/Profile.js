@@ -57,6 +57,7 @@ export default function Profile() {
 
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false); // change password boolean
     const [isBAModalOpen, setIsBAModalOpen] = useState(false);
+    const [bankAccounts, setBankAccounts] = useState([]); // bank accounts
     // when the edit profile button is clicked
     function onClickEditProfile() {
         setIsViewProfile(false);
@@ -266,6 +267,29 @@ export default function Profile() {
         str = str + '/' + file.name;
         console.log("useEffect", str);
       }
+
+      async function getBankAccounts() {
+  
+        const userId = parseInt(user.user_id);
+  
+        const response = await vendorStaffApi.get(`/getBankAccounts/${userId}`)
+        if (response.status) {
+          const bankAccounts = response.data;
+          //console.log(bankAccounts);
+          setBankAccounts(bankAccounts);
+      
+      } else {
+          toast.error(response.data.errorMessage, {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 1500
+          });
+      }
+  
+    }
+
+    getBankAccounts();
+
+
     }, [file]);
 
     return user ? (
@@ -345,8 +369,15 @@ export default function Profile() {
                         </div>
                         }
 
+                        <h3>List of Bank Accounts</h3>
+                        <ul>
+                        {bankAccounts.map((account) => (
+                              <li key={account.account}>Bank Account Number: *****{account.last4}</li>
+                        ))}
+                      </ul>
+
                         <CustomButton
-                                text="Manage Bank Accounts"
+                                text="Add Bank Account"
                                 icon={<KeyOutlined />}
                                 onClick={onClickManageBAButton}
                               />
