@@ -15,6 +15,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { passwordResetStageOne } from '../../redux/userRedux';
 import CustomButton from '../../components/CustomButton';
 
+const breadCrumbItems = [
+    {
+        title: 'Forget Password',
+    },
+]
+
 const formItemLayout = {
     labelCol: {
         xs: {
@@ -86,7 +92,7 @@ function PasswordReset() {
 
     return (
         <Layout style={styles.layout}>
-            <CustomHeader text={"Forget Password"} />
+            <CustomHeader items={breadCrumbItems} />
             <Row align='middle' justify='center'>
                 <Spin tip="Processing Request" size="large" spinning={loading}>
                     <Content style={styles.content}>
