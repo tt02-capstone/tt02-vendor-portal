@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Space, Button, Select, InputNumber, Upload } from "antd";
 import { MinusCircleOutlined, PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import CustomFileUpload from "../../components/CustomFileUpload";
+import { ToastContainer, toast } from 'react-toastify';
+import AWS from 'aws-sdk';
 
+window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export default function CreateAttractionModal(props) {
 
     const { TextArea } = Input;
     const { Option } = Select;
-    const [uploadedImageURLs, setUploadedImageURLs] = useState([]);
+    const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+    const [imageFiles, setImageFiles] = useState([]);
     const [selectedTicketTypes, setSelectedTicketTypes] = useState([]);
-
-    const normFile = (e) => {
-        console.log('Upload event:', e);
-
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
+    const [attractionName, setAttractionName] = useState('');
 
     const checkDuplicateTicketType = (_, value, allFields) => {
         if (value && value.length > 1) {
@@ -31,10 +28,102 @@ export default function CreateAttractionModal(props) {
         return Promise.resolve();
     };
 
-    // function uploadImage() {
-    //     console.log("uploadImage function");
-    // }
+    const handleAttractionNameChange = (e) => {
+        const newName = e.target.value;
+        setAttractionName(newName);
+        console.log("attractionName: ", attractionName)
+    };
 
+    // upload file
+    const S3BUCKET = 'tt02/attraction';
+    const TT02REGION = 'ap-southeast-1';
+    const ACCESS_KEY = 'AKIART7KLOHBGOHX2Y7T';
+    const SECRET_ACCESS_KEY = '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';
+
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        const selectedFiles = e.target.files; // Get the FileList object
+        const fileList = [];
+    
+        // Loop through the selected files and add them to the fileList array
+        for (let i = 0; i < selectedFiles.length; i++) {
+            fileList.push(selectedFiles[i]);
+        }
+    
+        setImageFiles(fileList); // Store the array of files in your state
+    };    
+
+    const onFinish = async (values) => {
+
+        const uploadPromises = imageFiles.map(async (file) => {
+
+        // Append the attraction name to the image name
+        const attractionImageName = attractionName + '_' + file.name;
+
+        // Upload file if it exists
+        if (file) {
+            const S3_BUCKET = S3BUCKET;
+            const REGION = TT02REGION;
+
+            AWS.config.update({
+                accessKeyId: ACCESS_KEY,
+                secretAccessKey: SECRET_ACCESS_KEY,
+            });
+            const s3 = new AWS.S3({
+                params: { Bucket: S3_BUCKET },
+                region: REGION,
+            });
+
+            const params = {
+                Bucket: S3_BUCKET,
+                Key: attractionImageName,
+                Body: file,
+            };
+
+            var upload = s3
+                .putObject(params)
+                .on("httpUploadProgress", (evt) => {
+                    console.log(
+                        "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+                    );
+                })
+                .promise();
+
+                await upload.then((err, data) => {
+                    const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+                    console.log("imageUrl", imageUrl);
+        
+                    toast.success('Upload successful!', {
+                        position: toast.POSITION.TOP_RIGHT,
+                        autoClose: 1500
+                    });
+        
+                    console.log(err);
+                    setFile(null);
+        
+                    // Update the uploadedImageUrls state
+                    setUploadedImageUrls([imageUrl]);
+                });
+            }
+        });
+        await Promise.all(uploadPromises);
+    };
+
+    useEffect(() => {
+        if (file) {
+            let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
+            str = str + '/' + 'attraction';
+            str = str + '/' + file.name;
+            console.log("useEffect", str);
+        }
+
+    }, [file]);
+
+    useEffect(() => {
+        // Only call the parent component's function when uploadedImageUrls changes
+        props.onClickSubmitAttractionCreate({ ...props.form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
+    }, [uploadedImageUrls]);
     return (
         <div>
             <Modal
@@ -52,7 +141,7 @@ export default function CreateAttractionModal(props) {
                     style={{ maxWidth: 600 }}
                     required={true}
                     requiredMark={true}
-                    onFinish={props.onClickSubmitAttractionCreate}
+                    onFinish={onFinish}
                 >
                     <Form.Item
                         label="Name"
@@ -61,7 +150,15 @@ export default function CreateAttractionModal(props) {
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
 
                     >
-                        <Input />
+                        <Input onChange={handleAttractionNameChange} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Images"
+                        name="attraction_image_list"
+                    >
+                        <Input type="file" onChange={handleFileChange} />
+                        <ToastContainer />
                     </Form.Item>
 
                     <Form.Item
@@ -118,21 +215,6 @@ export default function CreateAttractionModal(props) {
                     >
                         <Input />
                     </Form.Item>
-
-                    {/* <Form.Item label="Image Upload">
-                        <Form.Item name="image" valuePropName="fileList" getValueFromEvent={normFile} noStyle>
-                                <Upload.Dragger name="files" customRequest={({ file }) => {
-                                    const updatedURLs = uploadImage(file); // Call uploadImage when a file is uploaded
-                                    console.log('Updated URLs:', updatedURLs);
-                                }}>
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                <p className="ant-upload-hint">Support for a single or bulk upload.</p>
-                            </Upload.Dragger>
-                        </Form.Item>
-                    </Form.Item> */}
 
                     <Form.Item
                         label="Suggested Duration"
@@ -213,6 +295,7 @@ export default function CreateAttractionModal(props) {
                                                         { required: true, message: 'Missing ticket type' },
                                                         ({ getFieldValue }) => ({
                                                             validator(_, value) {
+                                                                if (value && value.length > 1) {
                                                                 const allTicketTypes = getFieldValue('price_list').map(
                                                                     (item) => item.ticket_type
                                                                 );
@@ -224,6 +307,7 @@ export default function CreateAttractionModal(props) {
                                                                     return Promise.resolve();
                                                                 }
                                                                 return Promise.reject('Duplicate ticket types are not allowed.');
+                                                                }
                                                             },
                                                         }),
                                                     ]}

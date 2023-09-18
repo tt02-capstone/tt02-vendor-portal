@@ -11,7 +11,7 @@ export default function ViewAttractionModal(props) {
 
     async function getAttraction(vendor, props) {
         try {
-            let response = await getAttractionByVendor(vendor.vendor_id, props.attractionId);
+            let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
         } catch (error) {
@@ -26,7 +26,7 @@ export default function ViewAttractionModal(props) {
 
     useEffect(() => {
         if (props.isViewAttractionModalOpen) {
-            getAttraction(vendor.vendor, props);
+            getAttraction(vendor, props);
         }
     }, [props.isViewAttractionModalOpen]);
 
@@ -82,6 +82,23 @@ export default function ViewAttractionModal(props) {
         }
     }
 
+    function renderAttractionImage(imageList) {
+        if (Array.isArray(imageList) && imageList.length > 0) {
+            // Assuming the first element of the imageList is the URL of the first image
+            const firstImageUrl = imageList[0];
+            return (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '35px' }}>
+                    <img
+                        src={firstImageUrl}
+                        alt="Attraction"
+                        style={{ maxWidth: '400px', maxHeight: '300px', width: '100%', height: 'auto' }}
+                    />
+                </div>
+            );
+        }
+        return 'No Image';
+    }    
+
     function renderProperty(label, value, color) {
 
         let formattedValue = typeof value === 'string' && value.includes('_')
@@ -129,6 +146,7 @@ export default function ViewAttractionModal(props) {
                 {/* seasonalactivity, reviewlist, tourtypelist */}
 
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
+                    {renderAttractionImage(selectedAttraction.attraction_image_list)}
                     {renderProperty('Description', selectedAttraction.description)}
                     {renderProperty('Category', selectedAttraction.attraction_category, getCategoryColor(selectedAttraction.attraction_category))}
                     {renderProperty('Address', selectedAttraction.address)}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag } from 'antd';
+import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag, Image } from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import EditAttractionModal from "./EditAttractionModal";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
-import { PlusOutlined }  from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
 
 export default function AttractionManagement() {
@@ -27,6 +27,7 @@ export default function AttractionManagement() {
     const [selectedAttractionId, setSelectedAttractionId] = useState(null);
     const [selectedAttraction, setSelectedAttraction] = useState([]);
     const [priceList, setPriceList] = useState([]);
+    const [attractionImages, setAttractionImages] = useState({});
 
     const attractionsColumns = [
         {
@@ -36,9 +37,25 @@ export default function AttractionManagement() {
         },
         {
             title: 'Image',
-            dataIndex: 'img_list[0]',
-            key: 'img_list[0]',
-        },
+            dataIndex: 'img_list',
+            key: 'img_list',
+            render: (imageList) => {
+                if (Array.isArray(imageList) && imageList.length > 0) {
+                    // Assuming the first element of the imageList is the URL of the first image
+                    const firstImageUrl = imageList[0];
+                    return (
+                        <div style={styles.imageContainer}>
+                            <img
+                                src={firstImageUrl}
+                                alt="Attraction"
+                                style={styles.image}
+                            />
+                        </div>
+                    );
+                }
+                return 'No Image';
+            },
+        },   
         {
             title: 'Name',
             dataIndex: 'name',
@@ -72,7 +89,7 @@ export default function AttractionManagement() {
                     default:
                         break;
                 }
-        
+
                 return (
                     <Tag color={tagColor}>{attractionCategory}</Tag>
                 );
@@ -140,7 +157,7 @@ export default function AttractionManagement() {
                     default:
                         break;
                 }
-        
+
                 return (
                     <Tag color={tagColor}>{priceTier}</Tag>
                 );
@@ -192,8 +209,8 @@ export default function AttractionManagement() {
         };
     });
 
-    useEffect(() => { 
-        if (getAttractionsData) { 
+    useEffect(() => {
+        if (getAttractionsData) {
             const fetchData = async () => {
                 const response = await getAttractionListByVendor(vendor.user_id);
                 console.log("response", response.data);
@@ -231,6 +248,8 @@ export default function AttractionManagement() {
     // create new attraction modal create button
     async function onClickSubmitAttractionCreate(values) {
 
+        console.log("onClickSubmitAttractionCreate Attraction image List", values.attraction_image_list)
+
         let attractionObj = {
             name: values.name,
             description: values.description,
@@ -238,7 +257,7 @@ export default function AttractionManagement() {
             opening_hours: values.opening_hours,
             age_group: values.age_group,
             contact_num: values.contact_num,
-            // attraction_image_list: values.attraction_image_list, 
+            attraction_image_list: values.attraction_image_list,
             is_published: true,
             suggested_duration: values.suggested_duration,
             avg_rating_tier: 0,
@@ -341,7 +360,7 @@ export default function AttractionManagement() {
 
     async function getAttraction(vendor, selectedAttractionId) {
         try {
-            let response = await getAttractionByVendor(vendor.user_id, selectedAttractionId);          
+            let response = await getAttractionByVendor(vendor.user_id, selectedAttractionId);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
         } catch (error) {
@@ -364,6 +383,24 @@ export default function AttractionManagement() {
         navigate('/attraction/viewTicket');
     }
 
+    // Define a function to add or update image file names for a specific attraction.
+    const updateAttractionImages = (attractionId, imageFileName) => {
+        setAttractionImages((prevImages) => ({
+            ...prevImages,
+            [attractionId]: [...(prevImages[attractionId] || []), imageFileName],
+        }));
+    };
+
+    // Define a function to remove an image file name for a specific attraction.
+    const removeAttractionImage = (attractionId, imageFileName) => {
+        setAttractionImages((prevImages) => ({
+            ...prevImages,
+            [attractionId]: prevImages[attractionId].filter(
+                (fileName) => fileName !== imageFileName
+            ),
+        }));
+    };
+
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
@@ -373,7 +410,7 @@ export default function AttractionManagement() {
 
                         <CustomButton
                             text="Create Attraction"
-                            style={{marginLeft: '3px', marginBottom: '20px'}}
+                            style={{ marginLeft: '3px', marginBottom: '20px' }}
                             icon={<PlusOutlined />}
                             onClick={onClickOpenCreateAttractionModal}
                         />
@@ -381,7 +418,7 @@ export default function AttractionManagement() {
                         <CustomButton
                             text="View Tickets"
                             onClick={redirectToTickets}
-                        />  
+                        />
 
                         {/* pagination */}
                         <CustomTablePagination
@@ -397,6 +434,8 @@ export default function AttractionManagement() {
                             isCreateAttractionModalOpen={isCreateAttractionModalOpen}
                             onClickCancelCreateAttractionModal={onClickCancelCreateAttractionModal}
                             onClickSubmitAttractionCreate={onClickSubmitAttractionCreate}
+                            onUpdateImages={updateAttractionImages}
+                            onRemoveImage={removeAttractionImage}
                         />
 
                         {/* Modal to view attraction */}
@@ -435,5 +474,17 @@ const styles = {
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-    },   
+    },
+    customRow: {
+        height: '280px',
+    },
+    imageContainer: {
+        maxWidth: '180px',
+        maxHeight: '100px', 
+        overflow: 'hidden', 
+    },
+    image: {
+        width: '100%', 
+        height: 'auto', 
+    },
 }

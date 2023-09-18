@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Select, Switch, InputNumber, Space } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Button, Select, Switch, InputNumber, Space, Upload } from "antd";
+import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { getAttractionByVendor } from "../../redux/attractionRedux";
 
 export default function EditAttractionModal(props) {
@@ -9,6 +9,7 @@ export default function EditAttractionModal(props) {
     const [form] = Form.useForm();
     const [selectedAttraction, setSelectedAttraction] = useState([]);
     const [priceList, setPriceList] = useState([]);
+    const [imageUrls, setImageUrls] = useState([]);
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     async function getAttraction(vendor, props) {
@@ -16,15 +17,18 @@ export default function EditAttractionModal(props) {
             let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
+            setImageUrls(response.data.attraction_image_list || []);
         } catch (error) {
             alert('An error occurred! Failed to retrieve attraction!');
         }
     }
 
     useEffect(() => {
-        // console.log('useEffect editAttraction selectedAttraction:', selectedAttraction);
-        // console.log('useEffect editAttraction priceList:', priceList);
-    }, [selectedAttraction, priceList])
+        form.setFieldsValue({
+            // ... Other form fields
+            attraction_image_list: imageUrls, // Set the image URLs in the form
+        });
+    }, [selectedAttraction, priceList, form, imageUrls])
 
     useEffect(() => {
         if (props.isEditAttractionModalOpen) {
@@ -47,7 +51,8 @@ export default function EditAttractionModal(props) {
             attraction_category: selectedAttraction.attraction_category,
             generic_location: selectedAttraction.generic_location,
             price_list: selectedAttraction.price_list,
-            // img list, est price tier
+            attraction_image_list: selectedAttraction.attraction_image_list,
+            // est price tier
         });
 
     }, [selectedAttraction, form]);
@@ -80,6 +85,30 @@ export default function EditAttractionModal(props) {
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
                     >
                         <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Current Image"
+                        name="attraction_image_list"
+                    >
+                        {/* Display the current image if it exists */}
+                        {imageUrls.length > 0 && (
+                            <img src={imageUrls[0]} alt="Current Attraction" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                        )}
+
+                        {/* Upload new image */}
+                        <Upload
+                            accept="image/*"
+                            beforeUpload={(file) => {
+                                // Handle the file upload here
+                                // You can replace the current image by updating imageUrls state
+                                setImageUrls([URL.createObjectURL(file)]);
+                                return false; // Prevent default upload behavior
+                            }}
+                            showUploadList={false}
+                        >
+                            <Button icon={<UploadOutlined />}>Replace Image</Button>
+                        </Upload>
                     </Form.Item>
 
                     <Form.Item
