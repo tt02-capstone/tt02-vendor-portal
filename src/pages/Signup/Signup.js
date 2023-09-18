@@ -19,6 +19,12 @@ import TermsAndConditionsModal from './TermsAndConditionsModal';
 import { validateContactNo, validateCountryCode, validateOnlyAlphabets, validatePassword } from '../../helper/validation';
 import CustomButton from '../../components/CustomButton';
 
+const breadCrumbItems = [
+  {
+      title: 'Vendor Registration',
+  },
+]
+
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -98,7 +104,7 @@ function Signup() {
   
   return (
     <Layout style={styles.layout}>
-      <CustomHeader text={"Vendor Registration"} />
+      <CustomHeader items={breadCrumbItems} />
       <Row align='middle' justify='center'>
         <Spin tip="Submitting Application" size="large" spinning={loading}>
           <Content style={styles.content}>
