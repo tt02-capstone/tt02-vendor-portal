@@ -9,10 +9,13 @@ import CustomButton from "../../components/CustomButton";
 import { ToastContainer, toast } from 'react-toastify';
 import EditPasswordModal from "./EditPasswordModal";
 import { editPassword } from "../../redux/userRedux";
+import { uploadNewProfilePic } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
+import { getVendorTotalEarnings, getTourTotalEarningForLocal } from "../../redux/paymentRedux";
 import { editLocalProfile } from "../../redux/localRedux";
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
 import CustomFileUpload from "../../components/CustomFileUpload";
+import { commaWith2DP } from "../../helper/numberFormat";
 import AWS from 'aws-sdk';
 import AddBankAccountModal from "./AddBankAccountsModal";
 import { loadStripe  } from '@stripe/stripe-js';
@@ -207,71 +210,43 @@ export default function Profile() {
             autoClose: 1500
         });
     }
-
   }
 
-    // upload file
-    const S3BUCKET ='tt02/user';
-    const TT02REGION ='ap-southeast-1';
-    const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
-    const SECRET_ACCESS_KEY ='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';
-
-    const [file, setFile] = useState(null);
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      setFile(file);
-    };
-
-    const uploadFile = async () => {
-      const S3_BUCKET = S3BUCKET;
-      const REGION = TT02REGION;
-
-      AWS.config.update({
-        accessKeyId: ACCESS_KEY,
-        secretAccessKey: SECRET_ACCESS_KEY,
-      });
-      const s3 = new AWS.S3({
-        params: { Bucket: S3_BUCKET },
-        region: REGION,
-      });
-
-      const params = {
-        Bucket: S3_BUCKET,
-        Key: file.name,
-        Body: file,
-      };
-
-      var upload = s3
-        .putObject(params)
-        .on("httpUploadProgress", (evt) => {
-          console.log(
-            "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-          );
-        })
-        .promise();
-
-      await upload.then((err, data) => {
-        console.log(err);
-        toast.success('Upload successful!', {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1500
-        });
-        setFile(null);
-      });
-    };
+    // total earnings to date for vendor and local
+    const [vendorTotalEarnings, setVendorTotalEarnings] = useState();
+    const [localTotalEarnings, setLocalTotalEarnings] = useState();
 
     useEffect(() => {
-      if (file) {
-        let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
-        str = str + '/' + 'user';
-        str = str + '/' + file.name;
-        console.log("useEffect", str);
-      }
 
+      const fetchData = async () => {
+        
+        if (user.user_type === 'VENDOR_STAFF') {
+          let response = await getVendorTotalEarnings(user.vendor.vendor_id);
+          if (response.status) {
+            setVendorTotalEarnings(response.data);
+          } else {
+              console.log("Vendor staff total earnings not shown!");
+          }
+        
+        } else if (user.user_type === 'LOCAL') {
+          let response = await getTourTotalEarningForLocal(user.user_id);
+          if (response.status) {
+              setLocalTotalEarnings(response.data);
+          } else {
+              console.log("Tour guide total earnings not shown!");
+          } 
+        }
+      }
+      
+      fetchData();
+    },[user]);
+
+    useEffect(() => {
+      // bank accounts
       async function getBankAccounts() {
-  
+
         const userId = parseInt(user.user_id);
-  
+
         const response = await vendorStaffApi.get(`/getBankAccounts/${userId}`)
         if (response.status) {
           const bankAccounts = response.data;
@@ -284,13 +259,85 @@ export default function Profile() {
               autoClose: 1500
           });
       }
-  
     }
 
     getBankAccounts();
+  }, []);
+  
+  // upload image
+  const S3BUCKET ='tt02/user'; // if you want to save in a folder called 'attraction', your S3BUCKET will instead be 'tt02/attraction'
+  const TT02REGION ='ap-southeast-1';
+  const ACCESS_KEY ='AKIART7KLOHBGOHX2Y7T';
+  const SECRET_ACCESS_KEY ='xsMGhdP0XsZKAzKdW3ED/Aa5uw91Ym5S9qz2HiJ0';
 
+  const [file, setFile] = useState(null);
 
-    }, [file]);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFile(file);
+  };
+
+  const uploadFile = async () => {
+      if (file) {
+          const S3_BUCKET = S3BUCKET;
+          const REGION = TT02REGION;
+      
+          AWS.config.update({
+              accessKeyId: ACCESS_KEY,
+              secretAccessKey: SECRET_ACCESS_KEY,
+          });
+          const s3 = new AWS.S3({
+              params: { Bucket: S3_BUCKET },
+              region: REGION,
+          });
+      
+          const params = {
+              Bucket: S3_BUCKET,
+              Key: file.name,
+              Body: file,
+          };
+      
+          var upload = s3
+              .putObject(params)
+              .on("httpUploadProgress", (evt) => {
+              console.log(
+                  "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+              );
+              })
+              .promise();
+      
+          await upload.then((err, data) => {
+              console.log(err);
+          });
+
+          let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + file.name;
+          const fetchData = async (userId, str) => {
+              const response = await uploadNewProfilePic({user_id: userId, profile_pic: str});
+              if (response.status) {
+                  console.log("image url saved in database")
+                  localStorage.setItem("user", JSON.stringify(response.data));
+                  setUser(response.data);
+                  // change local storage
+                  setFile(null);
+                  toast.success('User profile image successfully uploaded!', {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 1500
+                });
+
+              } else {
+                  console.log("User image URL in database not updated!");
+              }
+          }
+
+          fetchData(user.user_id, str);
+          setFile(null);
+      } else {
+        toast.error('Please select an image!', {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+      }
+    };
 
     return user ? (
         <div>
@@ -298,62 +345,48 @@ export default function Profile() {
             {isViewProfile && 
                 <Layout style={styles.layout}>
                     <CustomHeader items={viewProfileBreadcrumbItems}/>
-                    {/* <CustomFileUpload handleFileChange={handleFileChange} uploadFile={uploadFile}/> */}
-                    {file && file.name}
                     <Content style={styles.content}>
                       <Divider orientation="left" style={{fontSize: '150%' }} >User Profile</Divider>
-                        <Row>
-                          <Col span={8} style={{fontSize: '150%'}}>Name: {user.name}</Col>
-                          <Col span={8} style={{fontSize: '150%'}}>Email: {user.email}</Col>
-                          <Col span={8} style={{fontSize: '150%'}}>
-                            <CustomButton
-                              text="Edit Profile"
-                              icon={<UserOutlined />}
-                              onClick={onClickEditProfile}
-                            />
-                          </Col>
-                        </Row>
-
-                        {/* local specific */}
-                        {user.user_type === 'LOCAL' &&
-                          <div>
-                            <Row>
-                              <Col span={8} style={{fontSize: '150%'}}>Mobile number: {user.country_code + " " + user.mobile_num}</Col>
-                              <Col span={8} style={{fontSize: '150%'}}>Date of birth: {moment(user.date_of_birth).format('LL')}</Col>
-                              <Col span={8} style={{fontSize: '150%'}}>
-                                <CustomButton
-                                  text="Edit Password"
-                                  icon={<KeyOutlined />}
-                                  onClick={onClickEditPasswordButton}
-                                />
-                              </Col>
-                            </Row>
-                            <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
-                            <Row>
-                              <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${user.wallet_balance}</Col>
-                            </Row>
-                          </div>
-                        }
-                        
-
-                        {/* vendor staff specific */}
                         {user.user_type === 'VENDOR_STAFF' && 
                           <Row>
-                            <Col span={8} style={{fontSize: '150%'}}>Position in {user.vendor.business_name}: {user.position}</Col>
-                            {user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: Yes</Col>}
-                            {!user.is_master_account && <Col span={8} style={{fontSize: '150%'}}>Master Account: No</Col>}
-                            <Col span={8} style={{fontSize: '150%'}}>
-                              <CustomButton
-                                text="Edit Password"
-                                icon={<KeyOutlined />}
-                                onClick={onClickEditPasswordButton}
+                            <Col span={8} style={{marginLeft: '50px'}}>
+                              <img 
+                                  src={user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}
+                                  style={{borderRadius: '50%', width: '200px', height: '200px'}}
                               />
-                          </Col>
-                          
+                            </Col>
+                            <Col span={8} >
+                              <Row style={{fontSize: '150%', marginBottom: '5px'}}>Name: {user.name}</Row>
+                              <Row style={{fontSize: '150%', marginBottom: '5px'}}>Email: {user.email}</Row>
+                              <Row span={8} style={{fontSize: '150%', marginBottom: '5px'}}>Position in {user.vendor.business_name}: {user.position}</Row>
+                              {user.is_master_account && <Row span={8} style={{fontSize: '150%', marginBottom: '5px'}}>Master Account: Yes</Row>}
+                              {!user.is_master_account && <Row span={8} style={{fontSize: '150%', marginBottom: '5px'}}>Master Account: No</Row>}
+                            </Col>
+                            <Col>
+                              <Row>
+                                <CustomFileUpload handleFileChange={handleFileChange} uploadFile={uploadFile}/>
+                              </Row>
+                              <Row>
+                                <CustomButton
+                                  text="Edit Profile"
+                                  style={{marginBottom: '5px', marginTop: '5px'}}
+                                  icon={<UserOutlined />}
+                                  onClick={onClickEditProfile}
+                                />
+                              </Row>
+                              <Row>
+                                <CustomButton
+                                    text="Edit Password"
+                                    style={{marginBottom: '5px'}}
+                                    icon={<KeyOutlined />}
+                                    onClick={onClickEditPasswordButton}
+                                />
+                              </Row>
+                            </Col>
                           </Row>
-                          
                         }
 
+                        
                         {/* master vendor staff specific */}
                         {user.user_type === 'VENDOR_STAFF' && user.is_master_account === true && 
                           <div>
@@ -363,24 +396,81 @@ export default function Profile() {
                               <Col span={8} style={{fontSize: '150%'}}>Person-in-charge name: {user.vendor.poc_name}</Col>   
                             </Row>
                             <Row>
-                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge position: {user.vendor.poc_position}</Col>
-                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge contact number: {user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}</Col>   
+                              <Col span={8} style={{fontSize: '150%',}}>Person-in-charge position: {user.vendor.poc_position}</Col>
+                              <Col span={8} style={{fontSize: '150%'}}>Person-in-charge contact: {user.vendor.country_code + ' ' + user.vendor.poc_mobile_num}</Col>   
+                            </Row>
+                            <Row>
+                              <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(vendorTotalEarnings)}</Col>   
                             </Row>
                         </div>
                         }
 
-                        <h3>List of Bank Accounts</h3>
-                        <ul>
-                        {bankAccounts.map((account) => (
-                              <li key={account.account}>Bank Account Number: *****{account.last4}</li>
-                        ))}
-                      </ul>
-
-                        <CustomButton
+                        {user.user_type === 'VENDOR_STAFF' &&
+                          <div>
+                            <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
+                            <Row>
+                              <CustomButton
                                 text="Add Bank Account"
                                 icon={<KeyOutlined />}
                                 onClick={onClickManageBAButton}
                               />
+                            </Row>
+                            <Row>
+                              <ul>
+                                {bankAccounts.map((account) => (
+                                    <li key={account.account}>Bank Account Number: *****{account.last4}</li>
+                                ))}
+                              </ul>
+                            </Row>                            
+                          </div>
+                        }
+
+                        {/* local specific */}
+                        {user.user_type === 'LOCAL' &&
+                          <div>
+                            <Row>
+                            <Col span={8} >
+                              <img 
+                                  src={user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}
+                                  style={{borderRadius: '50%', width: '200px', height: '200px'}}
+                              />
+                            </Col>
+                            <Col span={8} >
+                              <Row style={{fontSize: '150%'}}>Name: {user.name}</Row>
+                              <Row style={{fontSize: '150%'}}>Email: {user.email}</Row>
+                              <Row span={8} style={{fontSize: '150%'}}>Mobile number: {user.country_code + " " + user.mobile_num}</Row>
+                              <Row span={8} style={{fontSize: '150%'}}>Date of birth: {moment(user.date_of_birth).format('LL')}</Row>
+                            </Col>
+                            <Col>
+                              <Row>
+                                <CustomFileUpload handleFileChange={handleFileChange} uploadFile={uploadFile}/>
+                              </Row>
+                              <Row>
+                                <CustomButton
+                                  text="Edit Profile"
+                                  style={{marginBottom: '5px', marginTop: '5px'}}
+                                  icon={<UserOutlined />}
+                                  onClick={onClickEditProfile}
+                                />
+                              </Row>
+                              <Row>
+                                <CustomButton
+                                    text="Edit Password"
+                                    style={{marginBottom: '5px'}}
+                                    icon={<KeyOutlined />}
+                                    onClick={onClickEditPasswordButton}
+                                />
+                              </Row>
+                            </Col>
+                          </Row>
+                          
+                          <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
+                          <Row>
+                            <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
+                            <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>   
+                          </Row>
+                          </div>
+                        }
                         
                         {/* other items to be displayed in the future */}
                     </Content>
@@ -442,7 +532,7 @@ export default function Profile() {
                           <Button type="primary" htmlType="submit" loading={loading}>
                             Submit
                           </Button>
-                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} />
+                          <CustomButton text="Cancel" onClick={onCancelVendorStaffProfileButton} style={{marginLeft: '10px'}}/>
                         </div>
                       </Form.Item>
                       <ToastContainer />
