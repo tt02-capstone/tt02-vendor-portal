@@ -37,8 +37,8 @@ export default function AttractionManagement() {
         },
         {
             title: 'Image',
-            dataIndex: 'img_list',
-            key: 'img_list',
+            dataIndex: 'attraction_image_list',
+            key: 'attraction_image_list',
             render: (imageList) => {
                 if (Array.isArray(imageList) && imageList.length > 0) {
                     // Assuming the first element of the imageList is the URL of the first image
@@ -55,7 +55,7 @@ export default function AttractionManagement() {
                 }
                 return 'No Image';
             },
-        },   
+        },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -183,16 +183,16 @@ export default function AttractionManagement() {
         },
     ];
 
-    const formattedAttractionsData = attractionsData.map((item, index) => {
-        const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
-        const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-        const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
-        const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
-
-        return {
-            key: index,
+    function formatAttractionData(attractionDataArray) {
+        return attractionDataArray.map(item => {
+          const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
+          const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+          const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
+          const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
+      
+          return {
             attraction_id: item.attraction_id,
-            img_list: item.attraction_image_list,
+            attraction_image_list: item.attraction_image_list,
             name: item.name,
             attraction_category: item.attraction_category,
             address: item.address,
@@ -205,9 +205,9 @@ export default function AttractionManagement() {
             estimated_price_tier: formattedPriceTier,
             suggested_duration: item.suggested_duration,
             price_list: item.price_list,
-
-        };
-    });
+          };
+        });
+      }
 
     useEffect(() => {
         if (getAttractionsData) {
@@ -330,7 +330,6 @@ export default function AttractionManagement() {
             opening_hours: values.opening_hours,
             age_group: values.age_group,
             contact_num: values.contact_num,
-            attraction_image_list: values.attraction_image_list,
             is_published: values.is_published,
             suggested_duration: values.suggested_duration,
             avg_rating_tier: selectedAttraction.avg_rating_tier,
@@ -339,8 +338,32 @@ export default function AttractionManagement() {
             price_list: values.price_list,
         }
 
+        // Add logic to update the img_list with the newly uploaded image URL
+        if (values.attraction_image_list && values.attraction_image_list.length > 0) {
+            attractionObj.attraction_image_list = [values.attraction_image_list[0]]; // Assuming the first image is the newly uploaded one
+            console.log('Updated attraction_image_list:', attractionObj.attraction_image_list);
+        }
+
         let response = await updateAttraction(vendor.user_id, attractionObj);
         if (response.status) {
+
+            // If the update is successful, update the attraction data in the parent component's state
+            const updatedAttractionData = attractionsData.map((attraction) => {
+                if (attraction.attraction_id === selectedAttraction.attraction_id) {
+                    // Replace the existing attraction with the updated one
+                    return { ...attraction, ...attractionObj };
+                }
+                return attraction; // Return other attractions unchanged
+            });
+
+            console.log("updatedAttractionData", updatedAttractionData)
+
+            // formatAttractionData(updatedAttractionData);
+
+            // // Update the state variable with the new attraction data
+            // setAttractionsData(updatedAttractionData);
+            // console.log('attractionsData:', attractionsData);
+
             setIsEditAttractionModalOpen(false);
             setGetAttractionsData(true);
             toast.success('Attraction successfully updated!', {
@@ -371,7 +394,7 @@ export default function AttractionManagement() {
     useEffect(() => {
         // console.log('useEffect editAttraction selectedAttraction:', selectedAttraction);
         // console.log('useEffect editAttraction priceList:', priceList);
-    }, [selectedAttraction, priceList])
+    }, [selectedAttraction, priceList, attractionsData])
 
     useEffect(() => {
         if (isEditAttractionModalOpen) {
@@ -424,7 +447,7 @@ export default function AttractionManagement() {
                         <CustomTablePagination
                             title="Attractions"
                             column={attractionsColumns}
-                            data={formattedAttractionsData}
+                            data={formatAttractionData(attractionsData)}
                             tableLayout="auto"
                         />
 
@@ -480,11 +503,11 @@ const styles = {
     },
     imageContainer: {
         maxWidth: '180px',
-        maxHeight: '100px', 
-        overflow: 'hidden', 
+        maxHeight: '100px',
+        overflow: 'hidden',
     },
     image: {
-        width: '100%', 
-        height: 'auto', 
+        width: '100%',
+        height: 'auto',
     },
 }
