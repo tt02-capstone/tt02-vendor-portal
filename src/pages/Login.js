@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import { FormLabel, TextField } from '@mui/material';
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,11 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { Button } from 'antd';
+import {AuthContext, TOKEN_KEY} from "../redux/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const authContext = useContext(AuthContext);
 
   const navigate = useNavigate(); // route navigation 
   const signUpRouteChange = () => {
@@ -53,7 +55,19 @@ function Login() {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1500
           });
-          localStorage.setItem("user", JSON.stringify(response.data));
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem(TOKEN_KEY, response.data.token);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
+
+          console.log('login', response.data)
+
+          setLoading(false);
+
+          authContext.setAuthState({
+            accessToken: response.data.token,
+            authenticated: true
+          });
+
           setTimeout(() => {
             navigate('/home')
           }, 700);
