@@ -28,6 +28,26 @@ export default function CreateAttractionModal(props) {
         return Promise.resolve();
     };
 
+    function normFile(e) {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e && e.fileList;
+    }
+
+    const uploadButton = (
+        <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
+    
+    // Function to handle file removal
+    function handleRemove(file) {
+        const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
+        setImageFiles(updatedFiles);
+    }
+
     const handleAttractionNameChange = (e) => {
         const newName = e.target.value;
         setAttractionName(newName);
@@ -43,71 +63,75 @@ export default function CreateAttractionModal(props) {
     const [file, setFile] = useState(null);
 
     const handleFileChange = (e) => {
-        const selectedFiles = e.target.files; // Get the FileList object
-        const fileList = [];
-    
-        // Loop through the selected files and add them to the fileList array
-        for (let i = 0; i < selectedFiles.length; i++) {
-            fileList.push(selectedFiles[i]);
-        }
-    
-        setImageFiles(fileList); // Store the array of files in your state
-    };    
+        const fileList = e.fileList; // Access the file list directly from e
+        setImageFiles(fileList);
+    }
 
     const onFinish = async (values) => {
-
         const uploadPromises = imageFiles.map(async (file) => {
-
-        // Append the attraction name to the image name
-        const attractionImageName = attractionName + '_' + file.name;
-
-        // Upload file if it exists
-        if (file) {
-            const S3_BUCKET = S3BUCKET;
-            const REGION = TT02REGION;
-
-            AWS.config.update({
-                accessKeyId: ACCESS_KEY,
-                secretAccessKey: SECRET_ACCESS_KEY,
-            });
-            const s3 = new AWS.S3({
-                params: { Bucket: S3_BUCKET },
-                region: REGION,
-            });
-
-            const params = {
-                Bucket: S3_BUCKET,
-                Key: attractionImageName,
-                Body: file,
-            };
-
-            var upload = s3
-                .putObject(params)
-                .on("httpUploadProgress", (evt) => {
-                    console.log(
-                        "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-                    );
-                })
-                .promise();
-
-                await upload.then((err, data) => {
-                    const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
-                    console.log("imageUrl", imageUrl);
-        
-                    toast.success('Upload successful!', {
-                        position: toast.POSITION.TOP_RIGHT,
-                        autoClose: 1500
-                    });
-        
-                    console.log(err);
-                    setFile(null);
-        
-                    // Update the uploadedImageUrls state
-                    setUploadedImageUrls([imageUrl]);
+            const attractionImageName = attractionName + '_' + file.name;
+            const blob = new Blob([file.originFileObj]);
+    
+            if (blob) {
+                const S3_BUCKET = S3BUCKET;
+                const REGION = TT02REGION;
+    
+                AWS.config.update({
+                    accessKeyId: ACCESS_KEY,
+                    secretAccessKey: SECRET_ACCESS_KEY,
+                });
+                const s3 = new AWS.S3({
+                    params: { Bucket: S3_BUCKET },
+                    region: REGION,
+                });
+    
+                const params = {
+                    Bucket: S3_BUCKET,
+                    Key: attractionImageName,
+                    Body: blob,
+                };
+    
+                return new Promise((resolve, reject) => {
+                    s3.putObject(params)
+                        .on("httpUploadProgress", (evt) => {
+                            console.log(
+                                "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+                            );
+                        })
+                        .send((err, data) => {
+                            if (err) {
+                                console.log(err);
+                                reject(err);
+                            } else {
+                                const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+                                console.log("imageUrl", imageUrl);
+                                resolve(imageUrl);
+                            }
+                        });
                 });
             }
         });
-        await Promise.all(uploadPromises);
+    
+        try {
+            const uploadedImageUrls = await Promise.all(uploadPromises);
+            // Now all images are uploaded, and you can do further processing with the URLs
+            console.log("All images uploaded:", uploadedImageUrls);
+    
+            toast.success('Upload successful!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+    
+            // Update the uploadedImageUrls state
+            setUploadedImageUrls(uploadedImageUrls);
+
+        } catch (error) {
+            console.error("Error uploading images:", error);
+            toast.error('Upload failed!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
     };
 
     useEffect(() => {
@@ -123,8 +147,10 @@ export default function CreateAttractionModal(props) {
     useEffect(() => {
         // Only call the parent component's function when uploadedImageUrls changes
         props.onClickSubmitAttractionCreate({ ...props.form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
+
+        console.log("uploadedImageUrls", uploadedImageUrls);
     }, [uploadedImageUrls]);
-    
+
     return (
         <div>
             <Modal
@@ -154,12 +180,34 @@ export default function CreateAttractionModal(props) {
                         <Input onChange={handleAttractionNameChange} />
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         label="Images"
                         name="attraction_image_list"
                     >
                         <Input type="file" onChange={handleFileChange} />
                         <ToastContainer />
+                    </Form.Item> */}
+
+                    <Form.Item
+                        label="Images"
+                        name="attraction_image_list"
+                        valuePropName="fileList"
+                        getValueFromEvent={normFile}
+                        rules={[
+                            { required: true, message: 'Please upload at least one image!' },
+                            // { type: 'array', min: 1, message: 'Please upload at least one image!' },
+                        ]}
+                    >
+                        <Upload
+                            beforeUpload={() => false} // To prevent auto-upload on file selection
+                            multiple
+                            listType="picture-card"
+                            fileList={imageFiles}
+                            onRemove={handleRemove}
+                            onChange={handleFileChange}
+                        >
+                            {imageFiles.length >= 8 ? null : uploadButton}
+                        </Upload>
                     </Form.Item>
 
                     <Form.Item
@@ -297,17 +345,17 @@ export default function CreateAttractionModal(props) {
                                                         ({ getFieldValue }) => ({
                                                             validator(_, value) {
                                                                 if (value && value.length > 1) {
-                                                                const allTicketTypes = getFieldValue('price_list').map(
-                                                                    (item) => item.ticket_type
-                                                                );
-                                                                if (
-                                                                    allTicketTypes.filter(
-                                                                        (type) => type === value
-                                                                    ).length === 1
-                                                                ) {
-                                                                    return Promise.resolve();
-                                                                }
-                                                                return Promise.reject('Duplicate ticket types are not allowed.');
+                                                                    const allTicketTypes = getFieldValue('price_list').map(
+                                                                        (item) => item.ticket_type
+                                                                    );
+                                                                    if (
+                                                                        allTicketTypes.filter(
+                                                                            (type) => type === value
+                                                                        ).length === 1
+                                                                    ) {
+                                                                        return Promise.resolve();
+                                                                    }
+                                                                    return Promise.reject('Duplicate ticket types are not allowed.');
                                                                 }
                                                             },
                                                         }),
