@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Select, Tag, Badge } from "antd";
+import { Modal, Select, Tag, Badge, Carousel } from "antd";
 import { getAttractionByVendor } from "../../redux/attractionRedux";
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 export default function ViewAttractionModal(props) {
 
@@ -84,33 +85,54 @@ export default function ViewAttractionModal(props) {
 
     function renderAttractionImage(imageList) {
         if (Array.isArray(imageList) && imageList.length > 0) {
-            // Assuming the first element of the imageList is the URL of the first image
-            const firstImageUrl = imageList[0];
+          // Render a Carousel of images if there are multiple images
+          if (imageList.length > 1) {
             return (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '35px' }}>
-                    <img
-                        src={firstImageUrl}
-                        alt="Attraction"
-                        style={{ maxWidth: '400px', maxHeight: '300px', width: '100%', height: 'auto' }}
-                    />
-                </div>
+              <div style={styles.carousel}> {/* Apply your carousal style */}
+                <Carousel autoplay arrows>
+                  {imageList.map((imageUrl, index) => (
+                    <div key={index}>
+                      <div style={styles.container}> {/* Apply your container style */}
+                        <img
+                          src={imageUrl}
+                          alt={`Attraction ${index + 1}`}
+                          style={styles.image}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
             );
+          } else {
+            // Display a single image if there is only one in the list
+            return (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '35px' }}>
+                <img
+                  src={imageList[0]}
+                  alt="Attraction"
+                  style={{ maxWidth: '400px', maxHeight: '300px', width: '100%', height: 'auto' }}
+                />
+              </div>
+            );
+          }
         }
         return 'No Image';
-    }    
+      }
+
 
     function renderProperty(label, value, color) {
 
         let formattedValue = typeof value === 'string' && value.includes('_')
-        ? value.split('_').join(' ')
-        : typeof value === 'string' && label === 'Contact Number'
-        ? value.replace(/(\d{4})(\d{4})/, '$1 $2')
-        : typeof value === 'string' && label === 'Area'
-        ? value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
-        : label === 'Avg Rating' && value === 0
-        ? 'N/A'
-        : value;
-               
+            ? value.split('_').join(' ')
+            : typeof value === 'string' && label === 'Contact Number'
+                ? value.replace(/(\d{4})(\d{4})/, '$1 $2')
+                : typeof value === 'string' && label === 'Area'
+                    ? value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+                    : label === 'Avg Rating' && value === 0
+                        ? 'N/A'
+                        : value;
+
         if (label === 'Suggested Duration') {
             formattedValue += ' Hours';
         }
@@ -142,7 +164,6 @@ export default function ViewAttractionModal(props) {
                 onCancel={props.onClickCancelViewAttractionModal}
                 footer={[]} // hide default buttons of modal
             >
-                {/* img list */}
                 {/* seasonalactivity, reviewlist, tourtypelist */}
 
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
@@ -164,3 +185,24 @@ export default function ViewAttractionModal(props) {
         </div>
     )
 }
+
+const styles = {
+    carousel: {
+      backgroundColor: 'white', // Adjust the background color as needed
+      paddingBottom: '50px',
+    },
+    container: {
+      display: 'flex',
+      justifyContent: 'center',
+      backgroundColor: 'white', // Adjust the background color as needed
+      alignContent: 'center',
+      height: '300px', // Set the desired height for all images
+    },
+    image: {
+      maxWidth: '100%',
+      maxHeight: '100%',
+      width: 'auto',
+      height: '100%',
+      objectFit: 'cover', // Crop or scale images to cover the container
+    },
+  };

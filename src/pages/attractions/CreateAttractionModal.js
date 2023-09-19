@@ -414,3 +414,27 @@ export default function CreateAttractionModal(props) {
         </div>
     )
 }
+
+const styles = {
+    layout: {
+        minHeight: '100vh',
+    },
+    content: {
+        margin: '24px 16px 0',
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    customRow: {
+        height: '280px',
+    },
+    imageContainer: {
+        maxWidth: '180px',
+        maxHeight: '100px',
+        overflow: 'hidden',
+    },
+    image: {
+        width: '100%',
+        height: 'auto',
+    },
+}

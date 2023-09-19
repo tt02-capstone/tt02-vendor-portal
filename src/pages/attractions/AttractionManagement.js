@@ -36,7 +36,7 @@ export default function AttractionManagement() {
             key: 'attraction_id',
         },
         {
-            title: 'Image',
+            title: 'Cover Image',
             dataIndex: 'attraction_image_list',
             key: 'attraction_image_list',
             render: (imageList) => {
