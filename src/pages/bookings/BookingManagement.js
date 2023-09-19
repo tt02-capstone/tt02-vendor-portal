@@ -116,6 +116,23 @@ export default function BookingManagement() {
             },
         },
         {
+            title: 'Tickets',
+            dataIndex: 'booking_item_list',
+            key: 'booking_item_list',
+            render: (bookingItemList) => {
+                if (bookingItemList && bookingItemList.length > 0) {
+                    const ticketDescriptions = bookingItemList.map((bookingItem) => (
+                        `${bookingItem.activity_selection} (${bookingItem.quantity})`
+                    ));
+                    const ticketDescriptionString = ticketDescriptions.join(', ');
+        
+                    return <div>{ticketDescriptionString}</div>;
+                } else {
+                    return 'N/A';
+                }
+            },
+        },
+        {
             title: 'Payment Status',
             dataIndex: 'payment',
             key: 'payment',

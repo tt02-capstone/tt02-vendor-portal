@@ -150,6 +150,24 @@ export default function ViewAttractionBookingModal(props) {
         );
     }
 
+    function renderBookingItems() {
+        const bookingItems = selectedAttractionBooking.booking_item_list || [];
+        
+        // Create an array of formatted ticket descriptions
+        const ticketDescriptions = bookingItems.map((bookingItem) => {
+          return `${bookingItem?.activity_selection} (${bookingItem?.quantity})`;
+        });
+        
+        const tickets = ticketDescriptions.join(', ');
+      
+        return (
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <div style={{ fontWeight: 'bold', minWidth: '200px' }}>Tickets:</div>
+            <div>{tickets}</div>
+          </div>
+        );
+      }
+
     return (
         <div>
             <Modal
@@ -171,12 +189,13 @@ export default function ViewAttractionBookingModal(props) {
                     {renderProperty('Last Updated', formatDate(selectedAttractionBooking.last_update))}
                     {renderProperty('Start Date', formatStartEndDate(selectedAttractionBooking.start_datetime))}
                     {renderProperty('End Date', formatStartEndDate(selectedAttractionBooking.end_datetime))}
+                    {renderBookingItems()}
                     {renderProperty('Payment Status', selectedAttractionBooking.payment ? (selectedAttractionBooking.payment.is_paid ? 'PAID' : 'UNPAID') : '', getPaymentStatusColor(selectedAttractionBooking.payment ? (selectedAttractionBooking.payment.is_paid ? 'PAID' : 'UNPAID') : ''))}
                     {renderProperty('Amount User Paid', selectedAttractionBooking.payment ? `$${selectedAttractionBooking.payment.payment_amount.toFixed(2)}` : '')}
                     {renderProperty('Commission Percentage', selectedAttractionBooking.payment ? `${(selectedAttractionBooking.payment.comission_percentage * 100).toFixed(0)}%` : '')}
                     {renderProperty('Amount Vendor Earns', calculateVendorEarns(selectedAttractionBooking.payment))}
                 </div>
-            </Modal>
-        </div>
+            </Modal >
+        </div >
     )
 }

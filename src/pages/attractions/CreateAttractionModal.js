@@ -124,6 +124,7 @@ export default function CreateAttractionModal(props) {
         // Only call the parent component's function when uploadedImageUrls changes
         props.onClickSubmitAttractionCreate({ ...props.form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
     }, [uploadedImageUrls]);
+    
     return (
         <div>
             <Modal
