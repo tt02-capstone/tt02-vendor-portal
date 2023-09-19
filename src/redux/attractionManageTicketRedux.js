@@ -39,7 +39,7 @@ export async function updateTicketPerDay(attraction_id,requestBody) {
 export async function getAllTicketListedByAttraction(attraction_id) {
     try {
         const response = await attractionApi.get(`/getAllTicketListedByAttraction/${attraction_id}`)
-        if (response.data != []) {
+        if (response.data !== []) {
             return response.data;
         }    
     } catch (error) {
@@ -51,7 +51,7 @@ export async function getAllTicketListedByAttraction(attraction_id) {
 export async function getTicketEnumByAttraction(attraction_id) {
     try {
         const response = await attractionApi.get(`/getTicketEnumByAttraction/${attraction_id}`)
-        if (response.data != []) {
+        if (response.data !== []) {
             return response.data;
         }    
     } catch (error) {

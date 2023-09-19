@@ -175,7 +175,7 @@ export default function BookingManagement() {
             console.log("user id", vendor.user_id)
             console.log("vendor vendor vendor",vendor.vendor.vendor_id)
             const fetchData = async () => {
-                const response = await getAttractionBookingListByVendor(vendor.vendor.vendor_id);
+                const response = await getAttractionBookingListByVendor(vendor.user_id);
                 console.log("response data", response.data)
                 if (response.status) {
                     var tempData = response.data.map((val) => ({ // an object is returned! but need array. i guess bc only 1 attraction?? 
