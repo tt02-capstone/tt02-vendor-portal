@@ -180,14 +180,6 @@ export default function CreateAttractionModal(props) {
                         <Input onChange={handleAttractionNameChange} />
                     </Form.Item>
 
-                    {/* <Form.Item
-                        label="Images"
-                        name="attraction_image_list"
-                    >
-                        <Input type="file" onChange={handleFileChange} />
-                        <ToastContainer />
-                    </Form.Item> */}
-
                     <Form.Item
                         label="Images"
                         name="attraction_image_list"

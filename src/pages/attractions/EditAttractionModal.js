@@ -35,8 +35,18 @@ export default function EditAttractionModal(props) {
     useEffect(() => {
         if (props.isEditAttractionModalOpen) {
             getAttraction(vendor, props);
+
         }
     }, [props.isEditAttractionModalOpen]);
+
+    useEffect(() => {
+        setImageFiles(existingImageUrls.map((url, index) => ({
+            uid: index,
+            name: `Image ${index + 1}`,
+            status: "done",
+            url: url,
+        })));
+    }, [existingImageUrls]);
 
     useEffect(() => {
         form.setFieldsValue({
@@ -53,7 +63,7 @@ export default function EditAttractionModal(props) {
             attraction_category: selectedAttraction.attraction_category,
             generic_location: selectedAttraction.generic_location,
             price_list: selectedAttraction.price_list,
-            attraction_image_list: existingImageUrls, 
+            attraction_image_list: existingImageUrls,
             // est price tier
         });
 
@@ -61,15 +71,36 @@ export default function EditAttractionModal(props) {
 
     const handleFileChange = (e) => {
         const selectedFiles = e.target.files; // Get the FileList object
+        console.log("selectedFiles", selectedFiles)
         const fileList = [];
-    
+
         // Loop through the selected files and add them to the fileList array
         for (let i = 0; i < selectedFiles.length; i++) {
             fileList.push(selectedFiles[i]);
         }
-    
+
         setImageFiles(fileList); // Store the array of files in your state
     };
+
+    function normFile(e) {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e && e.fileList;
+    }
+
+    const uploadButton = (
+        <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
+
+    // Function to handle file removal
+    function handleRemove(file) {
+        const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
+        setImageFiles(updatedFiles);
+    }
 
     const handleAttractionNameChange = (e) => {
         const newName = e.target.value;
@@ -84,59 +115,74 @@ export default function EditAttractionModal(props) {
     const SECRET_ACCESS_KEY = 'xsMGhdP0XsZKAzKdW3ED/Aa5uw91Ym5S9qz2HiJ0';
 
     const onFinish = async (values) => {
-
         const uploadPromises = imageFiles.map(async (file) => {
+            const attractionImageName = attractionName + '_' + file.name;
+            const blob = new Blob([file.originFileObj]);
 
-        // Append the attraction name to the image name
-        const attractionImageName = attractionName + '_' + file.name;
+            if (blob) {
+                const S3_BUCKET = S3BUCKET;
+                const REGION = TT02REGION;
 
-        // Upload file if it exists
-        if (file) {
-            const S3_BUCKET = S3BUCKET;
-            const REGION = TT02REGION;
+                AWS.config.update({
+                    accessKeyId: ACCESS_KEY,
+                    secretAccessKey: SECRET_ACCESS_KEY,
+                });
+                const s3 = new AWS.S3({
+                    params: { Bucket: S3_BUCKET },
+                    region: REGION,
+                });
 
-            AWS.config.update({
-                accessKeyId: ACCESS_KEY,
-                secretAccessKey: SECRET_ACCESS_KEY,
-            });
-            const s3 = new AWS.S3({
-                params: { Bucket: S3_BUCKET },
-                region: REGION,
-            });
+                const params = {
+                    Bucket: S3_BUCKET,
+                    Key: attractionImageName,
+                    Body: blob,
+                };
 
-            const params = {
-                Bucket: S3_BUCKET,
-                Key: attractionImageName,
-                Body: file,
-            };
-
-            var upload = s3
-                .putObject(params)
-                .on("httpUploadProgress", (evt) => {
-                    console.log(
-                        "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-                    );
-                })
-                .promise();
-
-                await upload.then((err, data) => {
-                    const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
-                    console.log("imageUrl", imageUrl);
-        
-                    toast.success('Upload successful!', {
-                        position: toast.POSITION.TOP_RIGHT,
-                        autoClose: 1500
-                    });
-        
-                    console.log(err);
-                    setFile(null);
-        
-                    // Update the uploadedImageUrls state
-                    setUploadedImageUrls([imageUrl]);
+                return new Promise((resolve, reject) => {
+                    s3.putObject(params)
+                        .on("httpUploadProgress", (evt) => {
+                            console.log(
+                                "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+                            );
+                        })
+                        .send((err, data) => {
+                            if (err) {
+                                console.log(err);
+                                reject(err);
+                            } else {
+                                const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+                                console.log("imageUrl", imageUrl);
+                                resolve(imageUrl);
+                            }
+                        });
                 });
             }
         });
-        await Promise.all(uploadPromises);
+
+        try {
+            const uploadedImageUrls = await Promise.all(uploadPromises);
+            // Now all images are uploaded, and you can do further processing with the URLs
+            console.log("All images uploaded:", uploadedImageUrls);
+
+            toast.success('Upload successful!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+
+            // Update the uploadedImageUrls state
+            setUploadedImageUrls(uploadedImageUrls);
+
+        } catch (error) {
+            console.error("Error uploading images:", error);
+            toast.error('Upload failed!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+        props.onClickSubmitEditAttraction({
+            ...form.getFieldsValue(),
+            attraction_image_list: uploadedImageUrls, // Extract URLs
+        });
     };
 
     useEffect(() => {
@@ -148,11 +194,6 @@ export default function EditAttractionModal(props) {
         }
 
     }, [file]);
-
-    useEffect(() => {
-        // Only call the parent component's function when uploadedImageUrls changes
-        props.onClickSubmitEditAttraction({ ...form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
-    }, [uploadedImageUrls]);
 
     return (
         <div>
@@ -185,9 +226,31 @@ export default function EditAttractionModal(props) {
                     <Form.Item
                         label="Images"
                         name="attraction_image_list"
+                        //valuePropName="fileList"
+                        getValueFromEvent={normFile}
+                        rules={[
+                            { required: true, message: 'Please upload at least one image!' },
+                        ]}
                     >
-                        <Input type="file" onChange={handleFileChange} />
-                        <ToastContainer />
+                        <Upload
+                            beforeUpload={() => false}
+                            multiple
+                            listType="picture-card"
+                            fileList={imageFiles}
+                            onRemove={handleRemove}
+                            showUploadList={{
+                                showPreviewIcon: true,
+                                showRemoveIcon: true,
+                            }}
+                            onChange={handleFileChange}
+                        >
+                            {imageFiles.length >= 8 ? null : (
+                                <div>
+                                    <PlusOutlined />
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </div>
+                            )}
+                        </Upload>
                     </Form.Item>
 
                     <Form.Item
@@ -239,8 +302,6 @@ export default function EditAttractionModal(props) {
                     >
                         <Input />
                     </Form.Item>
-
-                    {/* img list */}
 
                     <Form.Item
                         label="Publish?"
