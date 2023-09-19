@@ -452,6 +452,9 @@ export default function Profile() {
       </li>
     ))}
   </ul>
+  <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
+ 
+                            <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>   
 </Row>         
                             <Row>
                               <CustomButton
@@ -460,6 +463,13 @@ export default function Profile() {
                                 onClick={onClickManageBAButton}
                               />
                             </Row>
+
+                            <Col span={8}>
+        <Button type="primary" onClick={() => { /* Logic for Top Up */ }}>Top Up</Button>
+      </Col>
+      <Col span={8}>
+        <Button type="primary" onClick={() => { /* Logic for Withdraw */ }}>Withdraw</Button>
+      </Col>
                                               
                           </div>
                         }
