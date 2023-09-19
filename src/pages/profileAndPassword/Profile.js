@@ -20,7 +20,7 @@ import AWS from 'aws-sdk';
 import AddBankAccountModal from "./AddBankAccountsModal";
 import { loadStripe  } from '@stripe/stripe-js';
 import { useStripe } from '@stripe/react-stripe-js';
-import { vendorStaffApi } from "../../redux/api";
+import { vendorStaffApi,paymentApi } from "../../redux/api";
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -196,19 +196,48 @@ export default function Profile() {
 
       const bank_account_token = token.token.id
 
-      const response = await vendorStaffApi.post(`/addBankAccount/${userId}/${bank_account_token}`)
+      const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
+      post(`/addBankAccount/${userId}/${bank_account_token}`);
       if (response.status) {
-        toast.success('Bank account successfully!', {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 1500
-        });
+
         setIsBAModalOpen(false);
+        window.location.reload(); //Temporary measure will directly update bankAccount state
+        toast.success('Bank account created successfully!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+      });
     
     } else {
         toast.error(response.data.errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1500
         });
+    }
+  }
+
+  const deleteBankAccount = async (bank_account_id) => {
+    try {
+      const userId = parseInt(user.user_id);
+      const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
+      put(`/deleteBankAccount/${userId}/${bank_account_id}`);
+      
+      if (response.status) {
+        
+        window.location.reload(); //Temporary measure will directly update bankAccount state
+
+        toast.success('Bank account deleted successfully!', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+      });
+
+    } else {
+        toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+    }
+    } catch (error) {
+      console.error('An error occurred while deleting the bank account:', error);
     }
   }
 
@@ -247,7 +276,8 @@ export default function Profile() {
 
         const userId = parseInt(user.user_id);
 
-        const response = await vendorStaffApi.get(`/getBankAccounts/${userId}`)
+        const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).get(`/getBankAccounts/${userId}`);
+
         if (response.status) {
           const bankAccounts = response.data;
           //console.log(bankAccounts);
@@ -409,19 +439,28 @@ export default function Profile() {
                           <div>
                             <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
                             <Row>
+  <ul>
+    {bankAccounts.map((account) => (
+      <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
+        Bank Account Number: *****{account.last4}
+        <button 
+          onClick={() => deleteBankAccount(account.id)}
+          style={{ marginLeft: '10px' }}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</Row>         
+                            <Row>
                               <CustomButton
                                 text="Add Bank Account"
                                 icon={<KeyOutlined />}
                                 onClick={onClickManageBAButton}
                               />
                             </Row>
-                            <Row>
-                              <ul>
-                                {bankAccounts.map((account) => (
-                                    <li key={account.account}>Bank Account Number: *****{account.last4}</li>
-                                ))}
-                              </ul>
-                            </Row>                            
+                                              
                           </div>
                         }
 
