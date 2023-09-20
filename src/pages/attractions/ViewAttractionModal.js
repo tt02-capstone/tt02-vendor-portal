@@ -5,7 +5,6 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 export default function ViewAttractionModal(props) {
 
-    const { Option } = Select;
     const [selectedAttraction, setSelectedAttraction] = useState([]);
     const [priceList, setPriceList] = useState([]);
     const vendor = JSON.parse(localStorage.getItem("user"));
@@ -15,16 +14,12 @@ export default function ViewAttractionModal(props) {
             let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
-
-            console.log('getAttraction response.data.attraction_image_list:', response.data.attraction_image_list)
         } catch (error) {
             alert('An error occurred! Failed to retrieve attraction!');
         }
     }
 
     useEffect(() => {
-        // console.log('useEffect selectedAttraction:', selectedAttraction);
-        // console.log('useEffect priceList:', priceList);
     }, [selectedAttraction, priceList])
 
     useEffect(() => {
@@ -90,11 +85,11 @@ export default function ViewAttractionModal(props) {
           // Render a Carousel of images if there are multiple images
           if (imageList.length > 1) {
             return (
-              <div style={styles.carousel}> {/* Apply your carousal style */}
+              <div style={styles.carousel}> 
                 <Carousel autoplay arrows>
                   {imageList.map((imageUrl, index) => (
                     <div key={index}>
-                      <div style={styles.container}> {/* Apply your container style */}
+                      <div style={styles.container}> 
                         <img
                           src={imageUrl}
                           alt={`Attraction ${index + 1}`}
@@ -190,21 +185,21 @@ export default function ViewAttractionModal(props) {
 
 const styles = {
     carousel: {
-      backgroundColor: 'white', // Adjust the background color as needed
+      backgroundColor: 'white', 
       paddingBottom: '50px',
     },
     container: {
       display: 'flex',
       justifyContent: 'center',
-      backgroundColor: 'white', // Adjust the background color as needed
+      backgroundColor: 'white', 
       alignContent: 'center',
-      height: '300px', // Set the desired height for all images
+      height: '300px', 
     },
     image: {
       maxWidth: '100%',
       maxHeight: '100%',
       width: 'auto',
       height: '100%',
-      objectFit: 'cover', // Crop or scale images to cover the container
+      objectFit: 'cover', 
     },
   };

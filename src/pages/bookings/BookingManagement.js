@@ -14,11 +14,10 @@ import { ToastContainer, toast } from 'react-toastify';
 export default function BookingManagement() {
 
     const navigate = useNavigate();
-    // const { Header, Content, Sider, Footer } = Layout;
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     const [getAttractionBookingsData, setGetAttractionBookingsData] = useState(true);
-    const [attractionBookingsData, setAttractionBookingsData] = useState([]); // list of attractions
+    const [attractionBookingsData, setAttractionBookingsData] = useState([]); 
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [selectedBooking, setSelectedBooking] = useState([]);
 
@@ -94,8 +93,8 @@ export default function BookingManagement() {
             key: 'last_update',
             render: (lastUpdate) => {
                 const dateObj = new Date(lastUpdate);
-                const formattedDate = dateObj.toLocaleDateString(); // Format the date as per the user's locale
-                const formattedTime = dateObj.toLocaleTimeString(); // Format the time as per the user's locale
+                const formattedDate = dateObj.toLocaleDateString(); 
+                const formattedTime = dateObj.toLocaleTimeString(); 
                 return `${formattedDate} ${formattedTime}`;
             },
         },
@@ -178,7 +177,7 @@ export default function BookingManagement() {
                 const response = await getAttractionBookingListByVendor(vendor.vendor.vendor_id);
                 console.log("response data", response.data)
                 if (response.status) {
-                    var tempData = response.data.map((val) => ({ // an object is returned! but need array. i guess bc only 1 attraction?? 
+                    var tempData = response.data.map((val) => ({ 
                         ...val,
                         key: val.user_id,
                     }));
@@ -195,21 +194,20 @@ export default function BookingManagement() {
         }
     }, [getAttractionBookingsData]);
 
-    // View Booking 
-    const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false); // boolean to open modal
+    // VIEW BOOKING
+    const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false); 
 
     useEffect(() => {
 
     }, [selectedBookingId])
 
-    //view attraction modal open button
+    //view booking modal open button
     function onClickOpenViewAttractionBookingModal(bookingId) {
         setSelectedBookingId(bookingId);
         setIsViewAttractionBookingModalOpen(true);
-
     }
 
-    // view attraction modal cancel button
+    // view booking modal cancel button
     function onClickCancelViewAttractionBookingModal() {
         setIsViewAttractionBookingModalOpen(false);
     }

@@ -13,20 +13,7 @@ export default function CreateAttractionModal(props) {
     const { Option } = Select;
     const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
-    const [selectedTicketTypes, setSelectedTicketTypes] = useState([]);
     const [attractionName, setAttractionName] = useState('');
-
-    const checkDuplicateTicketType = (_, value, allFields) => {
-        if (value && value.length > 1) {
-            const allTicketTypes = allFields.map((field) => field.ticket_type);
-            const uniqueTicketTypes = new Set(allTicketTypes);
-
-            if (uniqueTicketTypes.size !== allTicketTypes.length) {
-                return Promise.reject('Duplicate ticket types are not allowed.');
-            }
-        }
-        return Promise.resolve();
-    };
 
     function normFile(e) {
         if (Array.isArray(e)) {
@@ -42,7 +29,6 @@ export default function CreateAttractionModal(props) {
         </div>
     );
     
-    // Function to handle file removal
     function handleRemove(file) {
         const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
         setImageFiles(updatedFiles);
@@ -63,7 +49,7 @@ export default function CreateAttractionModal(props) {
     const [file, setFile] = useState(null);
 
     const handleFileChange = (e) => {
-        const fileList = e.fileList; // Access the file list directly from e
+        const fileList = e.fileList; 
         setImageFiles(fileList);
     }
 
@@ -114,7 +100,6 @@ export default function CreateAttractionModal(props) {
     
         try {
             const uploadedImageUrls = await Promise.all(uploadPromises);
-            // Now all images are uploaded, and you can do further processing with the URLs
             console.log("All images uploaded:", uploadedImageUrls);
     
             toast.success('Upload successful!', {
@@ -122,8 +107,9 @@ export default function CreateAttractionModal(props) {
                 autoClose: 1500
             });
     
-            // Update the uploadedImageUrls state
             setUploadedImageUrls(uploadedImageUrls);
+
+            props.onClickSubmitAttractionCreate({ ...props.form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
 
         } catch (error) {
             console.error("Error uploading images:", error);
@@ -144,13 +130,6 @@ export default function CreateAttractionModal(props) {
 
     }, [file]);
 
-    useEffect(() => {
-        // Only call the parent component's function when uploadedImageUrls changes
-        props.onClickSubmitAttractionCreate({ ...props.form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
-
-        console.log("uploadedImageUrls", uploadedImageUrls);
-    }, [uploadedImageUrls]);
-
     return (
         <div>
             <Modal
@@ -158,7 +137,7 @@ export default function CreateAttractionModal(props) {
                 centered
                 open={props.isCreateAttractionModalOpen}
                 onCancel={props.onClickCancelCreateAttractionModal}
-                footer={[]} // hide default buttons of modal
+                footer={[]} 
             >
                 <Form
                     name="basic"
@@ -187,7 +166,6 @@ export default function CreateAttractionModal(props) {
                         getValueFromEvent={normFile}
                         rules={[
                             { required: true, message: 'Please upload at least one image!' },
-                            // { type: 'array', min: 1, message: 'Please upload at least one image!' },
                         ]}
                     >
                         <Upload
@@ -318,7 +296,7 @@ export default function CreateAttractionModal(props) {
                     >
                         <Form.List
                             name="price_list"
-                            initialValue={[{ ticket_type: '', local_amount: 0, tourist_amount: 0 }]}
+                            initialValue={[{ ticket_type: 'All'}]}
                         >
                             {(fields, { add, remove }) => (
                                 <>
@@ -366,14 +344,20 @@ export default function CreateAttractionModal(props) {
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'local_amount']}
-                                                    rules={[{ required: true, message: 'Missing local price' }]}
+                                                    rules={[
+                                                        { required: true, message: 'Missing local price' },
+                                                        { type: 'number', min: 0, message: 'Price must be greater than or equal to 0' }, 
+                                                    ]}
                                                 >
                                                     <InputNumber placeholder="Local Price" style={{ width: '110px' }} />
                                                 </Form.Item>
                                                 <Form.Item
                                                     {...restField}
                                                     name={[name, 'tourist_amount']}
-                                                    rules={[{ required: true, message: 'Missing tourist price' }]}
+                                                    rules={[
+                                                        { required: true, message: 'Missing tourist price' },
+                                                        { type: 'number', min: 0, message: 'Price must be greater than or equal to 0' }, 
+                                                    ]}
                                                 >
                                                     <InputNumber placeholder="Tourist Price" style={{ width: '110px' }} />
                                                 </Form.Item>

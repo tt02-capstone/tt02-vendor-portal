@@ -4,19 +4,13 @@ import { getAttractionBookingByVendor } from "../../redux/bookingRedux";
 
 export default function ViewAttractionBookingModal(props) {
 
-    const { Option } = Select;
     const [selectedAttractionBooking, setSelectedAttractionBooking] = useState([]);
-    // const [priceList, setPriceList] = useState([]);
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     async function getBooking(vendor, props) {
         try {
-            console.log("vendor.vendor id ", vendor.vendor_id)
-            console.log("props.bookingId ", props.bookingId)
             let response = await getAttractionBookingByVendor(vendor.vendor_id, props.bookingId);
-            console.log("selectedAttractionBooking ", selectedAttractionBooking)
             setSelectedAttractionBooking(response.data);
-            // setPriceList(response.data.price_list);
         } catch (error) {
             alert('An error occurred! Failed to retrieve booking!');
         }
@@ -64,9 +58,9 @@ export default function ViewAttractionBookingModal(props) {
     function getPaymentStatusColor(paymentStatus) {
         switch (paymentStatus) {
             case 'PAID':
-                return 'success'; // Set to green for 'Paid'
+                return 'success'; 
             case 'UNPAID':
-                return 'error';   // Set to red for 'Unpaid'
+                return 'error';  
             default:
                 return '';
         }
@@ -75,12 +69,11 @@ export default function ViewAttractionBookingModal(props) {
     function formatDate(dateTime) {
         if (!dateTime) return '';
         const dateObj = new Date(dateTime);
-        const formattedDate = dateObj.toLocaleDateString(); // Format the date as per the user's locale
-        const formattedTime = dateObj.toLocaleTimeString(); // Format the time as per the user's locale
+        const formattedDate = dateObj.toLocaleDateString(); 
+        const formattedTime = dateObj.toLocaleTimeString(); 
         return `${formattedDate} ${formattedTime}`;
     }
 
-    // Helper function to format date
     function formatStartEndDate(date) {
         if (!date) return '';
         return new Date(date).toLocaleDateString();

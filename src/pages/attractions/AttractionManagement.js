@@ -18,12 +18,10 @@ import { PlusOutlined } from "@ant-design/icons";
 export default function AttractionManagement() {
 
     const navigate = useNavigate();
-    // const { Header, Content, Sider, Footer } = Layout;
     const vendor = JSON.parse(localStorage.getItem("user"));
 
-    // attractions table pagination
     const [getAttractionsData, setGetAttractionsData] = useState(true);
-    const [attractionsData, setAttractionsData] = useState([]); // list of attractions
+    const [attractionsData, setAttractionsData] = useState([]); 
     const [selectedAttractionId, setSelectedAttractionId] = useState(null);
     const [selectedAttraction, setSelectedAttraction] = useState([]);
     const [priceList, setPriceList] = useState([]);
@@ -31,9 +29,10 @@ export default function AttractionManagement() {
 
     const attractionsColumns = [
         {
-            title: 'Id',
-            dataIndex: 'attraction_id',
-            key: 'attraction_id',
+            title: 'No.',
+            dataIndex: 'index', 
+            key: 'index',
+            render: (text, record, index) => index + 1, 
         },
         {
             title: 'Cover Image',
@@ -41,7 +40,6 @@ export default function AttractionManagement() {
             key: 'attraction_image_list',
             render: (imageList) => {
                 if (Array.isArray(imageList) && imageList.length > 0) {
-                    // Assuming the first element of the imageList is the URL of the first image
                     const firstImageUrl = imageList[0];
                     return (
                         <div style={styles.imageContainer}>
@@ -66,7 +64,7 @@ export default function AttractionManagement() {
             dataIndex: 'attraction_category',
             key: 'attraction_category',
             render: (attractionCategory) => {
-                let tagColor = 'default'; // Default color
+                let tagColor = 'default'; 
                 switch (attractionCategory) {
                     case 'HISTORICAL':
                         tagColor = 'purple';
@@ -137,7 +135,7 @@ export default function AttractionManagement() {
             dataIndex: 'estimated_price_tier',
             key: 'estimated_price_tier',
             render: (priceTier) => {
-                let tagColor = 'default'; // Default color
+                let tagColor = 'default'; 
                 switch (priceTier) {
                     case 'TIER 1':
                         tagColor = 'green';
@@ -213,7 +211,6 @@ export default function AttractionManagement() {
         if (getAttractionsData) {
             const fetchData = async () => {
                 const response = await getAttractionListByVendor(vendor.user_id);
-                // console.log("response", response.data);
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
                         ...val,
@@ -231,6 +228,7 @@ export default function AttractionManagement() {
         }
     }, [getAttractionsData]);
 
+    // CREATE ATTRACTION
     // form inputs for attraction creation
     const [createAttractionForm] = Form.useForm();
     const [isCreateAttractionModalOpen, setIsCreateAttractionModalOpen] = useState(false); // boolean to open modal
@@ -247,8 +245,6 @@ export default function AttractionManagement() {
 
     // create new attraction modal create button
     async function onClickSubmitAttractionCreate(values) {
-
-        console.log("onClickSubmitAttractionCreate Attraction image List", values.attraction_image_list)
 
         let attractionObj = {
             name: values.name,
@@ -286,12 +282,8 @@ export default function AttractionManagement() {
         }
     }
 
-    // View Attraction 
-    const [isViewAttractionModalOpen, setIsViewAttractionModalOpen] = useState(false); // boolean to open modal
-
-    useEffect(() => {
-        //console.log('selectedAttractionId:', selectedAttractionId);
-    }, [selectedAttractionId])
+    // VIEW ATTRACTION
+    const [isViewAttractionModalOpen, setIsViewAttractionModalOpen] = useState(false); 
 
     //view attraction modal open button
     function onClickOpenViewAttractionModal(attractionId) {
@@ -306,23 +298,21 @@ export default function AttractionManagement() {
     }
 
     // EDIT ATTRACTION
-    const [isEditAttractionModalOpen, setIsEditAttractionModalOpen] = useState(false); // boolean to open modal
+    const [isEditAttractionModalOpen, setIsEditAttractionModalOpen] = useState(false); 
 
-    //view attraction modal open button
+    //edit attraction modal open button
     function onClickOpenEditAttractionModal(attractionId) {
         setSelectedAttractionId(attractionId);
         setIsEditAttractionModalOpen(true);
     }
 
-    // view attraction modal cancel button
+    // edit attraction modal cancel button
     function onClickCancelEditAttractionModal() {
         setIsEditAttractionModalOpen(false);
     }
 
-    // create new attraction modal create button
+    // edit attraction modal button
     async function onClickSubmitEditAttraction(values) {
-
-        console.log("onClickSubmitEditAttraction Attraction image List", values.attraction_image_list);
 
         let attractionObj = {
             attraction_id: selectedAttraction.attraction_id,
@@ -365,7 +355,6 @@ export default function AttractionManagement() {
             // Refresh the cover image by forcing it to re-render
             const imageList = values.attraction_image_list;
             if (Array.isArray(imageList) && imageList.length > 0) {
-                // Assuming the first element of the imageList is the URL of the first image
                 const firstImageUrl = imageList[0];
                 // Update the selected attraction's image URL
                 setSelectedAttraction({
@@ -401,9 +390,7 @@ export default function AttractionManagement() {
     }
 
     useEffect(() => {
-        // console.log('useEffect editAttraction selectedAttraction:', selectedAttraction);
-        // console.log('useEffect editAttraction priceList:', priceList);
-    }, [selectedAttraction, priceList, attractionsData])
+    }, [selectedAttraction, selectedAttractionId, priceList, attractionsData])
 
     useEffect(() => {
         if (isEditAttractionModalOpen) {
@@ -415,7 +402,6 @@ export default function AttractionManagement() {
         navigate('/attraction/viewTicket');
     }
 
-    // Define a function to add or update image file names for a specific attraction.
     const updateAttractionImages = (attractionId, imageFileName) => {
         setAttractionImages((prevImages) => ({
             ...prevImages,
@@ -423,7 +409,6 @@ export default function AttractionManagement() {
         }));
     };
 
-    // Define a function to remove an image file name for a specific attraction.
     const removeAttractionImage = (attractionId, imageFileName) => {
         setAttractionImages((prevImages) => ({
             ...prevImages,

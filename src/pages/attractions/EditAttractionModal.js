@@ -27,16 +27,17 @@ export default function EditAttractionModal(props) {
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
             
+            // console.log("getAttraction response data", response.data);
             const newExistingImageUrls = response.data.attraction_image_list || [];
+            // console.log("editAttractionModal getAttraction newExistingImageUrls", newExistingImageUrls);
+
             setExistingImageUrls(newExistingImageUrls);
-           } catch (error) {
+            
+            // console.log("editAttractionModal getAttraction existingImageUrls", existingImageUrls);
+        } catch (error) {
             alert('An error occurred! Failed to retrieve attraction!');
         }
     }
-
-    useEffect(() => {
-        console.log("editAttractionModal getAttraction existingImageUrls", existingImageUrls);
-    }, [existingImageUrls]);
 
     useEffect(() => {
         if (props.isEditAttractionModalOpen) {
@@ -77,7 +78,7 @@ export default function EditAttractionModal(props) {
     }, [selectedAttraction, form]);
 
     const handleFileChange = (e) => {
-        const fileList = e.fileList; // Access the file list directly from e
+        const fileList = e.fileList; 
         setImageFiles(fileList);
     };
 
@@ -95,7 +96,6 @@ export default function EditAttractionModal(props) {
         </div>
     );
 
-    // Function to handle file removal
     function handleRemove(file) {
         const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
         setImageFiles(updatedFiles);
@@ -126,8 +126,6 @@ export default function EditAttractionModal(props) {
     
             // Check if the file is a new image (not an existing one)
             if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`)) {
-                // Handle the upload logic for new images here
-    
                 
                 const blob = new Blob([file.originFileObj]);
                 console.log("blob", blob);
@@ -177,7 +175,6 @@ export default function EditAttractionModal(props) {
             const uploadedImageUrls = await Promise.all(uploadPromises);
             // Now all image URLs are collected, including both new and existing ones
     
-            // Update the uploadedImageUrls state
             setUploadedImageUrls(uploadedImageUrls);
     
             props.onClickSubmitEditAttraction({
@@ -192,10 +189,6 @@ export default function EditAttractionModal(props) {
             });
         }
     };
-    
-
-    // useEffect(() => {
-    // }, [uploadedImageUrls]);
 
     useEffect(() => {
         if (file) {
