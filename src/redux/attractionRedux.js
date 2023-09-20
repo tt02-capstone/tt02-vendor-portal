@@ -17,10 +17,8 @@ export async function getAttractionListByVendor(vendorStaffId) {
 }
 
 export async function getAttractionByVendor(vendorStaffId, attractionId) {
-  console.log("vendorStaffId:",vendorStaffId, " attractionId:",  attractionId)
   return await attractionApi.get(`${attractionURL}/getAttractionByVendor/${vendorStaffId}/${attractionId}`)
   .then((response) => {
-    console.log(response.data)
     if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
       return {status: false, data: response.data};
     } else { // success

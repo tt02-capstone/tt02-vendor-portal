@@ -12,7 +12,7 @@ export default function EditAttractionModal(props) {
     const { Option } = Select;
     const [form] = Form.useForm();
     const [selectedAttraction, setSelectedAttraction] = useState([]);
-    const [attractionName, setAttractionName] = useState('');
+    const [editedAttractionName, setEditedAttractionName] = useState('');
     const [priceList, setPriceList] = useState([]);
     const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
@@ -23,14 +23,20 @@ export default function EditAttractionModal(props) {
     async function getAttraction(vendor, props) {
         try {
             let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
+            // console.log("getAttraction response data", response.data);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
-            setExistingImageUrls(response.data.attraction_image_list || []);
-            console.log(existingImageUrls);
-        } catch (error) {
+            
+            const newExistingImageUrls = response.data.attraction_image_list || [];
+            setExistingImageUrls(newExistingImageUrls);
+           } catch (error) {
             alert('An error occurred! Failed to retrieve attraction!');
         }
     }
+
+    useEffect(() => {
+        console.log("editAttractionModal getAttraction existingImageUrls", existingImageUrls);
+    }, [existingImageUrls]);
 
     useEffect(() => {
         if (props.isEditAttractionModalOpen) {
@@ -42,10 +48,11 @@ export default function EditAttractionModal(props) {
     useEffect(() => {
         setImageFiles(existingImageUrls.map((url, index) => ({
             uid: index,
-            name: `Image ${index + 1}`,
+            name: url.substring(url.lastIndexOf('/') + 1),
             status: "done",
             url: url,
         })));
+        console.log("imageFiles", imageFiles);
     }, [existingImageUrls]);
 
     useEffect(() => {
@@ -70,16 +77,8 @@ export default function EditAttractionModal(props) {
     }, [selectedAttraction, form]);
 
     const handleFileChange = (e) => {
-        const selectedFiles = e.target.files; // Get the FileList object
-        console.log("selectedFiles", selectedFiles)
-        const fileList = [];
-
-        // Loop through the selected files and add them to the fileList array
-        for (let i = 0; i < selectedFiles.length; i++) {
-            fileList.push(selectedFiles[i]);
-        }
-
-        setImageFiles(fileList); // Store the array of files in your state
+        const fileList = e.fileList; // Access the file list directly from e
+        setImageFiles(fileList);
     };
 
     function normFile(e) {
@@ -104,8 +103,8 @@ export default function EditAttractionModal(props) {
 
     const handleAttractionNameChange = (e) => {
         const newName = e.target.value;
-        setAttractionName(newName);
-        console.log("attractionName: ", attractionName)
+        setEditedAttractionName(newName);
+        console.log("editedAttractionName: ", editedAttractionName)
     };
 
     // upload file
@@ -116,47 +115,62 @@ export default function EditAttractionModal(props) {
 
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
-            const attractionImageName = attractionName + '_' + file.name;
+
+            // console.log("editedAttractionName", editedAttractionName);
+            // console.log("selectedAttraction.name", selectedAttraction.name);
+            let currentAttractionName = editedAttractionName || selectedAttraction.name;
+            console.log("currentAttractionName", currentAttractionName);
+
+            let attractionImageName = file.name;
+
+            console.log("file.name", file.name);
+    
+            // Check if attraction name is not already part of the file name
+            if (!file.name.startsWith(currentAttractionName + '_')) {
+                attractionImageName = currentAttractionName + '_' + file.name;
+            }
+            // console.log("attractionImageName", attractionImageName);
             const blob = new Blob([file.originFileObj]);
 
-            if (blob) {
-                const S3_BUCKET = S3BUCKET;
-                const REGION = TT02REGION;
+                if (blob) {
+                    const S3_BUCKET = S3BUCKET;
+                    const REGION = TT02REGION;
 
-                AWS.config.update({
-                    accessKeyId: ACCESS_KEY,
-                    secretAccessKey: SECRET_ACCESS_KEY,
-                });
-                const s3 = new AWS.S3({
-                    params: { Bucket: S3_BUCKET },
-                    region: REGION,
-                });
+                    AWS.config.update({
+                        accessKeyId: ACCESS_KEY,
+                        secretAccessKey: SECRET_ACCESS_KEY,
+                    });
+                    const s3 = new AWS.S3({
+                        params: { Bucket: S3_BUCKET },
+                        region: REGION,
+                    });
 
-                const params = {
-                    Bucket: S3_BUCKET,
-                    Key: attractionImageName,
-                    Body: blob,
-                };
+                    const params = {
+                        Bucket: S3_BUCKET,
+                        Key: attractionImageName,
+                        Body: blob,
+                    };
 
-                return new Promise((resolve, reject) => {
-                    s3.putObject(params)
-                        .on("httpUploadProgress", (evt) => {
-                            console.log(
-                                "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-                            );
-                        })
-                        .send((err, data) => {
-                            if (err) {
-                                console.log(err);
-                                reject(err);
-                            } else {
-                                const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
-                                console.log("imageUrl", imageUrl);
-                                resolve(imageUrl);
-                            }
-                        });
-                });
-            }
+                    return new Promise((resolve, reject) => {
+                        s3.putObject(params)
+                            .on("httpUploadProgress", (evt) => {
+                                // console.log(
+                                //     "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+                                // );
+                            })
+                            .send((err, data) => {
+                                if (err) {
+                                    console.log(err);
+                                    reject(err);
+                                } else {
+                                    const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+                                    console.log("imageUrl", imageUrl);
+                                    resolve(imageUrl);
+                                }
+                            });
+                    });
+                }
+            
         });
 
         try {
@@ -171,6 +185,13 @@ export default function EditAttractionModal(props) {
 
             // Update the uploadedImageUrls state
             setUploadedImageUrls(uploadedImageUrls);
+            console.log("setUploadedImageUrls", uploadedImageUrls);
+
+            props.onClickSubmitEditAttraction({
+                ...form.getFieldsValue(),
+                attraction_image_list: uploadedImageUrls, // Extract URLs
+            });
+            console.log("props.onClickSubmitEditAttraction uploadedImageUrls", uploadedImageUrls);
 
         } catch (error) {
             console.error("Error uploading images:", error);
@@ -179,11 +200,11 @@ export default function EditAttractionModal(props) {
                 autoClose: 1500
             });
         }
-        props.onClickSubmitEditAttraction({
-            ...form.getFieldsValue(),
-            attraction_image_list: uploadedImageUrls, // Extract URLs
-        });
+        
     };
+
+    // useEffect(() => {
+    // }, [uploadedImageUrls]);
 
     useEffect(() => {
         if (file) {
@@ -220,7 +241,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter name of attraction!' },
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
                     >
-                        <Input />
+                        <Input onChange={handleAttractionNameChange} />
                     </Form.Item>
 
                     <Form.Item

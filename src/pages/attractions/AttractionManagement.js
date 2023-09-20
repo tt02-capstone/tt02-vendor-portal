@@ -213,7 +213,7 @@ export default function AttractionManagement() {
         if (getAttractionsData) {
             const fetchData = async () => {
                 const response = await getAttractionListByVendor(vendor.user_id);
-                console.log("response", response.data);
+                // console.log("response", response.data);
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
                         ...val,
@@ -322,6 +322,8 @@ export default function AttractionManagement() {
     // create new attraction modal create button
     async function onClickSubmitEditAttraction(values) {
 
+        console.log("onClickSubmitEditAttraction Attraction image List", values.attraction_image_list);
+
         let attractionObj = {
             attraction_id: selectedAttraction.attraction_id,
             name: values.name,
@@ -336,12 +338,7 @@ export default function AttractionManagement() {
             attraction_category: values.attraction_category,
             generic_location: values.generic_location,
             price_list: values.price_list,
-        }
-
-        // Add logic to update the img_list with the newly uploaded image URL
-        if (values.attraction_image_list && values.attraction_image_list.length > 0) {
-            attractionObj.attraction_image_list = [values.attraction_image_list[0]]; // Assuming the first image is the newly uploaded one
-            console.log('Updated attraction_image_list:', attractionObj.attraction_image_list);
+            attraction_image_list: values.attraction_image_list,
         }
 
         let response = await updateAttraction(vendor.user_id, attractionObj);
@@ -356,7 +353,7 @@ export default function AttractionManagement() {
                 return attraction; // Return other attractions unchanged
             });
 
-            console.log("updatedAttractionData", updatedAttractionData)
+            // console.log("updatedAttractionData", updatedAttractionData)
 
             // formatAttractionData(updatedAttractionData);
 
