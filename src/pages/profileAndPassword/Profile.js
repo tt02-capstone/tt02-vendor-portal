@@ -21,6 +21,7 @@ import AddBankAccountModal from "./AddBankAccountsModal";
 import { loadStripe  } from '@stripe/stripe-js';
 import { useStripe } from '@stripe/react-stripe-js';
 import { vendorStaffApi,paymentApi } from "../../redux/api";
+import WalletModal from "./WalletModal";
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -61,6 +62,10 @@ export default function Profile() {
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false); // change password boolean
     const [isBAModalOpen, setIsBAModalOpen] = useState(false);
     const [bankAccounts, setBankAccounts] = useState([]); // bank accounts
+    const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+
+
     // when the edit profile button is clicked
     function onClickEditProfile() {
         setIsViewProfile(false);
@@ -148,10 +153,30 @@ export default function Profile() {
       setIsBAModalOpen(true);
     }
 
-  // close edit password modal
     function onClickCancelManageBAButton() {
-     setIsBAModalOpen(false);
+      setIsBAModalOpen(false);
+     }
+
+
+    function onClickCancelTopUpButton() {
+     setIsTopUpModalOpen(false);
     }
+
+    function onClickTopUpButton() {
+      setIsTopUpModalOpen(true);
+    }
+
+
+    function onClickCancelWithdrawButton() {
+     setIsWithdrawModalOpen(false);
+    }
+
+    function onClickWithdrawButton() {
+      setIsWithdrawModalOpen(true);
+    }
+
+ 
+    
 
     // when user edits password
     async function onClickSubmitNewPassword(val) {
@@ -214,6 +239,53 @@ export default function Profile() {
         });
     }
   }
+
+  async function onClickSubmitTopUp(topUpDetails) {
+
+    const userId = parseInt(user.user_id);
+    const amount = topUpDetails.amount;
+    const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
+    post(`/topUpWallet/${userId}/${amount}`);
+    if (response.status) {
+
+      setIsTopUpModalOpen(false);
+      //window.location.reload(); //Temporary measure will directly update bankAccount state
+      toast.success('Amount topped up successfully!', {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+    });
+  
+  } else {
+      toast.error(response.data.errorMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+      });
+  }
+}
+
+async function onClickSubmitWithdraw(withdrawalDetails) {
+  const bank_account_id = withdrawalDetails.bankAccountId;
+  const amount = withdrawalDetails.amount;
+  const userId = parseInt(user.user_id);
+
+  const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
+  post(`/withdrawWallet/${userId}/${bank_account_id}/${amount}`);
+  if (response.status) {
+
+    setIsTopUpModalOpen(false);
+    //window.location.reload(); //Temporary measure will directly update bankAccount state
+    toast.success('Amount topped up successfully!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 1500
+  });
+
+} else {
+    toast.error(response.data.errorMessage, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+    });
+}
+}
 
   const deleteBankAccount = async (bank_account_id) => {
     try {
@@ -452,6 +524,9 @@ export default function Profile() {
       </li>
     ))}
   </ul>
+  <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
+ 
+                            <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>   
 </Row>         
                             <Row>
                               <CustomButton
@@ -460,6 +535,13 @@ export default function Profile() {
                                 onClick={onClickManageBAButton}
                               />
                             </Row>
+
+                            <Col span={8}>
+        <Button type="primary" onClick={onClickTopUpButton}>Top Up</Button>
+      </Col>
+      <Col span={8}>
+        <Button type="primary" onClick={onClickWithdrawButton}>Withdraw</Button>
+      </Col>
                                               
                           </div>
                         }
@@ -812,6 +894,25 @@ export default function Profile() {
                     isBAModalOpen={isBAModalOpen}
                     onClickSubmitNewBankAccount={onClickSubmitNewBankAccount}
                     onClickCancelManageBAButton={onClickCancelManageBAButton}
+                />
+            }
+
+{isTopUpModalOpen && 
+                <WalletModal
+                    title="Top Up" 
+                    isModalOpen={isTopUpModalOpen}
+                    onClickSubmitButton={onClickSubmitTopUp}
+                    onClickCancelButton={onClickCancelTopUpButton}
+                />
+            }
+
+{isWithdrawModalOpen && 
+                <WalletModal
+                    title="Withdraw"
+                    isModalOpen={isWithdrawModalOpen}
+                    onClickSubmitButton={onClickSubmitWithdraw}
+                    onClickCancelButton={onClickCancelWithdrawButton}
+                    bankAccounts={bankAccounts}
                 />
             }
 
