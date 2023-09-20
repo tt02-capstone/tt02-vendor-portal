@@ -185,29 +185,29 @@ export default function AttractionManagement() {
 
     function formatAttractionData(attractionDataArray) {
         return attractionDataArray.map(item => {
-          const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
-          const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-          const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
-          const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
-      
-          return {
-            attraction_id: item.attraction_id,
-            attraction_image_list: item.attraction_image_list,
-            name: item.name,
-            attraction_category: item.attraction_category,
-            address: item.address,
-            opening_hours: item.opening_hours,
-            age_group: item.age_group,
-            contact_num: formattedContactNum,
-            is_published: item.is_published,
-            avg_rating_tier: formattedAvgRatingTier,
-            generic_location: formattedGenericLocation,
-            estimated_price_tier: formattedPriceTier,
-            suggested_duration: item.suggested_duration,
-            price_list: item.price_list,
-          };
+            const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
+            const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+            const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
+            const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
+
+            return {
+                attraction_id: item.attraction_id,
+                attraction_image_list: item.attraction_image_list,
+                name: item.name,
+                attraction_category: item.attraction_category,
+                address: item.address,
+                opening_hours: item.opening_hours,
+                age_group: item.age_group,
+                contact_num: formattedContactNum,
+                is_published: item.is_published,
+                avg_rating_tier: formattedAvgRatingTier,
+                generic_location: formattedGenericLocation,
+                estimated_price_tier: formattedPriceTier,
+                suggested_duration: item.suggested_duration,
+                price_list: item.price_list,
+            };
         });
-      }
+    }
 
     useEffect(() => {
         if (getAttractionsData) {
@@ -345,7 +345,7 @@ export default function AttractionManagement() {
         if (response.status) {
 
             // If the update is successful, update the attraction data in the parent component's state
-            const updatedAttractionData = attractionsData.map((attraction) => {
+            const updatedAttractionsData = attractionsData.map((attraction) => {
                 if (attraction.attraction_id === selectedAttraction.attraction_id) {
                     // Replace the existing attraction with the updated one
                     return { ...attraction, ...attractionObj };
@@ -353,13 +353,7 @@ export default function AttractionManagement() {
                 return attraction; // Return other attractions unchanged
             });
 
-            // console.log("updatedAttractionData", updatedAttractionData)
-
-            // formatAttractionData(updatedAttractionData);
-
-            // // Update the state variable with the new attraction data
-            // setAttractionsData(updatedAttractionData);
-            // console.log('attractionsData:', attractionsData);
+            setAttractionsData(updatedAttractionsData);
 
             setIsEditAttractionModalOpen(false);
             setGetAttractionsData(true);
@@ -367,6 +361,24 @@ export default function AttractionManagement() {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
             });
+
+            // Refresh the cover image by forcing it to re-render
+            const imageList = values.attraction_image_list;
+            if (Array.isArray(imageList) && imageList.length > 0) {
+                // Assuming the first element of the imageList is the URL of the first image
+                const firstImageUrl = imageList[0];
+                // Update the selected attraction's image URL
+                setSelectedAttraction({
+                    ...selectedAttraction,
+                    attraction_image_list: [firstImageUrl],
+                });
+            } else {
+                // If there's no image, set it to an empty array
+                setSelectedAttraction({
+                    ...selectedAttraction,
+                    attraction_image_list: [],
+                });
+            }
 
         } else {
             console.log("Attraction update failed!");

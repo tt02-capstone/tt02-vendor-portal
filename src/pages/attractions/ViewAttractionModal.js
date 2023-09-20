@@ -15,6 +15,8 @@ export default function ViewAttractionModal(props) {
             let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
+
+            console.log('getAttraction response.data.attraction_image_list:', response.data.attraction_image_list)
         } catch (error) {
             alert('An error occurred! Failed to retrieve attraction!');
         }

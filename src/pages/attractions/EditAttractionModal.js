@@ -115,27 +115,27 @@ export default function EditAttractionModal(props) {
 
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
-
-            // console.log("editedAttractionName", editedAttractionName);
-            // console.log("selectedAttraction.name", selectedAttraction.name);
+    
             let currentAttractionName = editedAttractionName || selectedAttraction.name;
-            console.log("currentAttractionName", currentAttractionName);
-
             let attractionImageName = file.name;
-
-            console.log("file.name", file.name);
     
             // Check if attraction name is not already part of the file name
             if (!file.name.startsWith(currentAttractionName + '_')) {
                 attractionImageName = currentAttractionName + '_' + file.name;
             }
-            // console.log("attractionImageName", attractionImageName);
-            const blob = new Blob([file.originFileObj]);
-
+    
+            // Check if the file is a new image (not an existing one)
+            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`)) {
+                // Handle the upload logic for new images here
+    
+                
+                const blob = new Blob([file.originFileObj]);
+                console.log("blob", blob);
+    
                 if (blob) {
                     const S3_BUCKET = S3BUCKET;
                     const REGION = TT02REGION;
-
+    
                     AWS.config.update({
                         accessKeyId: ACCESS_KEY,
                         secretAccessKey: SECRET_ACCESS_KEY,
@@ -144,19 +144,17 @@ export default function EditAttractionModal(props) {
                         params: { Bucket: S3_BUCKET },
                         region: REGION,
                     });
-
+    
                     const params = {
                         Bucket: S3_BUCKET,
                         Key: attractionImageName,
                         Body: blob,
                     };
-
+    
                     return new Promise((resolve, reject) => {
                         s3.putObject(params)
                             .on("httpUploadProgress", (evt) => {
-                                // console.log(
-                                //     "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
-                                // );
+                                // Handle upload progress here if needed
                             })
                             .send((err, data) => {
                                 if (err) {
@@ -164,35 +162,28 @@ export default function EditAttractionModal(props) {
                                     reject(err);
                                 } else {
                                     const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
-                                    console.log("imageUrl", imageUrl);
                                     resolve(imageUrl);
                                 }
                             });
                     });
                 }
-            
+            } else {
+                // If it's an existing image, return its URL directly
+                return `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+            }
         });
-
+    
         try {
             const uploadedImageUrls = await Promise.all(uploadPromises);
-            // Now all images are uploaded, and you can do further processing with the URLs
-            console.log("All images uploaded:", uploadedImageUrls);
-
-            toast.success('Upload successful!', {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 1500
-            });
-
+            // Now all image URLs are collected, including both new and existing ones
+    
             // Update the uploadedImageUrls state
             setUploadedImageUrls(uploadedImageUrls);
-            console.log("setUploadedImageUrls", uploadedImageUrls);
-
+    
             props.onClickSubmitEditAttraction({
                 ...form.getFieldsValue(),
-                attraction_image_list: uploadedImageUrls, // Extract URLs
+                attraction_image_list: uploadedImageUrls, // Combined list of new and existing URLs
             });
-            console.log("props.onClickSubmitEditAttraction uploadedImageUrls", uploadedImageUrls);
-
         } catch (error) {
             console.error("Error uploading images:", error);
             toast.error('Upload failed!', {
@@ -200,8 +191,8 @@ export default function EditAttractionModal(props) {
                 autoClose: 1500
             });
         }
-        
     };
+    
 
     // useEffect(() => {
     // }, [uploadedImageUrls]);
