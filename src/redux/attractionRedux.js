@@ -9,7 +9,7 @@ export async function getAttractionListByVendor(vendorStaffId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("attractionRedux getAttractionListByVendor Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -19,7 +19,7 @@ export async function getAttractionByVendor(vendorStaffId, attractionId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("attractionRedux getAttractionByVendor Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -29,7 +29,7 @@ export async function createAttraction(vendorStaffId,attraction) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("attractionRedux createAttraction Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -39,6 +39,6 @@ export async function updateAttraction(vendorStaffId, attraction) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("attractionRedux updateAttraction Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }

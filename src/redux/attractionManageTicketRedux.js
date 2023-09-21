@@ -8,6 +8,7 @@ export async function getAttractionList(vendor_id) {
         }    
     } catch (error) {
         console.error("Retrieve vendor attraction list error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -19,6 +20,7 @@ export async function createTickets(start_date,end_date,ticket_type,ticket_count
         }    
     } catch (error) {
         console.error("Create attraction ticket error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -33,6 +35,7 @@ export async function updateTicketPerDay(attraction_id,requestBody) {
         }
     } catch (error) {
         console.error("Update attraction ticket error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -44,6 +47,7 @@ export async function getAllTicketListedByAttraction(attraction_id) {
         }    
     } catch (error) {
         console.error("Get all tickets associated with attraction error!");
+        return {status: false, data: error.message};
     }
 }
 
@@ -56,5 +60,6 @@ export async function getTicketEnumByAttraction(attraction_id) {
         }    
     } catch (error) {
         console.error("Get attraction ticket enum attraction error!");
+        return {status: false, data: error.message};
     }
 }

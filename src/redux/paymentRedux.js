@@ -7,7 +7,7 @@ export async function getVendorTotalEarnings(vendorId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("paymentRedux getVendorTotalEarnings Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -17,6 +17,6 @@ export async function getTourTotalEarningForLocal(localId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("paymentRedux getTourTotalEarningForLocal Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }

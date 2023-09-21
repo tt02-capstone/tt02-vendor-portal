@@ -8,6 +8,6 @@ export async function editLocalProfile(editedProfile) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("localRedux editLocalProfile Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
