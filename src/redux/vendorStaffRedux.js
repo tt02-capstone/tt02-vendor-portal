@@ -1,87 +1,55 @@
 import { userApi, vendorStaffApi } from "./api";
+import { handleApiErrors } from "../helper/errorCatching";
 
 export async function createVendorStaff(vendorStaff) { // not intial signup
-  console.log("Enter createVendorStaff function");
-  console.log(vendorStaff);
-  return await vendorStaffApi.post(`/createVendorStaff`, vendorStaff)
-  .then((response) => {
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-      console.log('failure in vendorStaffRedux :: createVendorStaff');
-      return {status: false, data: response.data};
-    } else { // success
-      console.log("success in vendorStaffRedux :: createVendorStaff");
-      return {status: true, data: response.data};
-    }
-  })
-  .catch((error) => {
-    console.error("VendorStaffRedux createVendorStaff Error : ", error);
-  });
+
+  try {
+    const response = await vendorStaffApi.post(`/createVendorStaff`, vendorStaff);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("vendorStaffRedux createVendorStaff Error : ", error);
+    // response.message.error
+  }
 }
 
-export async function editVendorStaffProfile(edittedProfile) {
-  console.log("Enter editVendorStaffProfile function");
-  return await vendorStaffApi.put(`/editVendorStaffProfile`, edittedProfile)
-  .then((response) => {
-    console.log(response);
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-      console.log('failure in vendorStaffRedux :: editVendorStaffProfile :: vendor')
-      return {status: false, data: response.data};
-    } else { // success
-      console.log("success in vendorStaffRedux :: editVendorStaffProfile :: vendor");
-      console.log(response.data);
-      return {status: true, data: response.data};
-    }
-  })
-  .catch((error) => {
-    console.error("vendorStaffRedux editVendorStaffProfile: ", error);
-  });
+export async function editVendorStaffProfile(editedProfile) {
+
+  try {
+    const response = await vendorStaffApi.put(`/editVendorStaffProfile`, editedProfile);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("vendorStaffRedux editVendorStaffProfile Error : ", error);
+    // response.message.error
+  }
 }
 
 export async function getAllAssociatedVendorStaff(vendorId) {
-  console.log("Enter getAllAssociatedVendorStaff function");
-  return await vendorStaffApi.get(`/getAllAssociatedVendorStaff/${vendorId}`)
-  .then((response) => {
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-      console.log('failure in vendorStaffRedux :: getAllAssociatedVendorStaff')
-      return {status: false, data: response.data};
-    } else { // success
-      console.log("success in vendorStaffRedux :: getAllAssociatedVendorStaff");
-      return {status: true, data: response.data};
-    }
-  })
-  .catch((error) => {
+  try {
+    const response = await vendorStaffApi.get(`/getAllAssociatedVendorStaff/${vendorId}`);
+    return handleApiErrors(response);
+  } catch (error) {
     console.error("vendorStaffRedux getAllAssociatedVendorStaff Error : ", error);
-  });
+    // response.message.error
+  }
 }
 
 export async function toggleVendorStaffBlock(vendorStaffId) {
-  console.log("Enter toggleVendorStaffBlock function");
-  return await vendorStaffApi.put(`/toggleBlock/${vendorStaffId}`)
-  .then((response) => {
-    console.log(response);
-    if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 422) { // error
-      console.log('failure in vendorStaffRedux :: toggleVendorStaffBlock')
-      return {status: false, data: response.data};
-    } else { // success
-      console.log("success in vendorStaffRedux :: toggleVendorStaffBlock");
-      return {status: true, data: response.data};
-    }
-  })
-  .catch((error) => {
+  try {
+    const response = await vendorStaffApi.put(`/toggleBlock/${vendorStaffId}`);
+    return handleApiErrors(response);
+  } catch (error) {
     console.error("vendorStaffRedux toggleVendorStaffBlock Error : ", error);
-  });
+    // response.message.error
+  }
 }
 
 export async function verifyEmail(token) {
-  return await vendorStaffApi.get(`/verifyEmail/${token}`)
-  .then((response) => {
-      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
-          return { status: false, data: response.data };
-      } else {
-          return { status: true, data: response.data };
-      }
-  })
-  .catch((error) => {
-      console.error("VendorStaffRedux verifyEmail Error : ", error);
-  });
+
+  try {
+    const response = await vendorStaffApi.get(`/verifyEmail/${token}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("vendorStaffRedux verifyEmail Error : ", error);
+    // response.message.error
+  }
 }
