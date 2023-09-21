@@ -87,13 +87,14 @@ function AppLayout() {
                         }/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
                         <Route path="/home" element={<Home/>}/>
-                        <Route path="/" element={<Home/>}/>
+                        <Route path="*" element={<Home/>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
                         <Route path="/signup" element={<Signup/>}/>
                         <Route path="/passwordreset" element={<PasswordReset/>}/>
                         <Route path="/forgetpassword" element={<ForgetPassword/>}/>
                         <Route path="/verifyemail" element={<EmailVerification/>}/>
+                        <Route path="*" element={<Login/>}/>
                     </>
                 )}
             </Routes>
