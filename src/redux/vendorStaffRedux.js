@@ -8,7 +8,7 @@ export async function createVendorStaff(vendorStaff) { // not intial signup
     return handleApiErrors(response);
   } catch (error) {
     console.error("vendorStaffRedux createVendorStaff Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -19,7 +19,7 @@ export async function editVendorStaffProfile(editedProfile) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("vendorStaffRedux editVendorStaffProfile Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -29,7 +29,7 @@ export async function getAllAssociatedVendorStaff(vendorId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("vendorStaffRedux getAllAssociatedVendorStaff Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -39,7 +39,7 @@ export async function toggleVendorStaffBlock(vendorStaffId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("vendorStaffRedux toggleVendorStaffBlock Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -50,6 +50,6 @@ export async function verifyEmail(token) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("vendorStaffRedux verifyEmail Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }

@@ -8,7 +8,7 @@ export async function uploadNewProfilePic(user) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("userRedux uploadNewProfilePic Error : ", error);
-    // response.message.error
+    return error.message;
   }
 }
 
@@ -18,7 +18,7 @@ export async function editPassword(userId, oldPassword, newPassword) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("userRedux editPassword Error : ", error);
-    // response.message.error
+    return error.message;
   }
 }
 
@@ -28,7 +28,7 @@ export async function passwordResetStageOne(email) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("userRedux passwordResetStageOne Error : ", error);
-    // response.message.error
+    return error.message;
   }
 }
 
@@ -38,7 +38,7 @@ export async function passwordResetStageTwo(email, otp) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("userRedux passwordResetStageTwo Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
 
@@ -48,6 +48,6 @@ export async function passwordResetStageThree(email, password) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("userRedux passwordResetStageThree Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }

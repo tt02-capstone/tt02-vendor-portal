@@ -28,6 +28,6 @@ export async function createVendor(values) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("vendorRedux createVendor Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }

@@ -9,7 +9,7 @@ export async function getAttractionBookingListByVendor(vendorStaffId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("bookingRedux getAttractionBookingListByVendor Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
   
@@ -19,6 +19,6 @@ export async function getAttractionBookingByVendor(vendorStaffId, bookingId) {
     return handleApiErrors(response);
   } catch (error) {
     console.error("bookingRedux getAttractionBookingByVendor Error : ", error);
-    // response.message.error
+    return {status: false, data: error.message};
   }
 }
