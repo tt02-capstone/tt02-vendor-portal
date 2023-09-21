@@ -1,9 +1,7 @@
-import axios from "axios";
-
-const vendorURL = "http://localhost:8080/vendor";
+import { vendorApi } from "./api";
 
 export async function createVendor(values) {
-  return await axios.post(`${vendorURL}/createVendor`, {
+  return await vendorApi.post(`/createVendor`, {
     name: values.poc_name,
     email: values.email,
     password: values.password,

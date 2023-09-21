@@ -9,8 +9,10 @@ export default function ViewAttractionBookingModal(props) {
 
     async function getBooking(vendor, props) {
         try {
-            let response = await getAttractionBookingByVendor(vendor.vendor_id, props.bookingId);
+            let response = await getAttractionBookingByVendor(vendor.user_id, props.bookingId);
+            console.log("vendor.user_id", vendor.user_id);
             setSelectedAttractionBooking(response.data);
+            console.log("get booking for view booking", response.data);
         } catch (error) {
             alert('An error occurred! Failed to retrieve booking!');
         }
@@ -21,7 +23,7 @@ export default function ViewAttractionBookingModal(props) {
 
     useEffect(() => {
         if (props.isViewAttractionBookingModalOpen) {
-            getBooking(vendor.vendor, props);
+            getBooking(vendor, props);
         }
     }, [props.isViewAttractionBookingModalOpen]);
 

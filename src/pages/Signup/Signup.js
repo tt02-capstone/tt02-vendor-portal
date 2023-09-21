@@ -83,6 +83,7 @@ function Signup() {
   async function onFinish(values) {
     setLoading(true);
     let response = await createVendor(values);
+    console.log(response);
     if (response.status) {
       toast.success('Application submitted!', {
         position: toast.POSITION.TOP_RIGHT,

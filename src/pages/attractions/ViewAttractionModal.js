@@ -12,6 +12,7 @@ export default function ViewAttractionModal(props) {
     async function getAttraction(vendor, props) {
         try {
             let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
+            console.log("vendor.user_id", vendor.user_id);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
         } catch (error) {
