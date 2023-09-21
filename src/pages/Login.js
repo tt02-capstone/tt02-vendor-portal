@@ -75,7 +75,8 @@ function Login() {
         }
       })
         .catch((error) => {
-          console.error("Axios Error : ", error)
+          console.error("Axios Error : ", error);
+          setLoading(false);
         });
     }
   }
