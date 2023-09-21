@@ -1,4 +1,5 @@
 import axios from "axios";
+import {TOKEN_KEY} from "./AuthContext";
 
 const HOST = 'localhost'
 const HOST_WITH_PORT = `http://${HOST}:8080`
@@ -34,3 +35,16 @@ export const attractionApi = axios.create({
 export const paymentApi = axios.create({
     baseURL: HOST_WITH_PORT + '/payment'
 })
+
+const instanceList = [localApi, adminApi, bookingApi, vendorStaffApi, paymentApi, touristApi, attractionApi]
+
+instanceList.map((api) => {
+    api.interceptors.request.use( (config) => {
+        const token = localStorage.getItem(TOKEN_KEY);
+        config.headers.Authorization =  token ? `Bearer ${token}` : '';
+        return config;
+    });
+})
+
+
+
