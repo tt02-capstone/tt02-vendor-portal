@@ -373,7 +373,10 @@ export default function EditAttractionModal(props) {
                         label="Price List"
                         name="prices"
                     >
-                        <Form.List name="price_list">
+                        <Form.List 
+                            name="price_list"
+                            initialValue={[{ ticket_type: 'All'}]}
+                        >
                             {(fields, { add, remove }) => (
                                 <>
                                     {fields.map(({ key, name, ...restField }) => (

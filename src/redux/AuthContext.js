@@ -1,7 +1,7 @@
 import {createContext, useEffect, useState} from "react";
 import axios from "axios";
 
-const TOKEN_KEY= 'token'
+const TOKEN_KEY= 'vendortoken'
 const AuthContext = createContext(null);
 const {Provider} = AuthContext;
 
