@@ -31,7 +31,7 @@ export const validateContactNo = (rule, value) => {
 };
 
 export const validateOnlyAlphabets = (rule, value) => {
-    const regex = /^[A-Za-z]+$/;
+    const regex = /^[A-Za-z ]+$/;
     if (!regex.test(value)) {
     return Promise.reject('Field should contain letters only');
     }
