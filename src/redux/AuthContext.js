@@ -7,7 +7,6 @@ const {Provider} = AuthContext;
 
 const AuthProvider = ({children}) => {
     const [authState, setAuthState] = useState({
-        accessToken: null,
         authenticated: null,
     });
 
@@ -18,7 +17,6 @@ const AuthProvider = ({children}) => {
             if (token) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
                 setAuthState({
-                    accessToken: token,
                     authenticated: true
                 });
             }
@@ -32,13 +30,12 @@ const AuthProvider = ({children}) => {
         localStorage.clear()
         axios.defaults.headers.common['Authorization'] =  ``;
         setAuthState({
-            accessToken: null,
             authenticated: false,
         });
     };
 
     const getAccessToken = () => {
-        return authState.accessToken;
+        return localStorage.getItem(TOKEN_KEY);
     };
 
     return (
