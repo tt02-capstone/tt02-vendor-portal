@@ -186,9 +186,7 @@ export default function ViewAttractionBookingModal(props) {
                     {renderProperty('End Date', formatStartEndDate(selectedAttractionBooking.end_datetime))}
                     {renderBookingItems()}
                     {renderProperty('Payment Status', selectedAttractionBooking.payment ? (selectedAttractionBooking.payment.is_paid ? 'PAID' : 'UNPAID') : '', getPaymentStatusColor(selectedAttractionBooking.payment ? (selectedAttractionBooking.payment.is_paid ? 'PAID' : 'UNPAID') : ''))}
-                    {renderProperty('Amount User Paid', selectedAttractionBooking.payment ? `$${selectedAttractionBooking.payment.payment_amount.toFixed(2)}` : '')}
-                    {renderProperty('Commission Percentage', selectedAttractionBooking.payment ? `${(selectedAttractionBooking.payment.comission_percentage * 100).toFixed(0)}%` : '')}
-                    {renderProperty('Amount Vendor Earns', calculateVendorEarns(selectedAttractionBooking.payment))}
+                    {renderProperty('Amount Earned', calculateVendorEarns(selectedAttractionBooking.payment))}
                 </div>
             </Modal >
         </div >

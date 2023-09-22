@@ -17,9 +17,11 @@ export default function BookingManagement() {
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     const [getAttractionBookingsData, setGetAttractionBookingsData] = useState(true);
-    const [attractionBookingsData, setAttractionBookingsData] = useState([]); 
+    const [attractionBookingsData, setAttractionBookingsData] = useState([]);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [selectedBooking, setSelectedBooking] = useState([]);
+    const [sortField, setSortField] = useState(null);
+    const [sortOrder, setSortOrder] = useState(null);
 
     const bookingsColumns = [
         {
@@ -33,9 +35,9 @@ export default function BookingManagement() {
             key: 'customerName',
             render: (text, record) => {
                 if (record.tourist_user) {
-                    return record.tourist_user.name; 
+                    return record.tourist_user.name;
                 } else if (record.local_user) {
-                    return record.local_user.name; 
+                    return record.local_user.name;
                 } else {
                     return '';
                 }
@@ -47,9 +49,9 @@ export default function BookingManagement() {
             key: 'customerType',
             render: (text, record) => {
                 if (record.tourist_user) {
-                    return 'Tourist'; 
+                    return 'Tourist';
                 } else if (record.local_user) {
-                    return 'Local'; 
+                    return 'Local';
                 } else {
                     return '';
                 }
@@ -57,7 +59,7 @@ export default function BookingManagement() {
         },
         {
             title: 'Attraction',
-            dataIndex: 'attraction', 
+            dataIndex: 'attraction',
             key: 'attraction',
             render: (attraction) => {
                 return attraction ? attraction.name : '';
@@ -83,7 +85,7 @@ export default function BookingManagement() {
                         color = 'error';
                         break;
                 }
-    
+
                 return <Tag color={color}>{status}</Tag>;
             },
         },
@@ -93,8 +95,8 @@ export default function BookingManagement() {
             key: 'last_update',
             render: (lastUpdate) => {
                 const dateObj = new Date(lastUpdate);
-                const formattedDate = dateObj.toLocaleDateString(); 
-                const formattedTime = dateObj.toLocaleTimeString(); 
+                const formattedDate = dateObj.toLocaleDateString();
+                const formattedTime = dateObj.toLocaleTimeString();
                 return `${formattedDate} ${formattedTime}`;
             },
         },
@@ -124,7 +126,7 @@ export default function BookingManagement() {
                         `${bookingItem.activity_selection} (${bookingItem.quantity})`
                     ));
                     const ticketDescriptionString = ticketDescriptions.join(', ');
-        
+
                     return <div>{ticketDescriptionString}</div>;
                 } else {
                     return 'N/A';
@@ -142,7 +144,7 @@ export default function BookingManagement() {
                 } else {
                     color = 'red';
                 }
-    
+
                 return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
             },
         },
@@ -172,12 +174,12 @@ export default function BookingManagement() {
     useEffect(() => {
         if (getAttractionBookingsData) {
             console.log("user id", vendor.user_id)
-            console.log("vendor vendor vendor",vendor.vendor.vendor_id)
+            console.log("vendor vendor vendor", vendor.vendor.vendor_id)
             const fetchData = async () => {
                 const response = await getAttractionBookingListByVendor(vendor.user_id);
                 console.log("response data", response.data)
                 if (response.status) {
-                    var tempData = response.data.map((val) => ({ 
+                    var tempData = response.data.map((val) => ({
                         ...val,
                         key: val.user_id,
                     }));
@@ -194,8 +196,26 @@ export default function BookingManagement() {
         }
     }, [getAttractionBookingsData]);
 
+    useEffect(() => {
+        // Handle sorting and filtering when sortField, sortOrder, or attractionBookingsData changes
+        if (sortField && sortOrder !== null) {
+            // Apply sorting based on sortField and sortOrder
+            let sortedData = [...attractionBookingsData];
+            sortedData.sort((a, b) => {
+                const aValue = a[sortField];
+                const bValue = b[sortField];
+                if (sortOrder === 'ascend') {
+                    return aValue < bValue ? -1 : 1;
+                } else {
+                    return aValue > bValue ? -1 : 1;
+                }
+            });
+            setAttractionBookingsData(sortedData);
+        }
+    }, [sortField, sortOrder, attractionBookingsData]);
+
     // VIEW BOOKING
-    const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false); 
+    const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false);
 
     useEffect(() => {
 
@@ -222,6 +242,12 @@ export default function BookingManagement() {
         }
     }
 
+    const handleTableChange = (field, order, filters) => {
+        // Handle sorting by setting the sortField and sortOrder state
+        setSortField(field);
+        setSortOrder(order);
+    };
+
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
@@ -234,9 +260,10 @@ export default function BookingManagement() {
                             column={bookingsColumns}
                             data={attractionBookingsData}
                             tableLayout="auto"
+                            handleTableChange={handleTableChange}
                         />
 
-                        
+
                         <ViewAttractionBookingModal
                             isViewAttractionBookingModalOpen={isViewAttractionBookingModalOpen}
                             onClickCancelViewAttractionBookingModal={onClickCancelViewAttractionBookingModal}

@@ -42,3 +42,13 @@ export async function updateAttraction(vendorStaffId, attraction) {
     return {status: false, data: error.message};
   }
 }
+
+export async function getLastAttractionId() {
+  try {
+    const response = await attractionApi.get(`${attractionURL}/getLastAttractionId`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("attractionRedux getLastAttractionId Error: ", error);
+    return { status: false, data: error.message };
+  }
+}

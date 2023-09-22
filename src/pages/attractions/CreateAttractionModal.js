@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Space, Button, Select, InputNumber, Upload } from "antd";
 import { MinusCircleOutlined, PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import { getLastAttractionId } from "../../redux/attractionRedux";
 import CustomFileUpload from "../../components/CustomFileUpload";
 import { ToastContainer, toast } from 'react-toastify';
 import AWS from 'aws-sdk';
@@ -14,6 +15,33 @@ export default function CreateAttractionModal(props) {
     const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
     const [attractionName, setAttractionName] = useState('');
+    const [lastAttractionId, setLastAttractionId] = useState(null);
+    const [attractionId, setAttractionId] = useState(null);
+
+    useEffect(() => {
+        // Call the API function to get the last attraction_id
+        async function fetchLastAttractionId() {
+          try {
+            const response = await getLastAttractionId();
+            if (response.status) {
+              console.log("fetchLastAttractionId response", response);
+              setLastAttractionId(response.data);
+              const newAttractionId = response.data + 1;
+              setAttractionId(newAttractionId); // Update attractionId based on the lastAttractionId
+              console.log("lastAttractionId", response.data);
+              console.log("attractionId", newAttractionId);
+            } else {
+              console.error("Error fetching last attraction_id: ", response.data);
+            }
+          } catch (error) {
+            console.error("Error fetching attractionId: ", error);
+          }
+        }
+      
+        fetchLastAttractionId();
+      }, [attractionId]); // Add attractionId to the dependency array
+      
+    
 
     function normFile(e) {
         if (Array.isArray(e)) {
@@ -34,12 +62,6 @@ export default function CreateAttractionModal(props) {
         setImageFiles(updatedFiles);
     }
 
-    const handleAttractionNameChange = (e) => {
-        const newName = e.target.value;
-        setAttractionName(newName);
-        console.log("attractionName: ", attractionName)
-    };
-
     // upload file
     const S3BUCKET = 'tt02/attraction';
     const TT02REGION = 'ap-southeast-1';
@@ -55,7 +77,7 @@ export default function CreateAttractionModal(props) {
 
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
-            const attractionImageName = attractionName + '_' + file.name;
+            const attractionImageName = 'Attraction_' + attractionId + '_' + file.name;
             const blob = new Blob([file.originFileObj]);
     
             if (blob) {
@@ -109,6 +131,10 @@ export default function CreateAttractionModal(props) {
     
             setUploadedImageUrls(uploadedImageUrls);
 
+            const newAttractionId = attractionId + 1;
+            setAttractionId(newAttractionId);
+            console.log("nextAttractionId", attractionId);
+
             props.onClickSubmitAttractionCreate({ ...props.form.getFieldsValue(), attraction_image_list: uploadedImageUrls });
 
         } catch (error) {
@@ -124,7 +150,7 @@ export default function CreateAttractionModal(props) {
         if (file) {
             let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
             str = str + '/' + 'attraction';
-            str = str + '/' + file.name;
+            str = str + '/' + 'Attraction_' + attractionId + '_' + file.name;
             console.log("useEffect", str);
         }
 
@@ -156,7 +182,7 @@ export default function CreateAttractionModal(props) {
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
 
                     >
-                        <Input onChange={handleAttractionNameChange} />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item
