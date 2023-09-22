@@ -127,7 +127,6 @@ export default function Profile() {
             localStorage.setItem(TOKEN_KEY, response.data.token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
             authContext.setAuthState({
-                accessToken: response.data.token,
                 authenticated: true
             });
             setUser(response.data.user);
