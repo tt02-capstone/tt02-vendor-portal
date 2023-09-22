@@ -19,7 +19,7 @@ export default function CreateAttractionModal(props) {
     const [attractionId, setAttractionId] = useState(null);
 
     useEffect(() => {
-        // Call the API function to get the last attraction_id
+        
         async function fetchLastAttractionId() {
           try {
             const response = await getLastAttractionId();
@@ -27,7 +27,7 @@ export default function CreateAttractionModal(props) {
               console.log("fetchLastAttractionId response", response);
               setLastAttractionId(response.data);
               const newAttractionId = response.data + 1;
-              setAttractionId(newAttractionId); // Update attractionId based on the lastAttractionId
+              setAttractionId(newAttractionId); 
               console.log("lastAttractionId", response.data);
               console.log("attractionId", newAttractionId);
             } else {
@@ -39,7 +39,7 @@ export default function CreateAttractionModal(props) {
         }
       
         fetchLastAttractionId();
-      }, [attractionId]); // Add attractionId to the dependency array
+      }, [attractionId]); 
       
     
 

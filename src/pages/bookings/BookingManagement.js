@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag, Menu } from 'antd';
+import React, { useState, useEffect, useRef } from "react";
+import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag, Menu, Table } from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
@@ -9,12 +9,15 @@ import CustomHeader from "../../components/CustomHeader";
 import ViewAttractionBookingModal from "./ViewAttractionBookingModal";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
+import { SearchOutlined } from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
 import { ToastContainer, toast } from 'react-toastify';
 
 export default function BookingManagement() {
 
     const navigate = useNavigate();
     const vendor = JSON.parse(localStorage.getItem("user"));
+    const [loading, setLoading] = useState(false);
 
     const [getAttractionBookingsData, setGetAttractionBookingsData] = useState(true);
     const [attractionBookingsData, setAttractionBookingsData] = useState([]);
@@ -23,11 +26,141 @@ export default function BookingManagement() {
     const [sortField, setSortField] = useState(null);
     const [sortOrder, setSortOrder] = useState(null);
 
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
+    function getCustomerNameForSorting(record) {
+        if (record.tourist_user) {
+          return record.tourist_user.name.toLowerCase();
+        } else if (record.local_user) {
+          return record.local_user.name.toLowerCase();
+        } else {
+          return '';
+        }
+      }
+      
+      function getCustomerTypeForSorting(record) {
+        if (record.tourist_user) {
+          return 'Tourist';
+        } else if (record.local_user) {
+          return 'Local';
+        } else {
+          return '';
+        }
+      }
+      
     const bookingsColumns = [
         {
             title: 'Id',
             dataIndex: 'booking_id',
             key: 'booking_id',
+            sorter: (a, b) => a.booking_id.localeCompare(b.booking_id),
+            ...getColumnSearchProps('booking_id'),
         },
         {
             title: 'Customer Name',
@@ -42,21 +175,33 @@ export default function BookingManagement() {
                     return '';
                 }
             },
+            sorter: (a, b) => {
+                const nameA = getCustomerNameForSorting(a);
+                const nameB = getCustomerNameForSorting(b);
+                return nameA.localeCompare(nameB);
+              },
+              ...getColumnSearchProps('customerName'),
         },
         {
             title: 'Customer Type',
             dataIndex: 'customerType',
             key: 'customerType',
             render: (text, record) => {
-                if (record.tourist_user) {
-                    return 'Tourist';
-                } else if (record.local_user) {
-                    return 'Local';
-                } else {
-                    return '';
-                }
+              if (record.tourist_user) {
+                return 'Tourist';
+              } else if (record.local_user) {
+                return 'Local';
+              } else {
+                return '';
+              }
             },
-        },
+            sorter: (a, b) => {
+              const typeA = getCustomerTypeForSorting(a);
+              const typeB = getCustomerTypeForSorting(b);
+              return typeA.localeCompare(typeB);
+            },
+            ...getColumnSearchProps('customerType'),
+          },
         {
             title: 'Attraction',
             dataIndex: 'attraction',
@@ -64,6 +209,12 @@ export default function BookingManagement() {
             render: (attraction) => {
                 return attraction ? attraction.name : '';
             },
+            sorter: (a, b) => {
+                const nameA = ((a.attraction && a.attraction.name) || '').toLowerCase();
+                const nameB = ((b.attraction && b.attraction.name) || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+              },
+              ...getColumnSearchProps('attraction.name'),
         },
         {
             title: 'Status',
@@ -88,6 +239,8 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{status}</Tag>;
             },
+            sorter: (a, b) => a.status.localeCompare(b.status),
+            ...getColumnSearchProps('status'),
         },
         {
             title: 'Last Updated',
@@ -99,6 +252,8 @@ export default function BookingManagement() {
                 const formattedTime = dateObj.toLocaleTimeString();
                 return `${formattedDate} ${formattedTime}`;
             },
+            sorter: (a, b) => a.lastUpdate - b.lastUpdate, 
+            ...getColumnSearchProps('last_update'), 
         },
         {
             title: 'Start Date',
@@ -107,6 +262,8 @@ export default function BookingManagement() {
             render: (startTime) => {
                 return startTime ? new Date(startTime).toLocaleDateString() : '';
             },
+            sorter: (a, b) => a.startTime.localeCompare(b.startTime),
+            ...getColumnSearchProps('startTime'),
         },
         {
             title: 'End Date',
@@ -115,6 +272,8 @@ export default function BookingManagement() {
             render: (endTime) => {
                 return endTime ? new Date(endTime).toLocaleDateString() : '';
             },
+            sorter: (a, b) => a.endTime.localeCompare(b.endTime),
+            ...getColumnSearchProps('endTime'),
         },
         {
             title: 'Tickets',
@@ -147,6 +306,8 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
             },
+            sorter: (a, b) => a.payment.is_paid.localeCompare(b.payment.is_paid),
+            ...getColumnSearchProps('payment'),
         },
         {
             title: 'Amount Earned',
@@ -155,6 +316,8 @@ export default function BookingManagement() {
             render: (payment) => {
                 return `$${(payment.payment_amount * (1 - payment.comission_percentage)).toFixed(2)}`
             },
+            sorter: (a, b) => a.payment.is_paid.localeCompare(b.payment.is_paid),
+            ...getColumnSearchProps('payment.is_paid'),
         },
         {
             title: 'Action(s)',
@@ -196,24 +359,6 @@ export default function BookingManagement() {
         }
     }, [getAttractionBookingsData]);
 
-    useEffect(() => {
-        // Handle sorting and filtering when sortField, sortOrder, or attractionBookingsData changes
-        if (sortField && sortOrder !== null) {
-            // Apply sorting based on sortField and sortOrder
-            let sortedData = [...attractionBookingsData];
-            sortedData.sort((a, b) => {
-                const aValue = a[sortField];
-                const bValue = b[sortField];
-                if (sortOrder === 'ascend') {
-                    return aValue < bValue ? -1 : 1;
-                } else {
-                    return aValue > bValue ? -1 : 1;
-                }
-            });
-            setAttractionBookingsData(sortedData);
-        }
-    }, [sortField, sortOrder, attractionBookingsData]);
-
     // VIEW BOOKING
     const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false);
 
@@ -242,12 +387,6 @@ export default function BookingManagement() {
         }
     }
 
-    const handleTableChange = (field, order, filters) => {
-        // Handle sorting by setting the sortField and sortOrder state
-        setSortField(field);
-        setSortOrder(order);
-    };
-
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
@@ -255,14 +394,12 @@ export default function BookingManagement() {
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
-                        <CustomTablePagination
-                            title="Attraction Bookings"
-                            column={bookingsColumns}
-                            data={attractionBookingsData}
-                            tableLayout="auto"
-                            handleTableChange={handleTableChange}
-                        />
-
+                        <Table 
+                        dataSource={attractionBookingsData}
+                        tableLayout='fixed'
+                        columns={bookingsColumns}
+                        style={{ width: '98%' }}
+                        loading={loading} />
 
                         <ViewAttractionBookingModal
                             isViewAttractionBookingModalOpen={isViewAttractionBookingModalOpen}

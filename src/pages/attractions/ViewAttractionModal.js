@@ -166,6 +166,7 @@ export default function ViewAttractionModal(props) {
 
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderAttractionImage(selectedAttraction.attraction_image_list)}
+                    {renderProperty('Attraction ID', selectedAttraction.attraction_id)}
                     {renderProperty('Description', selectedAttraction.description)}
                     {renderProperty('Category', selectedAttraction.attraction_category, getCategoryColor(selectedAttraction.attraction_category))}
                     {renderProperty('Address', selectedAttraction.address)}

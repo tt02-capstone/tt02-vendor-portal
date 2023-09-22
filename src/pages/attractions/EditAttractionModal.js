@@ -33,7 +33,7 @@ export default function EditAttractionModal(props) {
 
             setExistingImageUrls(newExistingImageUrls);
             
-            // console.log("editAttractionModal getAttraction existingImageUrls", existingImageUrls);
+            console.log("editAttractionModal getAttraction existingImageUrls", existingImageUrls);
         } catch (error) {
             alert('An error occurred! Failed to retrieve attraction!');
         }
@@ -101,12 +101,6 @@ export default function EditAttractionModal(props) {
         setImageFiles(updatedFiles);
     }
 
-    const handleAttractionNameChange = (e) => {
-        const newName = e.target.value;
-        setEditedAttractionName(newName);
-        console.log("editedAttractionName: ", editedAttractionName)
-    };
-
     // upload file
     const S3BUCKET = 'tt02/attraction';
     const TT02REGION = 'ap-southeast-1';
@@ -116,16 +110,20 @@ export default function EditAttractionModal(props) {
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
     
-            let currentAttractionName = editedAttractionName || selectedAttraction.name;
-            let attractionImageName = file.name;
-    
-            // Check if attraction name is not already part of the file name
-            if (!file.name.startsWith(currentAttractionName + '_')) {
-                attractionImageName = currentAttractionName + '_' + file.name;
-            }
-    
+        const attractionImageName = 'Attraction_' + selectedAttraction.attraction_id + '_' + file.name;
+
+        console.log("existingImageUrls", existingImageUrls);
+
+        // this currentFileUrl http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/Attraction_3_Attraction_3_art science.jpeg
+        const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/Attraction_${selectedAttraction.attraction_id}_${file.name}`;
+
+        console.log("currentFileUrl", currentFileUrl);
+
+        console.log(file.name, " is a new image? ", !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/Attraction_${selectedAttraction.attraction_id}`));
+
             // Check if the file is a new image (not an existing one)
-            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`)) {
+            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/Attraction_${selectedAttraction.attraction_id}_${file.name}`) 
+            && !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${file.name}`)) {
                 
                 const blob = new Blob([file.originFileObj]);
                 console.log("blob", blob);
@@ -159,7 +157,7 @@ export default function EditAttractionModal(props) {
                                     console.log(err);
                                     reject(err);
                                 } else {
-                                    const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+                                    const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/Attraction_${selectedAttraction.attraction_id}_${file.name}`;
                                     resolve(imageUrl);
                                 }
                             });
@@ -167,7 +165,7 @@ export default function EditAttractionModal(props) {
                 }
             } else {
                 // If it's an existing image, return its URL directly
-                return `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${attractionImageName}`;
+                return `http://tt02.s3-ap-southeast-1.amazonaws.com/attraction/${file.name}`;
             }
         });
     
@@ -195,7 +193,7 @@ export default function EditAttractionModal(props) {
             let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
             str = str + '/' + 'attraction';
             str = str + '/' + file.name;
-            console.log("useEffect", str);
+            // console.log("useEffect", str);
         }
 
     }, [file]);
@@ -225,7 +223,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter name of attraction!' },
                         { max: 128, message: 'Name should not exceed 128 characters!' },]}
                     >
-                        <Input onChange={handleAttractionNameChange} />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item
