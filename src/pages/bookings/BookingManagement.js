@@ -21,6 +21,13 @@ export default function BookingManagement() {
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [selectedBooking, setSelectedBooking] = useState([]);
 
+    const viewBookingBreadCrumb = [
+        {
+          title: 'Bookings',
+        }
+    ];
+
+
     const bookingsColumns = [
         {
             title: 'Id',
@@ -225,7 +232,8 @@ export default function BookingManagement() {
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
-                <CustomHeader text={"Header"} />
+                {/* <CustomHeader text={"Header"} /> */}
+                <CustomHeader items={viewBookingBreadCrumb}/>
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
@@ -258,11 +266,13 @@ export default function BookingManagement() {
 const styles = {
     layout: {
         minHeight: '100vh',
+        minWidth: '91.5vw'
     },
     content: {
         margin: '24px 16px 0',
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+        width: "98%"
     },
 }

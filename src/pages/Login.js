@@ -80,7 +80,8 @@ function Login() {
   }
 
   return (
-    <div className="Login" style={{backgroundColor: "white"}}>
+    <div className="Login" style={{backgroundColor: "white", display: "flex", flexDirection: "column",
+    justifyContent: "center", alignItems: "center", minHeight: "100vh"}}>
       <br /><br /><br />
       <center><h1>WithinSG Vendor Portal</h1></center>
       <form onSubmit={handleSubmit} style={formStyle}>
