@@ -17,20 +17,18 @@ export default function BookingManagement() {
 
     const navigate = useNavigate();
     const vendor = JSON.parse(localStorage.getItem("user"));
-    const [loading, setLoading] = useState(false);
 
     const [getAttractionBookingsData, setGetAttractionBookingsData] = useState(true);
     const [attractionBookingsData, setAttractionBookingsData] = useState([]);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [selectedBooking, setSelectedBooking] = useState([]);
-    const [sortField, setSortField] = useState(null);
-    const [sortOrder, setSortOrder] = useState(null);
 
     const breadcrumbItems = [
         {
           title: 'Bookings',
         },
     ];
+
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -44,149 +42,197 @@ export default function BookingManagement() {
         clearFilters();
         setSearchText('');
     };
-
-    const getColumnSearchProps = (dataIndex) => ({
+      const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div
+          <div
+            style={{
+              padding: 8,
+            }}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <Input
+              ref={searchInput}
+              placeholder={`Search ${Array.isArray(dataIndex) ? dataIndex.join(', ') : dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+              style={{
+                marginBottom: 8,
+                display: 'block',
+              }}
+            />
+            <Space>
+              <Button
+                type="primary"
+                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                icon={<SearchOutlined />}
+                size="small"
                 style={{
-                    padding: 8,
+                  width: 90,
                 }}
-                onKeyDown={(e) => e.stopPropagation()}
-            >
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{
-                        marginBottom: 8,
-                        display: 'block',
-                    }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => clearFilters && handleReset(clearFilters)}
-                        size="small"
-                        style={{
-                            width: 90,
-                        }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        Close
-                    </Button>
-                </Space>
-            </div>
+              >
+                Search
+              </Button>
+              <Button
+                onClick={() => clearFilters && handleReset(clearFilters)}
+                size="small"
+                style={{
+                  width: 90,
+                }}
+              >
+                Reset
+              </Button>
+              {/* <Button
+                  type="link"
+                  size="small"
+                  onClick={() => {
+                      confirm({
+                          closeDropdown: false,
+                      });
+                      setSearchText(selectedKeys[0]);
+                      setSearchedColumn(dataIndex);
+                  }}
+              >
+                  Filter
+              </Button> */}
+              <Button
+                type="link"
+                size="small"
+                onClick={() => {
+                  close();
+                }}
+              >
+                Close
+              </Button>
+            </Space>
+          </div>
         ),
         filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{
-                    color: filtered ? '#1677ff' : undefined,
-                }}
-            />
+          <SearchOutlined
+            style={{
+              color: filtered ? '#1677ff' : undefined,
+            }}
+          />
         ),
-        onFilter: (value, record) =>
-            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownOpenChange: (visible) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
+        onFilter: (value, record) => {
+
+            console.log("onFilter value", value);
+            console.log("onFilter record", record);
+            console.log("onFilter dataIndex", dataIndex);
+            
+            if (dataIndex == 'customerName') {
+                const customerName = record.tourist_user.name;
+                console.log("customer name", customerName);
+                if (customerName) {
+                    return customerName.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
+            } else if (dataIndex == 'customerType') {
+                const customerType = record.tourist_user;
+                if (customerType) {
+                    return 'Tourist'.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return 'Local'.toLowerCase().includes(value.toLowerCase());
+                }
+            } else if (dataIndex == 'attractionName') {
+                const attractionName = record.attraction;
+                if (attractionName) {
+                    return attractionName.name.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
+            } else if (dataIndex == 'status') {
+                const status = record.status;
+                if (status) {
+                    return status.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
+            } else if (dataIndex == 'last_update') {
+                const lastUpdate = record.last_update;
+                if (lastUpdate) {
+                    return lastUpdate.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
+            } else if (dataIndex == 'start_datetime') {
+                const startDatetime = record.start_datetime;
+                if (startDatetime) {
+                    return startDatetime.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
+            } else if (dataIndex == 'end_datetime') {
+                const endDatetime = record.end_datetime;
+                if (endDatetime) {
+                    return endDatetime.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
+            } else if (dataIndex == 'payment') {
+                const payment = record.payment;
+                if (payment) {
+                    return payment.is_paid.toLowerCase().includes(value.toLowerCase());
+                } else {
+                    return false;
+                }
             }
         },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{
-                        backgroundColor: '#ffc069',
-                        padding: 0,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            ),
-    });
+        onFilterDropdownOpenChange: (visible) => {
+          if (visible) {
+            setTimeout(() => searchInput.current?.select(), 100);
+          }
+        },
 
-    function getCustomerNameForSorting(record) {
-        if (record.tourist_user) {
-          return record.tourist_user.name.toLowerCase();
-        } else if (record.local_user) {
-          return record.local_user.name.toLowerCase();
-        } else {
-          return '';
+        render: (text) =>{
+            console.log("render text", text);
+            console.log("render dataIndex", dataIndex);
+            console.log("render searchedColumn", searchedColumn);
+            return searchedColumn === dataIndex ? (
+              <Highlighter
+                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text ? text.toString() : ''}
+              />
+            ) : (
+              text
+            );
         }
-      }
-      
-      function getCustomerTypeForSorting(record) {
-        if (record.tourist_user) {
-          return 'Tourist';
-        } else if (record.local_user) {
-          return 'Local';
-        } else {
-          return '';
-        }
-      }
+      });     
+    
       
     const bookingsColumns = [
         {
             title: 'Id',
             dataIndex: 'booking_id',
             key: 'booking_id',
-            sorter: (a, b) => a.booking_id.localeCompare(b.booking_id),
-            ...getColumnSearchProps('booking_id'),
+            width: 80,
+            sorter: (a, b) => Number(a.booking_id) - Number(b.booking_id),
+            // not displaying correctly due to text rendering issues too
+            // ...getColumnSearchProps('booking_id'),
         },
         {
             title: 'Customer Name',
             dataIndex: 'customerName',
             key: 'customerName',
             render: (text, record) => {
-                if (record.tourist_user) {
-                    return record.tourist_user.name;
-                } else if (record.local_user) {
-                    return record.local_user.name;
-                } else {
-                    return '';
-                }
+                const customerName = record.tourist_user
+                    ? record.tourist_user.name
+                    : record.local_user
+                    ? record.local_user.name
+                    : '';
+        
+                return customerName;
             },
             sorter: (a, b) => {
-                const nameA = getCustomerNameForSorting(a);
-                const nameB = getCustomerNameForSorting(b);
+                const nameA = a.tourist_user ? a.tourist_user.name : a.local_user ? a.local_user.name : '';
+                const nameB = b.tourist_user ? b.tourist_user.name : b.local_user ? b.local_user.name : '';
+        
                 return nameA.localeCompare(nameB);
-              },
-              ...getColumnSearchProps('customerName'),
+            },
+            // ...getColumnSearchProps('customerName')
         },
         {
             title: 'Customer Type',
@@ -202,25 +248,39 @@ export default function BookingManagement() {
               }
             },
             sorter: (a, b) => {
-              const typeA = getCustomerTypeForSorting(a);
-              const typeB = getCustomerTypeForSorting(b);
-              return typeA.localeCompare(typeB);
+                const getTypeValue = (record) => {
+                    if (record.tourist_user) {
+                        return 1; // Tourist
+                    } else if (record.local_user) {
+                        return 2; // Local
+                    } else {
+                        return 0; 
+                    }
+                };
+        
+                const typeA = getTypeValue(a);
+                const typeB = getTypeValue(b);
+        
+                return typeA - typeB;
             },
-            ...getColumnSearchProps('customerType'),
+            // ...getColumnSearchProps('customerType')
           },
         {
             title: 'Attraction',
-            dataIndex: 'attraction',
-            key: 'attraction',
-            render: (attraction) => {
-                return attraction ? attraction.name : '';
+            dataIndex: 'attractionName',
+            key: 'attractionName',
+            render: (text, record) => {
+                console.log("text", text);
+                console.log("record", record);
+                return record.attraction.name;
             },
             sorter: (a, b) => {
-                const nameA = ((a.attraction && a.attraction.name) || '').toLowerCase();
-                const nameB = ((b.attraction && b.attraction.name) || '').toLowerCase();
+                const nameA = (a.attraction && a.attraction.name) || ''; 
+                const nameB = (b.attraction && b.attraction.name) || ''; 
+        
                 return nameA.localeCompare(nameB);
-              },
-              ...getColumnSearchProps('attraction.name'),
+            },
+            // ...getColumnSearchProps('record.attraction.name'),
         },
         {
             title: 'Status',
@@ -245,8 +305,15 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{status}</Tag>;
             },
-            sorter: (a, b) => a.status.localeCompare(b.status),
-            ...getColumnSearchProps('status'),
+            sorter: (a, b) => {
+                const statusOrder = ['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED'];
+                const statusA = a.status || ''; 
+                const statusB = b.status || ''; 
+        
+                return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
+            },
+            // formatting not preserved
+            // ...getColumnSearchProps('status'),
         },
         {
             title: 'Last Updated',
@@ -254,12 +321,19 @@ export default function BookingManagement() {
             key: 'last_update',
             render: (lastUpdate) => {
                 const dateObj = new Date(lastUpdate);
-                const formattedDate = dateObj.toLocaleDateString();
-                const formattedTime = dateObj.toLocaleTimeString();
-                return `${formattedDate} ${formattedTime}`;
+                const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()} ${dateObj.toLocaleTimeString()}`;
+                return formattedDate;
             },
-            sorter: (a, b) => a.lastUpdate - b.lastUpdate, 
-            ...getColumnSearchProps('last_update'), 
+            sorter: (a, b) => {
+                // Extract the underlying date values for 'a' and 'b'
+                const dateA = new Date(a.last_update).getTime();
+                const dateB = new Date(b.last_update).getTime();
+        
+                // Compare the date values for sorting
+                return dateA - dateB;
+            },
+            // formatting not preserved
+            // ...getColumnSearchProps('last_update'),
         },
         {
             title: 'Start Date',
@@ -268,8 +342,16 @@ export default function BookingManagement() {
             render: (startTime) => {
                 return startTime ? new Date(startTime).toLocaleDateString() : '';
             },
-            sorter: (a, b) => a.startTime.localeCompare(b.startTime),
-            ...getColumnSearchProps('startTime'),
+            sorter: (a, b) => {
+                // Extract the underlying date values for 'a' and 'b'
+                const dateA = new Date(a.start_datetime).getTime();
+                const dateB = new Date(b.start_datetime).getTime();
+        
+                // Compare the date values for sorting
+                return dateA - dateB;
+            },
+            // formatting not preserved
+            // ...getColumnSearchProps('start_datetime'),
         },
         {
             title: 'End Date',
@@ -278,8 +360,16 @@ export default function BookingManagement() {
             render: (endTime) => {
                 return endTime ? new Date(endTime).toLocaleDateString() : '';
             },
-            sorter: (a, b) => a.endTime.localeCompare(b.endTime),
-            ...getColumnSearchProps('endTime'),
+            sorter: (a, b) => {
+                // Extract the underlying date values for 'a' and 'b'
+                const dateA = new Date(a.end_datetime).getTime();
+                const dateB = new Date(b.end_datetime).getTime();
+        
+                // Compare the date values for sorting
+                return dateA - dateB;
+            },
+            // formatting not preserved
+            // ...getColumnSearchProps('end_datetime'),
         },
         {
             title: 'Tickets',
@@ -312,8 +402,13 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
             },
-            sorter: (a, b) => a.payment.is_paid.localeCompare(b.payment.is_paid),
-            ...getColumnSearchProps('payment'),
+            sorter: (a, b) => {
+                const isPaidA = (a.payment && a.payment.is_paid) || false; 
+                const isPaidB = (b.payment && b.payment.is_paid) || false; 
+        
+                return isPaidA - isPaidB;
+            },
+            // missing search
         },
         {
             title: 'Amount Earned',
@@ -322,8 +417,12 @@ export default function BookingManagement() {
             render: (payment) => {
                 return `$${(payment.payment_amount * (1 - payment.comission_percentage)).toFixed(2)}`
             },
-            sorter: (a, b) => a.payment.is_paid.localeCompare(b.payment.is_paid),
-            ...getColumnSearchProps('payment.is_paid'),
+            sorter: (a, b) => {
+                const amountA = a.payment.payment_amount * (1 - a.payment.comission_percentage);
+                const amountB = b.payment.payment_amount * (1 - b.payment.comission_percentage);
+        
+                return amountA - amountB;
+            },
         },
         {
             title: 'Action(s)',
