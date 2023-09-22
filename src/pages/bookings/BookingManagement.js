@@ -396,16 +396,17 @@ export default function BookingManagement() {
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
-                <CustomHeader text={"Header"} />
+            <CustomHeader items={breadcrumbItems}/>
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
-                        <Table 
-                        dataSource={attractionBookingsData}
-                        tableLayout='fixed'
-                        columns={bookingsColumns}
-                        style={{ width: '98%' }}
-                        loading={loading} />
+                        <CustomTablePagination
+                            title="Bookings"
+                            column={bookingsColumns}
+                            data={attractionBookingsData}
+                            tableLayout="fixed"
+                            
+                        />
 
                         <ViewAttractionBookingModal
                             isViewAttractionBookingModalOpen={isViewAttractionBookingModalOpen}
@@ -428,6 +429,7 @@ export default function BookingManagement() {
 const styles = {
     layout: {
         minHeight: '100vh',
+        minWidth: '90vw'
     },
     content: {
         margin: '24px 16px 0',

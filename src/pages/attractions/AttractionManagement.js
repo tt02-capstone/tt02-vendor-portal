@@ -453,7 +453,6 @@ export default function AttractionManagement() {
                         {/* pagination */}
                         <CustomTablePagination
                             title="Attractions"
-                            style={styles.table}
                             column={attractionsColumns}
                             data={formatAttractionData(attractionsData)}
                             tableLayout="fixed"
@@ -507,9 +506,6 @@ const styles = {
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    table: {
-
     },
     customRow: {
         height: '280px',
