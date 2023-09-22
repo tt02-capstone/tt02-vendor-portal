@@ -13,7 +13,7 @@ import { uploadNewProfilePic } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
 import { getVendorTotalEarnings, getTourTotalEarningForLocal } from "../../redux/paymentRedux";
 import { editLocalProfile } from "../../redux/localRedux";
-import { UserOutlined, KeyOutlined } from "@ant-design/icons";
+import { UserOutlined, KeyOutlined, BankOutlined, DollarOutlined } from "@ant-design/icons";
 import CustomFileUpload from "../../components/CustomFileUpload";
 import { commaWith2DP } from "../../helper/numberFormat";
 import AWS from 'aws-sdk';
@@ -105,20 +105,20 @@ export default function Profile() {
             response = await editVendorStaffProfile(obj);
 
         } else if (user.user_type === 'LOCAL') {
-            let obj = {
-                "user_id": user.user_id,
-                "name": values.name,
-                "email": values.email,
-                "date_of_birth": dayjs(values.date_of_birth).format("YYYY-MM-DD"),
-                "country_code": values.country_code,
-                "mobile_num": values.mobile_num,
-            }
-            response = await editLocalProfile(obj);
+          let obj = {
+              "user_id": user.user_id,
+              "name": values.name,
+              "email": values.email,
+              "date_of_birth": dayjs(values.date_of_birth).format("YYYY-MM-DD"),
+              "country_code": values.country_code,
+              "mobile_num": values.mobile_num,
+          }
+          response = await editLocalProfile(obj);
         }
         
-        console.log(response);
         if (response.status) {
             setUser(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data));
             toast.success('User profile changed successfully!', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
@@ -375,8 +375,12 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.file;
     setFile(file);
+    toast.success(e.file.name + ' selected!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 1500
+    });
   };
 
   const uploadFile = async () => {
@@ -513,6 +517,17 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                           <div>
                             <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
                             <Row>
+                              <Col span={3}>
+                                <CustomButton text="Add Bank Account" icon={<BankOutlined />} onClick={onClickManageBAButton} />
+                              </Col>
+                              <Col span={2}>
+                                <Button type="primary" icon={<DollarOutlined />} onClick={onClickTopUpButton}>Top Up</Button>
+                              </Col>
+                              <Col span={3}>
+                                <Button type="primary" icon={<DollarOutlined />} onClick={onClickWithdrawButton}>Withdraw</Button>
+                              </Col>
+                            </Row>
+                            <Row>
                               <ul>
                                 {bankAccounts.map((account) => (
                                   <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
@@ -526,23 +541,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                                   </li>
                                 ))}
                               </ul>
-                              <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
-                          </Row>         
-                            <Row>
-                              <CustomButton
-                                text="Add Bank Account"
-                                icon={<KeyOutlined />}
-                                onClick={onClickManageBAButton}
-                              />
                             </Row>
-
-                            <Col span={8}>
-        <Button type="primary" onClick={onClickTopUpButton}>Top Up</Button>
-      </Col>
-      <Col span={8}>
-        <Button type="primary" onClick={onClickWithdrawButton}>Withdraw</Button>
-      </Col>
-                                              
                           </div>
                         }
 
@@ -833,7 +832,12 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                         initialValue={dayjs(user.date_of_birth)}
                         rules={[{ required: true, message: 'Date of birth is required!'}]}
                       >
-                        <DatePicker style={{width: '100%'}} format={dateFormat} />
+                        <DatePicker style={{width: '100%'}} format={dateFormat}
+                          disabledDate={(current) => {
+                            let customDate = moment().add(1, "days").format("YYYY-MM-DD");
+                            return current >= moment(customDate, "YYYY-MM-DD");
+                          }} 
+                        />
                       </Form.Item>
         
                       <Form.Item label="Contact No">
