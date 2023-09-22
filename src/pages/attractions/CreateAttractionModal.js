@@ -102,10 +102,10 @@ export default function CreateAttractionModal(props) {
             const uploadedImageUrls = await Promise.all(uploadPromises);
             console.log("All images uploaded:", uploadedImageUrls);
     
-            toast.success('Upload successful!', {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 1500
-            });
+            // toast.success('Upload successful!', {
+            //     position: toast.POSITION.TOP_RIGHT,
+            //     autoClose: 1500
+            // });
     
             setUploadedImageUrls(uploadedImageUrls);
 
@@ -113,10 +113,10 @@ export default function CreateAttractionModal(props) {
 
         } catch (error) {
             console.error("Error uploading images:", error);
-            toast.error('Upload failed!', {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 1500
-            });
+            // toast.error('Upload failed!', {
+            //     position: toast.POSITION.TOP_RIGHT,
+            //     autoClose: 1500
+            // });
         }
     };
 
@@ -296,7 +296,7 @@ export default function CreateAttractionModal(props) {
                     >
                         <Form.List
                             name="price_list"
-                            initialValue={[{ ticket_type: 'All'}]}
+                            initialValue={[{ ticket_type: 'ALL'}]}
                         >
                             {(fields, { add, remove }) => (
                                 <>

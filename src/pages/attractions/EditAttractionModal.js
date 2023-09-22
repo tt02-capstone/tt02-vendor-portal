@@ -375,7 +375,7 @@ export default function EditAttractionModal(props) {
                     >
                         <Form.List 
                             name="price_list"
-                            initialValue={[{ ticket_type: 'All'}]}
+                            initialValue={[{ ticket_type: 'ALL'}]}
                         >
                             {(fields, { add, remove }) => (
                                 <>

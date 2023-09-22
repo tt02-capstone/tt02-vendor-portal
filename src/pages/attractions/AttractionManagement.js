@@ -267,6 +267,7 @@ export default function AttractionManagement() {
             createAttractionForm.resetFields();
             setGetAttractionsData(true);
             setIsCreateAttractionModalOpen(false);
+            console.log("createAttraction response", response.status)
             toast.success('Attraction successfully created!', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
