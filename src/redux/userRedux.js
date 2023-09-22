@@ -44,7 +44,7 @@ export async function passwordResetStageTwo(email, otp) {
 
 export async function passwordResetStageThree(email, password) {
   try {
-    const response = await userApi.post(`$/webPasswordResetStageThree/${email}/${password}`);
+    const response = await userApi.post(`/webPasswordResetStageThree/${email}/${password}`);
     return handleApiErrors(response);
   } catch (error) {
     console.error("userRedux passwordResetStageThree Error : ", error);
