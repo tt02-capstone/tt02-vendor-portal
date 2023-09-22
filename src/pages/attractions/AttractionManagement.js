@@ -18,6 +18,7 @@ import { PlusOutlined } from "@ant-design/icons";
 export default function AttractionManagement() {
 
     const navigate = useNavigate();
+    const { Header, Content, Sider, Footer } = Layout;
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     const [getAttractionsData, setGetAttractionsData] = useState(true);
@@ -27,11 +28,18 @@ export default function AttractionManagement() {
     const [priceList, setPriceList] = useState([]);
     const [attractionImages, setAttractionImages] = useState({});
 
+    const breadcrumbItems = [
+        {
+          title: 'Attractions',
+        },
+    ];
+
     const attractionsColumns = [
         {
             title: 'Id',
             dataIndex: 'attraction_id', 
             key: 'attraction_id',
+            width: 50,
         },
         {
             title: 'Cover Image',
@@ -111,6 +119,7 @@ export default function AttractionManagement() {
             title: 'Contact Num',
             dataIndex: 'contact_num',
             key: 'contact_num',
+            width: 120,
         },
         {
             title: 'Published',
@@ -122,12 +131,14 @@ export default function AttractionManagement() {
                 } else {
                     return <Badge status="error" text="No" />
                 }
-            }
+            },
+            width: 100,
         },
         {
             title: 'Avg Rating',
             dataIndex: 'avg_rating_tier',
             key: 'avg_rating_tier',
+            width: 100,
         },
         {
             title: 'Price Tier',
@@ -158,7 +169,8 @@ export default function AttractionManagement() {
                 return (
                     <Tag color={tagColor}>{priceTier}</Tag>
                 );
-            }
+            },
+            width: 100,
         },
         {
             title: 'Action(s)',
@@ -176,7 +188,8 @@ export default function AttractionManagement() {
                     />
 
                 </Space>
-            }
+            },
+            width: 160,
         },
     ];
 
@@ -421,7 +434,7 @@ export default function AttractionManagement() {
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
-                <CustomHeader text={"Header"} />
+                <CustomHeader items={breadcrumbItems}/>
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
@@ -440,9 +453,11 @@ export default function AttractionManagement() {
                         {/* pagination */}
                         <CustomTablePagination
                             title="Attractions"
+                            style={styles.table}
                             column={attractionsColumns}
                             data={formatAttractionData(attractionsData)}
-                            tableLayout="auto"
+                            tableLayout="fixed"
+                            
                         />
 
                         {/* Modal to create new attraction */}
@@ -485,12 +500,16 @@ export default function AttractionManagement() {
 const styles = {
     layout: {
         minHeight: '100vh',
+        minWidth: '90vw'
     },
     content: {
         margin: '24px 16px 0',
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    table: {
+
     },
     customRow: {
         height: '280px',

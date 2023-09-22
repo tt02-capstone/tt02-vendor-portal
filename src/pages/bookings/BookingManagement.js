@@ -26,6 +26,12 @@ export default function BookingManagement() {
     const [sortField, setSortField] = useState(null);
     const [sortOrder, setSortOrder] = useState(null);
 
+    const breadcrumbItems = [
+        {
+          title: 'Bookings',
+        },
+    ];
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
