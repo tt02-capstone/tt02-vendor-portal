@@ -67,7 +67,7 @@ function Login() {
           });
 
           setTimeout(() => {
-            navigate('/home')
+            navigate('/profile')
           }, 700);
           setLoading(false);
         }

@@ -1,6 +1,5 @@
 import {Routes, Route, useNavigate, useLocation} from "react-router-dom";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
 import VendorStaff from "./pages/vendor/VendorStaff";
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar";
@@ -16,7 +15,6 @@ import ForgetPassword from "./pages/PasswordReset/ForgetPassword";
 import EmailVerification from "./pages/EmailVerification";
 import AttractionManageTicket from "./pages/attractions/AttractionManageTicket";
 import {
-    HomeOutlined,
     UserOutlined,
     UsergroupAddOutlined,
     BarsOutlined,
@@ -35,10 +33,9 @@ function AppLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const {authState, logout} = useContext(AuthContext);
-    const [currentTab, setCurrentTab] = useState('/home');
+    const [currentTab, setCurrentTab] = useState('/profile');
 
     const vendorStaffMenuItems = [
-        {key: '/home', label: 'Home', icon: <HomeOutlined/>},
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
@@ -47,7 +44,6 @@ function AppLayout() {
     ];
 
     const localMenuItems = [
-        {key: '/home', label: 'Home', icon: <HomeOutlined/>},
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
@@ -80,14 +76,9 @@ function AppLayout() {
                         <Route path="/attraction" element={<AttractionManagement/>}/>
                         <Route path="/attraction/viewTicket" element={<AttractionManageTicket/>}/>
                         <Route path="/bookingmanagement" element={<BookingManagement/>}/>
-                        <Route path="/profile" element={
-                            <Elements stripe={stripePromise}>
-                                <Profile/>
-                            </Elements>
-                        }/>
+                        <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
-                        <Route path="/home" element={<Home/>}/>
-                        <Route path="*" element={<Home/>}/>
+                        <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
                         <Route path="/signup" element={<Signup/>}/>
