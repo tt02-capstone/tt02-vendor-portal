@@ -13,6 +13,7 @@ import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
 import { PlusOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 
 
 export default function AttractionManagement() {
@@ -28,10 +29,10 @@ export default function AttractionManagement() {
     const [priceList, setPriceList] = useState([]);
     const [attractionImages, setAttractionImages] = useState({});
 
-    const breadcrumbItems = [
+    const viewAttractionBreadCrumb = [
         {
           title: 'Attractions',
-        },
+        }
     ];
 
     const attractionsColumns = [
@@ -434,7 +435,8 @@ export default function AttractionManagement() {
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
-                <CustomHeader items={breadcrumbItems}/>
+                {/* <CustomHeader text={"Header"} /> */}
+                <CustomHeader items={viewAttractionBreadCrumb}/>
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
@@ -447,6 +449,8 @@ export default function AttractionManagement() {
 
                         <CustomButton
                             text="View Tickets"
+                            style={{ marginLeft: '15px', marginBottom: '20px' }}
+                            icon={ <SearchOutlined/> }
                             onClick={redirectToTickets}
                         />
 
@@ -499,13 +503,14 @@ export default function AttractionManagement() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '90vw'
+        minWidth: '91.5vw'
     },
     content: {
-        margin: '24px 16px 0',
+        margin: '1vh 3vh 1vh 3vh',
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+        width: "98%"
     },
     customRow: {
         height: '280px',

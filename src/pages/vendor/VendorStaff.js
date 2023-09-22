@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Form } from 'antd';
+import React, { useState, useEffect, useRef } from "react";
+import { Layout, Form, Input, Space, Button } from 'antd';
 import {useNavigate} from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Highlighter from 'react-highlight-words';
+import { SearchOutlined }  from "@ant-design/icons";
 import { createVendorStaff, getAllAssociatedVendorStaff, toggleVendorStaffBlock } from "../../redux/vendorStaffRedux";
 import CustomHeader from "../../components/CustomHeader";
 import { Navigate } from 'react-router-dom';
@@ -21,7 +23,115 @@ export default function VendorStaff() {
         {
           title: 'Users',
         },
-      ];
+    ];
+
+    
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    {/* <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button> */}
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
 
     // vendor staff table pagination
     const [getVendorStaffData, setGetVendorStaffData] = useState(true);
@@ -32,16 +142,31 @@ export default function VendorStaff() {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            ...getColumnSearchProps('name'),
         },
         {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
+            sorter: (a, b) => a.email.localeCompare(b.email),
+            ...getColumnSearchProps('email'),
         },
         {
             title: 'Login Access',
             dataIndex: 'is_blocked',
             key: 'is_blocked',
+            filters: [
+                {
+                  text: 'Allowed',
+                  value: false,
+                },
+                {
+                  text: 'Denied',
+                  value: true,
+                },
+            ],
+            onFilter: (value, record) => record.is_blocked === value,
             render: (text) => {
                 if (text === true) {
                     return <p>No</p>
@@ -54,11 +179,24 @@ export default function VendorStaff() {
             title: 'Position',
             dataIndex: 'position',
             key: 'position',
+            sorter: (a, b) => a.position.localeCompare(b.position),
+            ...getColumnSearchProps('position'),
         },
         {
             title: 'Master Account',
             dataIndex: 'is_master_account',
             key: 'is_master_account',
+            filters: [
+                {
+                  text: 'Master',
+                  value: true,
+                },
+                {
+                  text: 'Non-master',
+                  value: false,
+                },
+            ],
+            onFilter: (value, record) => record.is_master_account === value,
             render: (text) => {
                 if (text === true) {
                     return <p>Yes</p>

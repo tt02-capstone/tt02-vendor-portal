@@ -40,7 +40,7 @@ export const paymentApi = axios.create({
     baseURL: HOST_WITH_PORT + '/payment'
 })
 
-const instanceList = [localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi]
+const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( (config) => {
@@ -50,5 +50,35 @@ instanceList.map((api) => {
     });
 })
 
+const refreshToken = async () => {
+    try {
+        const resp = await userApi.get("/refreshToken");
+        return resp.data;
+    } catch (e) {
+        console.log("Error",e);
+    }
+};
 
+instanceList.map((api) => {
+    api.interceptors.response.use(
+        (response) => {
+            return response;
+        },
+        async function (error) {
+            const originalRequest = error.config;
+            //403 Network error does not return status code so -> using !error.status instead
+            if (!error.status && !originalRequest._retry) {
+                originalRequest._retry = true;
+                const resp = await refreshToken();
+                const newToken = resp.refreshToken;
+                console.log("Refresh token", newToken)
 
+                localStorage.setItem(TOKEN_KEY, newToken);
+                axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                return api(originalRequest);
+            }
+            return Promise.reject(error);
+        }
+    );
+})

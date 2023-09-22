@@ -32,8 +32,6 @@ function Login() {
     padding: "20px"
   }
 
-  // localStorage.removeItem("user");
-
   function validateForm() {
     return email.length > 0 && password.length > 0;
   }
@@ -64,12 +62,11 @@ function Login() {
           setLoading(false);
 
           authContext.setAuthState({
-            accessToken: response.data.token,
             authenticated: true
           });
 
           setTimeout(() => {
-            navigate('/home')
+            navigate('/profile')
           }, 700);
           setLoading(false);
         }
@@ -82,7 +79,8 @@ function Login() {
   }
 
   return (
-    <div className="Login" style={{backgroundColor: "white"}}>
+    <div className="Login" style={{backgroundColor: "white", display: "flex", flexDirection: "column",
+    justifyContent: "center", alignItems: "center", minHeight: "100vh"}}>
       <br /><br /><br />
       <center><h1>WithinSG Vendor Portal</h1></center>
       <form onSubmit={handleSubmit} style={formStyle}>

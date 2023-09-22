@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Layout, Spin, Form, Input, Button, Row, Col, DatePicker, Divider, Typography } from 'antd';
 import dayjs, { Dayjs } from "dayjs";
 import moment from 'moment';
@@ -13,7 +13,7 @@ import { uploadNewProfilePic } from "../../redux/userRedux";
 import { editVendorStaffProfile } from "../../redux/vendorStaffRedux"
 import { getVendorTotalEarnings, getTourTotalEarningForLocal } from "../../redux/paymentRedux";
 import { editLocalProfile } from "../../redux/localRedux";
-import { UserOutlined, KeyOutlined } from "@ant-design/icons";
+import { UserOutlined, KeyOutlined, BankOutlined, DollarOutlined } from "@ant-design/icons";
 import CustomFileUpload from "../../components/CustomFileUpload";
 import { commaWith2DP } from "../../helper/numberFormat";
 import AWS from 'aws-sdk';
@@ -22,6 +22,8 @@ import { loadStripe  } from '@stripe/stripe-js';
 import { useStripe } from '@stripe/react-stripe-js';
 import { vendorStaffApi,paymentApi } from "../../redux/api";
 import WalletModal from "./WalletModal";
+import {AuthContext, TOKEN_KEY} from "../../redux/AuthContext";
+import axios from 'axios';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -34,6 +36,7 @@ export default function Profile() {
     const navigate = useNavigate();
     const dateFormat = "DD-MM-YYYY";
     const { Header, Content, Sider, Footer } = Layout;
+    const authContext = useContext(AuthContext);
 
     const viewProfileBreadcrumbItems = [
       {
@@ -80,6 +83,7 @@ export default function Profile() {
                 "name": values.name,
                 "email": values.email,
                 "position": values.position,
+                "password": values.password,
                 "vendor": {
                     "vendor_id" : user.vendor.vendor_id,
                     "business_name": values.business_name,
@@ -98,6 +102,7 @@ export default function Profile() {
             "name": values.name,
             "email": values.email,
             "position": values.position,
+            "password": values.password,
             "vendor": {
                 "vendor_id" : user.vendor.vendor_id,
             }
@@ -105,25 +110,33 @@ export default function Profile() {
             response = await editVendorStaffProfile(obj);
 
         } else if (user.user_type === 'LOCAL') {
-            let obj = {
-                "user_id": user.user_id,
-                "name": values.name,
-                "email": values.email,
-                "date_of_birth": dayjs(values.date_of_birth).format("YYYY-MM-DD"),
-                "country_code": values.country_code,
-                "mobile_num": values.mobile_num,
-            }
-            response = await editLocalProfile(obj);
+          let obj = {
+              "user_id": user.user_id,
+              "name": values.name,
+              "email": values.email,
+              "password": values.password,
+              "date_of_birth": dayjs(values.date_of_birth).format("YYYY-MM-DD"),
+              "country_code": values.country_code,
+              "mobile_num": values.mobile_num,
+          }
+          response = await editLocalProfile(obj);
         }
         
-        console.log(response);
         if (response.status) {
-            setUser(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+            localStorage.setItem(TOKEN_KEY, response.data.token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
+            authContext.setAuthState({
+                authenticated: true
+            });
+            setUser(response.data.user);
+
             toast.success('User profile changed successfully!', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
             });
             setIsViewProfile(true);
+            form.setFieldValue("password", "");
 
         } else {
             console.log("User profile not editted!");
@@ -137,6 +150,7 @@ export default function Profile() {
     // when cancel edit profile details
     function onCancelVendorStaffProfileButton() {
         setIsViewProfile(true);
+        form.setFieldValue("password", "");
     }
 
     // when the edit password button is clicked
@@ -174,9 +188,6 @@ export default function Profile() {
     function onClickWithdrawButton() {
       setIsWithdrawModalOpen(true);
     }
-
- 
-    
 
     // when user edits password
     async function onClickSubmitNewPassword(val) {
@@ -375,12 +386,18 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.file;
     setFile(file);
+    toast.success(e.file.name + ' selected!', {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 1500
+    });
   };
 
   const uploadFile = async () => {
+      let finalURL;
       if (file) {
+          finalURL = "user_" + user.user_id + "_" + file.name;
           const S3_BUCKET = S3BUCKET;
           const REGION = TT02REGION;
       
@@ -395,7 +412,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
       
           const params = {
               Bucket: S3_BUCKET,
-              Key: file.name,
+              Key: finalURL,
               Body: file,
           };
       
@@ -412,7 +429,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
               console.log(err);
           });
 
-          let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + file.name;
+          let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + finalURL;
           const fetchData = async (userId, str) => {
               const response = await uploadNewProfilePic({user_id: userId, profile_pic: str});
               if (response.status) {
@@ -511,38 +528,31 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                           <div>
                             <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
                             <Row>
-  <ul>
-    {bankAccounts.map((account) => (
-      <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
-        Bank Account Number: *****{account.last4}
-        <button 
-          onClick={() => deleteBankAccount(account.id)}
-          style={{ marginLeft: '10px' }}
-        >
-          Delete
-        </button>
-      </li>
-    ))}
-  </ul>
-  <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
- 
-                            <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>   
-</Row>         
-                            <Row>
-                              <CustomButton
-                                text="Add Bank Account"
-                                icon={<KeyOutlined />}
-                                onClick={onClickManageBAButton}
-                              />
+                              <Col span={3}>
+                                <CustomButton text="Add Bank Account" icon={<BankOutlined />} onClick={onClickManageBAButton} />
+                              </Col>
+                              <Col span={2}>
+                                <Button type="primary" icon={<DollarOutlined />} onClick={onClickTopUpButton}>Top Up</Button>
+                              </Col>
+                              <Col span={3}>
+                                <Button type="primary" icon={<DollarOutlined />} onClick={onClickWithdrawButton}>Withdraw</Button>
+                              </Col>
                             </Row>
-
-                            <Col span={8}>
-        <Button type="primary" onClick={onClickTopUpButton}>Top Up</Button>
-      </Col>
-      <Col span={8}>
-        <Button type="primary" onClick={onClickWithdrawButton}>Withdraw</Button>
-      </Col>
-                                              
+                            <Row>
+                              <ul>
+                                {bankAccounts.map((account) => (
+                                  <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
+                                    Bank Account Number: *****{account.last4}
+                                    <button 
+                                      onClick={() => deleteBankAccount(account.id)}
+                                      style={{ marginLeft: '10px' }}
+                                    >
+                                      Delete
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </Row>
                           </div>
                         }
 
@@ -550,7 +560,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                         {user.user_type === 'LOCAL' &&
                           <div>
                             <Row>
-                            <Col span={8} >
+                            <Col span={8} style={{marginLeft: '50px'}}>
                               <img 
                                   src={user.profile_pic ? user.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}
                                   style={{borderRadius: '50%', width: '200px', height: '200px'}}
@@ -646,6 +656,15 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                             initialValue={user.is_master_account ? "Yes" : "No"}
                             >
                         <Input disabled={true}/>
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Password (Validation)"
+                        name="password"
+                        tooltip="Password is required for validation. This is not to change password!"
+                        rules={[{ required: true, message: 'Password is required!' }]}
+                        >
+                        <Input.Password placeholder="Enter password" />
                       </Form.Item>
 
                       <Form.Item {...tailFormItemLayout}>
@@ -778,6 +797,15 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                           <Input.TextArea showCount maxLength={300} />
                         </Form.Item>
 
+                        <Form.Item
+                          label="Password (Validation)"
+                          name="password"
+                          tooltip="Password is required for validation. This is not to change password!"
+                          rules={[{ required: true, message: 'Password is required!' }]}
+                        >
+                          <Input.Password placeholder="Enter password" />
+                        </Form.Item>
+
                         <Form.Item {...tailFormItemLayout}>
                           <div style={{ textAlign: "right" }}>
                             <Button type="primary" htmlType="submit" loading={loading}>
@@ -833,7 +861,12 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                         initialValue={dayjs(user.date_of_birth)}
                         rules={[{ required: true, message: 'Date of birth is required!'}]}
                       >
-                        <DatePicker style={{width: '100%'}} format={dateFormat} />
+                        <DatePicker style={{width: '100%'}} format={dateFormat}
+                          disabledDate={(current) => {
+                            let customDate = moment().add(1, "days").format("YYYY-MM-DD");
+                            return current >= moment(customDate, "YYYY-MM-DD");
+                          }} 
+                        />
                       </Form.Item>
         
                       <Form.Item label="Contact No">
@@ -862,6 +895,15 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                             </Col>
                           </Row>
                         </Input.Group>
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Password (Validation)"
+                        name="password"
+                        tooltip="Password is required for validation. This is not to change password!"
+                        rules={[{ required: true, message: 'Password is required!' }]}
+                        >
+                        <Input.Password placeholder="Enter password" />
                       </Form.Item>
 
                       <Form.Item>

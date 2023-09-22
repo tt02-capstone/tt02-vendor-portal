@@ -22,7 +22,7 @@ export default function AttractionManageTicket() {
 
     const viewTicketBreadCrumb = [
         {
-          title: 'Attraction',
+          title: 'Attractions',
         },
         {
           title: 'View Tickets',
@@ -301,7 +301,7 @@ export default function AttractionManageTicket() {
             title: 'Price List',
             dataIndex: 'price_list',
             key: 'price_list', 
-            width: 220,
+            width: 250,
             sorter: (a, b) => a.price_list.localeCompare(b.price_list),
             ...getColumnSearchProps('price_list'),
         },
@@ -379,9 +379,12 @@ export default function AttractionManageTicket() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '90vw'
+        minWidth: '90vw',
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 }

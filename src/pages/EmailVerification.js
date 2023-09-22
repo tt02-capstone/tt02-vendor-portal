@@ -20,6 +20,12 @@ const styles = {
     },
 }
 
+const breadcrumbItems = [
+    {
+      title: 'Email Verification',
+    },
+  ];
+
 function EmailVerification() {
     const [successful, setSuccessful] = useState(true);
     useEffect(() => {
@@ -41,7 +47,7 @@ function EmailVerification() {
 
     return successful ? (
         <Layout style={styles.layout}>
-            <CustomHeader text={"Email Verification"} />
+            <CustomHeader items={breadcrumbItems} />
             <Row align='middle' justify='center'>
                 <p>Your email has been verified successfully.</p>
             </Row>

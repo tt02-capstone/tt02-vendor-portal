@@ -1,5 +1,8 @@
 import React, {useState, useEffect} from "react";
 import { ToastContainer, toast } from 'react-toastify';
+import { Upload, Button, Row } from "antd";
+import CustomButton from "./CustomButton";
+import { UploadOutlined } from '@ant-design/icons';
 import AWS from 'aws-sdk';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -39,7 +42,7 @@ export default function CustomFileUpload(props) {
 
   const [file, setFile] = useState(null);
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.file;
     setFile(file);
   };
 
@@ -95,9 +98,18 @@ export default function CustomFileUpload(props) {
 
   return (
     <div>
-        <input type="file" onChange={props.handleFileChange} />
-        <button onClick={props.uploadFile}>Upload</button>
-        <ToastContainer />
+      <Row>
+          <Upload
+              beforeUpload={() => false} // To prevent auto-upload on file selection
+              fileList={[]} // clear previous image
+              onChange={props.handleFileChange}
+          >
+            <Button style={{marginRight: '7px'}} icon={<UploadOutlined />}>Select Image</Button>
+          </Upload>
+          {/* <input type="file" onChange={props.handleFileChange} /> */}
+          <CustomButton text="Upload" onClick={props.uploadFile} />
+      </Row>    
+      <ToastContainer />
     </div>
   );
 }
