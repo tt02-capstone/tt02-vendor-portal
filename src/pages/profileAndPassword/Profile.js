@@ -380,7 +380,9 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
   };
 
   const uploadFile = async () => {
+      let finalURL;
       if (file) {
+          finalURL = "user_" + user.user_id + "_" + file.name;
           const S3_BUCKET = S3BUCKET;
           const REGION = TT02REGION;
       
@@ -395,7 +397,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
       
           const params = {
               Bucket: S3_BUCKET,
-              Key: file.name,
+              Key: finalURL,
               Body: file,
           };
       
@@ -412,7 +414,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
               console.log(err);
           });
 
-          let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + file.name;
+          let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/' + finalURL;
           const fetchData = async (userId, str) => {
               const response = await uploadNewProfilePic({user_id: userId, profile_pic: str});
               if (response.status) {
@@ -511,23 +513,21 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                           <div>
                             <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
                             <Row>
-  <ul>
-    {bankAccounts.map((account) => (
-      <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
-        Bank Account Number: *****{account.last4}
-        <button 
-          onClick={() => deleteBankAccount(account.id)}
-          style={{ marginLeft: '10px' }}
-        >
-          Delete
-        </button>
-      </li>
-    ))}
-  </ul>
-  <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
- 
-                            <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>   
-</Row>         
+                              <ul>
+                                {bankAccounts.map((account) => (
+                                  <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
+                                    Bank Account Number: *****{account.last4}
+                                    <button 
+                                      onClick={() => deleteBankAccount(account.id)}
+                                      style={{ marginLeft: '10px' }}
+                                    >
+                                      Delete
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                              <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
+                          </Row>         
                             <Row>
                               <CustomButton
                                 text="Add Bank Account"
