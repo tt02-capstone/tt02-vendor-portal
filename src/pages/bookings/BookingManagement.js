@@ -204,15 +204,6 @@ export default function BookingManagement() {
       
     const bookingsColumns = [
         {
-            title: 'Id',
-            dataIndex: 'booking_id',
-            key: 'booking_id',
-            width: 80,
-            sorter: (a, b) => Number(a.booking_id) - Number(b.booking_id),
-            // not displaying correctly due to text rendering issues too
-            // ...getColumnSearchProps('booking_id'),
-        },
-        {
             title: 'Customer Name',
             dataIndex: 'customerName',
             key: 'customerName',

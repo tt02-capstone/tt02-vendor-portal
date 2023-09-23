@@ -166,7 +166,7 @@ export default function ViewAttractionBookingModal(props) {
     return (
         <div>
             <Modal
-                title={`Booking ID: ${selectedAttractionBooking.booking_id}`}
+                title={`Booking Details`}
                 centered
                 open={props.isViewAttractionBookingModalOpen}
                 onCancel={props.onClickCancelViewAttractionBookingModal}
