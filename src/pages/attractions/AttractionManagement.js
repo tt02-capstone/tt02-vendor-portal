@@ -37,12 +37,6 @@ export default function AttractionManagement() {
 
     const attractionsColumns = [
         {
-            title: 'Id',
-            dataIndex: 'attraction_id', 
-            key: 'attraction_id',
-            width: 50,
-        },
-        {
             title: 'Cover Image',
             dataIndex: 'attraction_image_list',
             key: 'attraction_image_list',

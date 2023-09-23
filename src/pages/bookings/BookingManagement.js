@@ -29,6 +29,7 @@ export default function BookingManagement() {
         }
     ];
 
+    const { TextArea } = Input;
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
