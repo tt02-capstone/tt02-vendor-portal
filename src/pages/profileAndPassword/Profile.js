@@ -436,7 +436,10 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
         if (response.status) {
           const bankAccounts = response.data;
           //console.log(bankAccounts);
-          setBankAccounts(bankAccounts);
+          if (bankAccounts) {
+            setBankAccounts(bankAccounts);
+          }
+          
       
       } else {
           toast.error(response.data.errorMessage, {
@@ -611,7 +614,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                             </Row>
                             <Row>
                               <ul>
-                                {bankAccounts.map((account) => (
+                                {bankAccounts && bankAccounts.length > 0 && bankAccounts.map((account) => (
                                   <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
                                     Bank Account Number: *****{account.last4}
 
@@ -695,7 +698,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
 </Row>
                             <Row>
                               <ul>
-                                {bankAccounts.map((account) => (
+                                {bankAccounts && bankAccounts.length > 0 && bankAccounts.map((account) => (
                                   <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
                                     Bank Account Number: *****{account.last4}
 
