@@ -9,6 +9,12 @@ export default function WalletModal(props) {
         setSelectedBankAccountId(e.target.value);
       };
 
+      const onFinish = (formValues) => {
+        // formValues contains the form data
+        // selectedBankAccountId contains the selected bank account ID
+        props.onClickSubmitButton({ ...formValues, selectedBankAccountId });
+      };
+
     return(
         <div>
             <Modal
@@ -25,7 +31,7 @@ export default function WalletModal(props) {
                     style={{ maxWidth: 600 }}
                     required={true}
                     requiredMark={true}
-                    onFinish={props.onClickSubmitButton}
+                    onFinish={onFinish}
                 >
                     <Form.Item
                     label="Amount"
@@ -43,7 +49,7 @@ export default function WalletModal(props) {
         />
                     </Form.Item>
 
-                    {props.title === "Withdraw" && (
+        
 
                     <ul>
                         
@@ -66,7 +72,7 @@ export default function WalletModal(props) {
     <li>No bank accounts available.</li>
   )}
 </ul>
-                    )}
+   
 
                    
 
