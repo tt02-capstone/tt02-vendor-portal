@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Button, InputNumber } from "antd";
 
 
 export default function WalletModal(props) {
     const [selectedBankAccountId, setSelectedBankAccountId] = useState(null);
+    const [isFormValid, setIsFormValid] = useState(false);
 
     const handleRadioChange = (e) => {
         setSelectedBankAccountId(e.target.value);
       };
+
+      useEffect(() => {
+        // Check if a bank account is selected
+        if (selectedBankAccountId) {
+            setIsFormValid(true);
+        } else {
+            setIsFormValid(false);
+        }
+    }, [selectedBankAccountId]);
 
       const onFinish = (formValues) => {
         // formValues contains the form data
@@ -77,7 +87,7 @@ export default function WalletModal(props) {
                    
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" disabled={!isFormValid}>
                             Submit
                         </Button>
                     </Form.Item>
