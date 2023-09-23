@@ -256,11 +256,13 @@ export default function Profile() {
       if (response.data) {
 
         setIsBAModalOpen(false);
-        window.location.reload(); //Temporary measure will directly update bankAccount state
+         //Temporary measure will directly update bankAccount state
         toast.success('Bank account created successfully!', {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1500
       });
+
+      window.location.reload();
     
     } else {
       setIsBAModalOpen(false);
@@ -369,7 +371,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
 
       if (response.status) {
         
-        window.location.reload(); //Temporary measure will directly update bankAccount state
+        setBankAccounts(bankAccounts.filter((account) => account.id !== bank_account_id));
 
         toast.success('Bank account deleted successfully!', {
           position: toast.POSITION.TOP_RIGHT,
@@ -1036,6 +1038,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                     isModalOpen={isWithdrawModalOpen}
                     onClickSubmitButton={onClickSubmitWithdraw}
                     onClickCancelButton={onClickCancelWithdrawButton}
+                    walletBalance={(user.user_type === 'LOCAL') ? user.wallet_balance : user.vendor.wallet_balance}
                     bankAccounts={bankAccounts}
                 />
             }

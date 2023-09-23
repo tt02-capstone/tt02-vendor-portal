@@ -51,6 +51,7 @@ export default function WalletModal(props) {
                     >
                     <InputNumber
           min={0}
+          max={props.walletBalance}
           step={0.01}
           precision={2}
           formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
