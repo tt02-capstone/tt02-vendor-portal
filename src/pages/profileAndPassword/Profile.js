@@ -337,7 +337,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
     setUser({...user, vendor: {...user.vendor, wallet_balance: newWalletBalance}});
     setIsWithdrawModalOpen(false);
     //window.location.reload(); //Temporary measure will directly update bankAccount state
-    toast.success('Amount topped up successfully!', {
+    toast.success('Amount withdrawn successfully!', {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: 1500
   });
