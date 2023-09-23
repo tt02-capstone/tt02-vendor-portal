@@ -29,7 +29,6 @@ export default function BookingManagement() {
         }
     ];
 
-    const { TextArea } = Input;
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -286,6 +285,7 @@ export default function BookingManagement() {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
+            onFilter: (value, record) => record.status === value,
             render: (status) => {
                 let color = '';
                 switch (status) {
@@ -392,6 +392,7 @@ export default function BookingManagement() {
             title: 'Payment Status',
             dataIndex: 'payment',
             key: 'payment',
+            onFilter: (value, record) => record.is_paid === value,
             render: (payment) => {
                 let color = '';
                 if (payment && payment.is_paid) {
