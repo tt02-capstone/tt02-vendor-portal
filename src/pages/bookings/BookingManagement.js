@@ -114,7 +114,6 @@ export default function BookingManagement() {
           />
         ),
         onFilter: (value, record) => {
-
             console.log("onFilter value", value);
             console.log("onFilter record", record);
             console.log("onFilter dataIndex", dataIndex);
@@ -178,6 +177,8 @@ export default function BookingManagement() {
                 }
             }
         },
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
         onFilterDropdownOpenChange: (visible) => {
           if (visible) {
             setTimeout(() => searchInput.current?.select(), 100);
@@ -204,15 +205,6 @@ export default function BookingManagement() {
       
     const bookingsColumns = [
         {
-            title: 'Id',
-            dataIndex: 'booking_id',
-            key: 'booking_id',
-            width: 80,
-            sorter: (a, b) => Number(a.booking_id) - Number(b.booking_id),
-            // not displaying correctly due to text rendering issues too
-            // ...getColumnSearchProps('booking_id'),
-        },
-        {
             title: 'Customer Name',
             dataIndex: 'customerName',
             key: 'customerName',
@@ -225,18 +217,29 @@ export default function BookingManagement() {
         
                 return customerName;
             },
-            sorter: (a, b) => {
-                const nameA = a.tourist_user ? a.tourist_user.name : a.local_user ? a.local_user.name : '';
-                const nameB = b.tourist_user ? b.tourist_user.name : b.local_user ? b.local_user.name : '';
+            // sorter: (a, b) => {
+            //     const nameA = a.tourist_user ? a.tourist_user.name : a.local_user ? a.local_user.name : '';
+            //     const nameB = b.tourist_user ? b.tourist_user.name : b.local_user ? b.local_user.name : '';
         
-                return nameA.localeCompare(nameB);
-            },
+            //     return nameA.localeCompare(nameB);
+            // },
             // ...getColumnSearchProps('customerName')
         },
         {
             title: 'Customer Type',
-            dataIndex: 'customerType',
-            key: 'customerType',
+            dataIndex: 'booking_id',
+            key: 'booking_id',
+            // filters: [
+            //     {
+            //       text: 'Tourist',
+            //       value: false,
+            //     },
+            //     {
+            //       text: 'Local',
+            //       value: true,
+            //     },
+            // ],
+            // onFilter: (value, record) => record.tourist_user === undefined || record.local_user,
             render: (text, record) => {
               if (record.tourist_user) {
                 return 'Tourist';
@@ -246,22 +249,22 @@ export default function BookingManagement() {
                 return '';
               }
             },
-            sorter: (a, b) => {
-                const getTypeValue = (record) => {
-                    if (record.tourist_user) {
-                        return 1; // Tourist
-                    } else if (record.local_user) {
-                        return 2; // Local
-                    } else {
-                        return 0; 
-                    }
-                };
+            // sorter: (a, b) => {
+            //     const getTypeValue = (record) => {
+            //         if (record.tourist_user) {
+            //             return 1; // Tourist
+            //         } else if (record.local_user) {
+            //             return 2; // Local
+            //         } else {
+            //             return 0; 
+            //         }
+            //     };
         
-                const typeA = getTypeValue(a);
-                const typeB = getTypeValue(b);
+            //     const typeA = getTypeValue(a);
+            //     const typeB = getTypeValue(b);
         
-                return typeA - typeB;
-            },
+            //     return typeA - typeB;
+            // },
             // ...getColumnSearchProps('customerType')
           },
         {
@@ -273,18 +276,29 @@ export default function BookingManagement() {
                 console.log("record", record);
                 return record.attraction.name;
             },
-            sorter: (a, b) => {
-                const nameA = (a.attraction && a.attraction.name) || ''; 
-                const nameB = (b.attraction && b.attraction.name) || ''; 
+            // sorter: (a, b) => {
+            //     const nameA = (a.attraction && a.attraction.name) || ''; 
+            //     const nameB = (b.attraction && b.attraction.name) || ''; 
         
-                return nameA.localeCompare(nameB);
-            },
+            //     return nameA.localeCompare(nameB);
+            // },
             // ...getColumnSearchProps('record.attraction.name'),
         },
         {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
+            // filters: [
+            //     {
+            //       text: 'Upcoming',
+            //       value: 'UPCOMING',
+            //     },
+            //     {
+            //       text: 'Cancelled',
+            //       value: 'CANCELLED',
+            //     },
+            // ],
+            // onFilter: (value, record) => record.status === value,
             render: (status) => {
                 let color = '';
                 switch (status) {
@@ -304,13 +318,13 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{status}</Tag>;
             },
-            sorter: (a, b) => {
-                const statusOrder = ['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED'];
-                const statusA = a.status || ''; 
-                const statusB = b.status || ''; 
+            // sorter: (a, b) => {
+            //     const statusOrder = ['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED'];
+            //     const statusA = a.status || ''; 
+            //     const statusB = b.status || ''; 
         
-                return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
-            },
+            //     return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
+            // },
             // formatting not preserved
             // ...getColumnSearchProps('status'),
         },
@@ -323,14 +337,14 @@ export default function BookingManagement() {
                 const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()} ${dateObj.toLocaleTimeString()}`;
                 return formattedDate;
             },
-            sorter: (a, b) => {
-                // Extract the underlying date values for 'a' and 'b'
-                const dateA = new Date(a.last_update).getTime();
-                const dateB = new Date(b.last_update).getTime();
+            // sorter: (a, b) => {
+            //     // Extract the underlying date values for 'a' and 'b'
+            //     const dateA = new Date(a.last_update).getTime();
+            //     const dateB = new Date(b.last_update).getTime();
         
-                // Compare the date values for sorting
-                return dateA - dateB;
-            },
+            //     // Compare the date values for sorting
+            //     return dateA - dateB;
+            // },
             // formatting not preserved
             // ...getColumnSearchProps('last_update'),
         },
@@ -341,14 +355,14 @@ export default function BookingManagement() {
             render: (startTime) => {
                 return startTime ? new Date(startTime).toLocaleDateString() : '';
             },
-            sorter: (a, b) => {
-                // Extract the underlying date values for 'a' and 'b'
-                const dateA = new Date(a.start_datetime).getTime();
-                const dateB = new Date(b.start_datetime).getTime();
+            // sorter: (a, b) => {
+            //     // Extract the underlying date values for 'a' and 'b'
+            //     const dateA = new Date(a.start_datetime).getTime();
+            //     const dateB = new Date(b.start_datetime).getTime();
         
-                // Compare the date values for sorting
-                return dateA - dateB;
-            },
+            //     // Compare the date values for sorting
+            //     return dateA - dateB;
+            // },
             // formatting not preserved
             // ...getColumnSearchProps('start_datetime'),
         },
@@ -359,14 +373,14 @@ export default function BookingManagement() {
             render: (endTime) => {
                 return endTime ? new Date(endTime).toLocaleDateString() : '';
             },
-            sorter: (a, b) => {
-                // Extract the underlying date values for 'a' and 'b'
-                const dateA = new Date(a.end_datetime).getTime();
-                const dateB = new Date(b.end_datetime).getTime();
+            // sorter: (a, b) => {
+            //     // Extract the underlying date values for 'a' and 'b'
+            //     const dateA = new Date(a.end_datetime).getTime();
+            //     const dateB = new Date(b.end_datetime).getTime();
         
-                // Compare the date values for sorting
-                return dateA - dateB;
-            },
+            //     // Compare the date values for sorting
+            //     return dateA - dateB;
+            // },
             // formatting not preserved
             // ...getColumnSearchProps('end_datetime'),
         },
@@ -401,12 +415,12 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
             },
-            sorter: (a, b) => {
-                const isPaidA = (a.payment && a.payment.is_paid) || false; 
-                const isPaidB = (b.payment && b.payment.is_paid) || false; 
+            // sorter: (a, b) => {
+            //     const isPaidA = (a.payment && a.payment.is_paid) || false; 
+            //     const isPaidB = (b.payment && b.payment.is_paid) || false; 
         
-                return isPaidA - isPaidB;
-            },
+            //     return isPaidA - isPaidB;
+            // },
             // missing search
         },
         {
@@ -416,12 +430,12 @@ export default function BookingManagement() {
             render: (payment) => {
                 return `$${(payment.payment_amount * (1 - payment.comission_percentage)).toFixed(2)}`
             },
-            sorter: (a, b) => {
-                const amountA = a.payment.payment_amount * (1 - a.payment.comission_percentage);
-                const amountB = b.payment.payment_amount * (1 - b.payment.comission_percentage);
+            // sorter: (a, b) => {
+            //     const amountA = a.payment.payment_amount * (1 - a.payment.comission_percentage);
+            //     const amountB = b.payment.payment_amount * (1 - b.payment.comission_percentage);
         
-                return amountA - amountB;
-            },
+            //     return amountA - amountB;
+            // },
         },
         {
             title: 'Action(s)',
