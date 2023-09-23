@@ -256,13 +256,14 @@ export default function Profile() {
       if (response.data) {
 
         setIsBAModalOpen(false);
+        setBankAccounts([...bankAccounts, response.data]);
          //Temporary measure will directly update bankAccount state
         toast.success('Bank account created successfully!', {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1500
       });
 
-      window.location.reload();
+      
     
     } else {
       setIsBAModalOpen(false);
