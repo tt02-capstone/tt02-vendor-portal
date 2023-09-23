@@ -216,17 +216,28 @@ export default function Profile() {
     }
 
     async function onClickSubmitNewBankAccount(bankAccountDetails) {
+      try {
 
-      const token = await stripe.createToken('bank_account',{
+        const token = await stripe.createToken('bank_account',{
         
-          country: 'SG',
-          currency: 'sgd',
+          country: 'US',
+          currency: 'usd',
           routing_number: bankAccountDetails.routingNumber,
           account_number: bankAccountDetails.bankAccountNumber,
+          account_holder_name: user.name,
+          account_holder_type: "individual",
+
         
       });
 
-      console.log(token)
+      if (token.token === undefined) {
+        toast.error(token.error, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+      });
+      } else {
+
+        console.log(token)
 
       const userId = parseInt(user.user_id);
 
@@ -234,31 +245,62 @@ export default function Profile() {
 
       const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
       post(`/addBankAccount/${userId}/${bank_account_token}`);
-      if (response.status) {
+      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
+        setIsBAModalOpen(false);
+        toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+  
+    } else {
+      if (response.data) {
 
         setIsBAModalOpen(false);
-        window.location.reload(); //Temporary measure will directly update bankAccount state
+         //Temporary measure will directly update bankAccount state
         toast.success('Bank account created successfully!', {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1500
       });
+
+      window.location.reload();
     
     } else {
+      setIsBAModalOpen(false);
         toast.error(response.data.errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
             autoClose: 1500
         });
     }
+
+    }
+
+      
+
+      }
+
+
+      } catch {
+        setIsBAModalOpen(false);
+        toast.error('Error adding bank account', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+      });
+      }
+
+      
   }
 
   async function onClickSubmitTopUp(topUpDetails) {
+    try {
 
+      const bank_account_id = topUpDetails.selectedBankAccountId;
     const userId = parseInt(user.user_id);
     const amount = topUpDetails.amount;
     const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
-    post(`/topUpWallet/${userId}/${amount}`);
+    post(`/topUpWallet/${userId}/${bank_account_id}/${amount}`);
     if (response.status) {
-
+      const newWalletBalance = response.data;
+      setUser({...user, vendor: {...user.vendor, wallet_balance: newWalletBalance}});
       setIsTopUpModalOpen(false);
       //window.location.reload(); //Temporary measure will directly update bankAccount state
       toast.success('Amount topped up successfully!', {
@@ -272,18 +314,27 @@ export default function Profile() {
           autoClose: 1500
       });
   }
+
+    } catch (error) {
+      toast.error(error, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+    });
+    }
+    
 }
 
 async function onClickSubmitWithdraw(withdrawalDetails) {
-  const bank_account_id = withdrawalDetails.bankAccountId;
+  const bank_account_id = withdrawalDetails.selectedBankAccountId;
   const amount = withdrawalDetails.amount;
   const userId = parseInt(user.user_id);
 
   const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
   post(`/withdrawWallet/${userId}/${bank_account_id}/${amount}`);
   if (response.status) {
-
-    setIsTopUpModalOpen(false);
+    const newWalletBalance = response.data;
+    setUser({...user, vendor: {...user.vendor, wallet_balance: newWalletBalance}});
+    setIsWithdrawModalOpen(false);
     //window.location.reload(); //Temporary measure will directly update bankAccount state
     toast.success('Amount topped up successfully!', {
       position: toast.POSITION.TOP_RIGHT,
@@ -300,13 +351,27 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
 
   const deleteBankAccount = async (bank_account_id) => {
     try {
-      const userId = parseInt(user.user_id);
+      if (bankAccounts.length <= 1) {
+        toast.error('Unable to delete bank account: There must be at least one bank account', {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+      });
+      } else {
+        const userId = parseInt(user.user_id);
       const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).
       put(`/deleteBankAccount/${userId}/${bank_account_id}`);
-      
+
+      if (response.data.httpStatusCode === 400 || response.data.httpStatusCode === 404 || response.data.httpStatusCode === 422) {
+        toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+        });
+  
+    } else {
+
       if (response.status) {
         
-        window.location.reload(); //Temporary measure will directly update bankAccount state
+        setBankAccounts(bankAccounts.filter((account) => account.id !== bank_account_id));
 
         toast.success('Bank account deleted successfully!', {
           position: toast.POSITION.TOP_RIGHT,
@@ -319,6 +384,13 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
             autoClose: 1500
         });
     }
+
+
+    }
+      
+      
+      }
+      
     } catch (error) {
       console.error('An error occurred while deleting the bank account:', error);
     }
@@ -526,33 +598,44 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
 
                         {user.user_type === 'VENDOR_STAFF' &&
                           <div>
-                            <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
+                            <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account and Wallet</Divider>
                             <Row>
-                              <Col span={3}>
-                                <CustomButton text="Add Bank Account" icon={<BankOutlined />} onClick={onClickManageBAButton} />
-                              </Col>
-                              <Col span={2}>
-                                <Button type="primary" icon={<DollarOutlined />} onClick={onClickTopUpButton}>Top Up</Button>
-                              </Col>
-                              <Col span={3}>
+                            <Col span={5} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.vendor.wallet_balance)}</Col>
+
+                              <Col span={8}>
                                 <Button type="primary" icon={<DollarOutlined />} onClick={onClickWithdrawButton}>Withdraw</Button>
                               </Col>
+                            </Row>
+                            <Row>
+                            <Col span={5} style={{fontSize: '150%'}}>Bank Accounts</Col>
                             </Row>
                             <Row>
                               <ul>
                                 {bankAccounts.map((account) => (
                                   <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
                                     Bank Account Number: *****{account.last4}
-                                    <button 
-                                      onClick={() => deleteBankAccount(account.id)}
-                                      style={{ marginLeft: '10px' }}
-                                    >
-                                      Delete
-                                    </button>
+
+                                    <Button
+                                   danger
+                                   
+                                  style={{span: 5, marginLeft:'5px', marginBottom: '5px', marginTop: '5px'}}
+                                  onClick={() => deleteBankAccount(account.id)}
+                                >
+                                Delete
+                                </Button>
                                   </li>
                                 ))}
                               </ul>
                             </Row>
+                            <Row>
+                            
+                           
+                              <Col span={3}>
+                                <CustomButton text="Add Bank Account" icon={<BankOutlined />} onClick={onClickManageBAButton} />
+                              </Col>
+                              
+                            </Row>
+                            
                           </div>
                         }
 
@@ -945,6 +1028,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                     isModalOpen={isTopUpModalOpen}
                     onClickSubmitButton={onClickSubmitTopUp}
                     onClickCancelButton={onClickCancelTopUpButton}
+                    bankAccounts={bankAccounts}
                 />
             }
 
@@ -954,6 +1038,7 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                     isModalOpen={isWithdrawModalOpen}
                     onClickSubmitButton={onClickSubmitWithdraw}
                     onClickCancelButton={onClickCancelWithdrawButton}
+                    walletBalance={(user.user_type === 'LOCAL') ? user.wallet_balance : user.vendor.wallet_balance}
                     bankAccounts={bankAccounts}
                 />
             }

@@ -1,12 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Button, InputNumber } from "antd";
 
 
 export default function WalletModal(props) {
     const [selectedBankAccountId, setSelectedBankAccountId] = useState(null);
+    const [isFormValid, setIsFormValid] = useState(false);
 
     const handleRadioChange = (e) => {
         setSelectedBankAccountId(e.target.value);
+      };
+
+      useEffect(() => {
+        // Check if a bank account is selected
+        if (selectedBankAccountId) {
+            setIsFormValid(true);
+        } else {
+            setIsFormValid(false);
+        }
+    }, [selectedBankAccountId]);
+
+      const onFinish = (formValues) => {
+        // formValues contains the form data
+        // selectedBankAccountId contains the selected bank account ID
+        props.onClickSubmitButton({ ...formValues, selectedBankAccountId });
       };
 
     return(
@@ -25,7 +41,7 @@ export default function WalletModal(props) {
                     style={{ maxWidth: 600 }}
                     required={true}
                     requiredMark={true}
-                    onFinish={props.onClickSubmitButton}
+                    onFinish={onFinish}
                 >
                     <Form.Item
                     label="Amount"
@@ -35,6 +51,7 @@ export default function WalletModal(props) {
                     >
                     <InputNumber
           min={0}
+          max={props.walletBalance}
           step={0.01}
           precision={2}
           formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -43,7 +60,7 @@ export default function WalletModal(props) {
         />
                     </Form.Item>
 
-                    {props.title === "Withdraw" && (
+        
 
                     <ul>
                         
@@ -66,12 +83,12 @@ export default function WalletModal(props) {
     <li>No bank accounts available.</li>
   )}
 </ul>
-                    )}
+   
 
                    
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" disabled={!isFormValid}>
                             Submit
                         </Button>
                     </Form.Item>
