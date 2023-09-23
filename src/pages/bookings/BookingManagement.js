@@ -405,6 +405,7 @@ export default function BookingManagement() {
             title: 'Payment Status',
             dataIndex: 'payment',
             key: 'payment',
+            onFilter: (value, record) => record.is_paid === value,
             render: (payment) => {
                 let color = '';
                 if (payment && payment.is_paid) {

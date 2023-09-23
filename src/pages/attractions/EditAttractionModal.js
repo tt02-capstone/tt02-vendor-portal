@@ -9,6 +9,7 @@ window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export default function EditAttractionModal(props) {
 
+    const { TextArea } = Input;
     const { Option } = Select;
     const [form] = Form.useForm();
     const [selectedAttraction, setSelectedAttraction] = useState([]);
@@ -262,7 +263,7 @@ export default function EditAttractionModal(props) {
                         rules={[{ required: true, message: 'Please enter description of attraction!' },
                         { max: 800, message: 'Description should not exceed 800 characters!' }]}
                     >
-                        <Input />
+                        <TextArea rows={4} />
                     </Form.Item>
 
                     <Form.Item
