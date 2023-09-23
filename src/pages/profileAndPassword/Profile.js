@@ -679,9 +679,45 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                           </Row>
                           
                           <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
-                          <Row>
-                            <Col span={8} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
-                            <Col span={8} style={{fontSize: '150%'}}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>   
+                          <Row style={{ marginBottom: '20px' }}>
+  <Col span={6} style={{ fontSize: '150%' }}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
+  <Col span={8}>
+    <Button type="primary" icon={<DollarOutlined />} onClick={onClickWithdrawButton}>Withdraw</Button>
+  </Col>
+</Row>
+
+<Row style={{ marginBottom: '20px' }}>
+  <Col span={8} style={{ fontSize: '150%' }}>Total earnings to date: ${commaWith2DP(localTotalEarnings)}</Col>
+</Row>
+
+<Row style={{ marginBottom: '20px' }}>
+  <Col span={5} style={{ fontSize: '150%' }}>Bank Accounts</Col>
+</Row>
+                            <Row>
+                              <ul>
+                                {bankAccounts.map((account) => (
+                                  <li key={account.id} style={{ display: 'flex', alignItems: 'center' }}>
+                                    Bank Account Number: *****{account.last4}
+
+                                    <Button
+                                   danger
+                                   
+                                  style={{span: 5, marginLeft:'5px', marginBottom: '5px', marginTop: '5px'}}
+                                  onClick={() => deleteBankAccount(account.id)}
+                                >
+                                Delete
+                                </Button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </Row>
+                            <Row>
+                            
+                           
+                            <Col span={3}>
+                              <CustomButton text="Add Bank Account" icon={<BankOutlined />} onClick={onClickManageBAButton} />
+                            </Col>
+                            
                           </Row>
                           </div>
                         }
