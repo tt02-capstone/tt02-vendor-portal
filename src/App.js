@@ -7,6 +7,7 @@ import {Layout, Menu} from "antd";
 import React, {useContext, useEffect, useState} from "react";
 import {Footer} from "antd/es/layout/layout";
 import AttractionManagement from "./pages/attractions/AttractionManagement";
+import AccommodationManagement from "./pages/accommodations/AccommodationManagement";
 import BookingManagement from "./pages/bookings/BookingManagement";
 import Profile from "./pages/profileAndPassword/Profile";
 import Signup from "./pages/Signup/Signup";
@@ -39,6 +40,7 @@ function AppLayout() {
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
+        {key: '/accommodation', label: 'Accommodations', icon: <BankOutlined/>,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
@@ -74,6 +76,7 @@ function AppLayout() {
                 {authState?.authenticated ? (
                     <>
                         <Route path="/attraction" element={<AttractionManagement/>}/>
+                        <Route path="/accommodation" element={<AccommodationManagement/>}/>
                         <Route path="/attraction/viewTicket" element={<AttractionManageTicket/>}/>
                         <Route path="/bookingmanagement" element={<BookingManagement/>}/>
                         <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
