@@ -5,6 +5,7 @@ export default function CustomTablePagination(props) {
 
     // data --> actual data to be put in table. Must be in [{}, {}] format
     // style --> css
+    // rowKey --> add the id in
     // title --> table header
     // column --> header for each column
     // e.g.
@@ -34,6 +35,7 @@ export default function CustomTablePagination(props) {
                 style={props.style}
                 bordered={true}
                 tableLayout={props.tableLayout}
+                rowKey={props.rowKey}
                 columns={props.column}
                 pagination={pagination} 
                 dataSource={props.data} />

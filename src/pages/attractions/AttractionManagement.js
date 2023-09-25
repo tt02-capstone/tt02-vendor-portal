@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag, Image } from 'antd';
+import { Layout, Form, Input, Badge, Space, Tag } from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
@@ -297,7 +297,6 @@ export default function AttractionManagement() {
     function onClickOpenViewAttractionModal(attractionId) {
         setSelectedAttractionId(attractionId);
         setIsViewAttractionModalOpen(true);
-
     }
 
     // view attraction modal cancel button

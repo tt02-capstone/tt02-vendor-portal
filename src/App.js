@@ -19,12 +19,14 @@ import {
     UsergroupAddOutlined,
     BarsOutlined,
     CalendarOutlined,
-    BankOutlined
+    BankOutlined,
+    PhoneOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
+import TelecomManagement from "./pages/telecom/TelecomManagement";
 
 function AppLayout() {
 
@@ -39,6 +41,7 @@ function AppLayout() {
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
+        {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
@@ -78,6 +81,7 @@ function AppLayout() {
                         <Route path="/bookingmanagement" element={<BookingManagement/>}/>
                         <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
+                        <Route path="/telecom" element={<TelecomManagement/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
