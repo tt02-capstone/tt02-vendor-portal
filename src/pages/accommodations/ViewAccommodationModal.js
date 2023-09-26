@@ -29,23 +29,39 @@ export default function ViewAccommodationModal(props) {
         }
     }, [props.isViewAccommodationModalOpen]);
 
-    const formattedRoomList = roomList.map((item, index) => {
-        const itemStyle = {
-            margin: 0,
-            padding: 0,
-        };
-
-        return (
-            <div>room</div>
-            // need to edit
-            // <p key={index} style={index === 0 ? { marginTop: 0 } : itemStyle}>
-            //     {index === 0 ? null : <br />}
-            //     <span>{item.ticket_type}</span><br />
-            //     <span>Local Price: $</span> {item.local_amount}<br />
-            //     <span>Tourist Price: $</span> {item.tourist_amount}
-            // </p>
-        );
-    });
+    function formattedRoomList() {
+        const roomTypes = {};
+      
+        if (roomList && roomList.length > 0) {
+          roomList.forEach((room) => {
+            const { room_type } = room;
+            // Trim leading and trailing spaces from room_type and capitalize the first letter
+            const cleanedType = room_type.charAt(0).toUpperCase() + room_type.slice(1).toLowerCase();
+            if (roomTypes[cleanedType]) {
+              roomTypes[cleanedType] += 1;
+            } else {
+              roomTypes[cleanedType] = 1;
+            }
+          });
+      
+          const formattedStats = Object.keys(roomTypes).map((type, index) => {
+            const itemStyle = {
+              margin: 0,
+              padding: 0,
+            };
+      
+            return (
+              <p key={index} style={index === 0 ? { marginTop: 0 } : itemStyle}>
+                <span>{type} Rooms: {roomTypes[type]}</span>
+              </p>
+            );
+          });
+      
+          return formattedStats;
+        }
+      
+        return <p>No rooms available.</p>;
+      }
 
     function getPriceTierColor(priceTier) {
         switch (priceTier) {
@@ -166,7 +182,7 @@ export default function ViewAccommodationModal(props) {
                     {renderProperty('Check In Time', selectedAccommodation.check_in_time)}
                     {renderProperty('Check Out Time', selectedAccommodation.check_out_time)}
                     {renderProperty('Price Tier', selectedAccommodation.estimated_price_tier, getPriceTierColor(selectedAccommodation.estimated_price_tier))}
-                    {renderProperty('Rooms', formattedRoomList)}
+                    {renderProperty('Rooms', formattedRoomList())}
                 </div>
             </Modal>
         </div>
