@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Form, Input, Badge, Space, Tag } from 'antd';
-import { Content } from "antd/es/layout/layout";
+import React, { useState, useEffect, useRef } from "react";
+import { Layout, Form, Input, Button, Badge, Space, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAttractionListByVendor, getAttractionByVendor, createAttraction, updateAttraction } from "../../redux/attractionRedux";
+import { getAttractionListByVendor, getAttractionByVendor, createAttraction, updateAttraction, createSeasonalActivity } from "../../redux/attractionRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CreateAttractionModal from "./CreateAttractionModal";
 import ViewAttractionModal from "./ViewAttractionModal";
@@ -14,12 +13,13 @@ import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
 import { PlusOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
-
+import Highlighter from 'react-highlight-words';
+import SeasonalActivityModal from "./SeasonalActivityModal";
 
 export default function AttractionManagement() {
 
     const navigate = useNavigate();
-    const { Header, Content, Sider, Footer } = Layout;
+    const { Content } = Layout;
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     const [getAttractionsData, setGetAttractionsData] = useState(true);
@@ -28,12 +28,124 @@ export default function AttractionManagement() {
     const [selectedAttraction, setSelectedAttraction] = useState([]);
     const [priceList, setPriceList] = useState([]);
     const [attractionImages, setAttractionImages] = useState({});
+    const [seasonalModal, setSeasonalModal] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const viewAttractionBreadCrumb = [
         {
           title: 'Attractions',
         }
     ];
+
+    // add filter 
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
 
     const attractionsColumns = [
         {
@@ -60,11 +172,15 @@ export default function AttractionManagement() {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            ...getColumnSearchProps('name')
         },
         {
             title: 'Category',
             dataIndex: 'attraction_category',
             key: 'attraction_category',
+            sorter: (a, b) => a.attraction_category.localeCompare(b.attraction_category),
+            ...getColumnSearchProps('attraction_category'),
             render: (attractionCategory) => {
                 let tagColor = 'default'; 
                 switch (attractionCategory) {
@@ -95,31 +211,41 @@ export default function AttractionManagement() {
                 );
             }
         },
-        {
-            title: 'Area',
-            dataIndex: 'generic_location',
-            key: 'generic_location',
-        },
-        {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
-        },
+        // {
+        //     title: 'Area',
+        //     dataIndex: 'generic_location',
+        //     key: 'generic_location',
+        //     sorter: (a, b) => a.generic_location.localeCompare(b.generic_location),
+        //     ...getColumnSearchProps('generic_location')
+        // },
+        // {
+        //     title: 'Address',
+        //     dataIndex: 'address',
+        //     key: 'address',
+        //     sorter: (a, b) => a.address.localeCompare(b.address),
+        //     ...getColumnSearchProps('address')
+        // },
         {
             title: 'Opening Hours',
             dataIndex: 'opening_hours',
             key: 'opening_hours',
+            sorter: (a, b) => a.opening_hours.localeCompare(b.opening_hours),
+            ...getColumnSearchProps('opening_hours')
         },
         {
             title: 'Contact Num',
             dataIndex: 'contact_num',
             key: 'contact_num',
             width: 120,
+            sorter: (a, b) => a.contact_num.localeCompare(b.contact_num),
+            ...getColumnSearchProps('contact_num')
+            
         },
         {
             title: 'Published',
             dataIndex: 'is_published',
             key: 'is_published',
+            sorter: (a, b) => String(a.is_published).localeCompare(String(b.is_published)),
             render: (text) => {
                 if (text === true) {
                     return <Badge status="success" text="Yes" />
@@ -127,18 +253,22 @@ export default function AttractionManagement() {
                     return <Badge status="error" text="No" />
                 }
             },
-            width: 100,
+            width: 150,
         },
         {
             title: 'Avg Rating',
             dataIndex: 'avg_rating_tier',
             key: 'avg_rating_tier',
+            sorter: (a, b) => a.avg_rating_tier.localeCompare(b.avg_rating_tier),
+            ...getColumnSearchProps('avg_rating_tier'),
             width: 100,
         },
         {
             title: 'Price Tier',
             dataIndex: 'estimated_price_tier',
             key: 'estimated_price_tier',
+            sorter: (a, b) => a.estimated_price_tier.localeCompare(b.estimated_price_tier),
+            ...getColumnSearchProps('estiminated_price_tier'),
             render: (priceTier) => {
                 let tagColor = 'default'; 
                 switch (priceTier) {
@@ -168,25 +298,82 @@ export default function AttractionManagement() {
             width: 100,
         },
         {
+            title: 'Seasonal Activity',
+            dataIndex: 'seasonal_activity_list',
+            key: 'seasonal_activity_list',
+            sorter: (a, b) => a.seasonal_activity_list.localeCompare(b.seasonal_activity_list),
+            ...getColumnSearchProps('seasonal_activity_list'),
+            width: 220
+        },
+        {
             title: 'Action(s)',
             dataIndex: 'operation',
             key: 'operation',
+            align: 'center',
             render: (text, record) => {
-                return <Space>
+                return <div>
                     <CustomButton
                         text="View"
+                        style ={{ fontSize : 13, fontWeight: "bold"}}
                         onClick={() => onClickOpenViewAttractionModal(record.attraction_id)}
                     />
+                    <br/><br/>
                     <CustomButton
                         text="Edit"
+                        style ={{ fontSize : 13, fontWeight: "bold"}}
                         onClick={() => onClickOpenEditAttractionModal(record.attraction_id)}
                     />
-
-                </Space>
+                    <br/><br/>
+                    <CustomButton
+                        text= " + Seasonal Activity"
+                        style ={{ fontSize : 13, fontWeight: "bold"}}
+                        onClick={() => createSeasonal(record.attraction_id)}
+                        loading={loading}
+                    />
+                </div>
             },
-            width: 160,
+            width: 200,
         },
     ];
+
+    const showSeasonalModal = ()=> {
+        setSeasonalModal(true);
+    };
+
+    const seasonalModalCancel = () => {
+        setSeasonalModal(false);
+    };
+
+    const createSeasonal = (attractionId) => {
+        setSelectedAttractionId(attractionId)
+        showSeasonalModal()
+    }
+
+    const seasonalModalSubmit = async (values) => {
+        let activity = {
+            name: values.name,
+            description: values.description,
+            start_date : values.startDate.format('YYYY-MM-DD'),
+            end_date : values.endDate.format('YYYY-MM-DD'),
+            suggested_duration: values.suggested_duration,
+        }
+
+        const new_activity = await createSeasonalActivity(vendor.user_id, selectedAttractionId, activity);
+        if (new_activity.error) {
+            toast.error('Create Activity Failed! ' + new_activity.error, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1000
+            });
+        } else {
+            toast.success('Activity Added!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1000
+            });
+        }
+
+        setSeasonalModal(false); 
+        setGetAttractionsData(true); // refresh the table
+    };
 
     function formatAttractionData(attractionDataArray) {
         return attractionDataArray.map(item => {
@@ -194,6 +381,28 @@ export default function AttractionManagement() {
             const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
             const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
+            const activityList = item.seasonal_activity_list;
+
+            const validActivityList = activityList.filter(item => {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0'); // format to current timezone 
+    
+                const todayFormatted = `${year}-${month}-${day}`;
+    
+                return item.start_date >= todayFormatted && item.end_date >=  todayFormatted;
+            });
+
+            let activityListString; 
+
+            if (validActivityList.length > 0) {
+                activityListString = validActivityList.map((item, index) => {
+                    return `${index + 1}. ${item.name} from ${item.start_date} to ${item.end_date}`;
+                }).join('\n');
+            } else {
+                activityListString = 'No Activities Created!';
+            }
 
             return {
                 attraction_id: item.attraction_id,
@@ -210,6 +419,7 @@ export default function AttractionManagement() {
                 estimated_price_tier: formattedPriceTier,
                 suggested_duration: item.suggested_duration,
                 price_list: item.price_list,
+                seasonal_activity_list: activityListString
             };
         });
     }
@@ -479,6 +689,13 @@ export default function AttractionManagement() {
                             onClickCancelEditAttractionModal={onClickCancelEditAttractionModal}
                             onClickSubmitEditAttraction={onClickSubmitEditAttraction}
                             attractionId={selectedAttractionId}
+                        />
+
+                        {/* modal to create seasonal activity */}
+                        <SeasonalActivityModal
+                            isVisible={seasonalModal}
+                            onCancel={seasonalModalCancel}
+                            onSubmit={seasonalModalSubmit}
                         />
 
                     </Content>
