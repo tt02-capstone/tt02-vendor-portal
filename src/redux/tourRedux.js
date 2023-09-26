@@ -5,7 +5,6 @@ const tourURL = "http://localhost:8080/tour";
 
 export async function getAllTourTypesByLocal(userId) {
     try {
-        console.log('GAB');
         const response = await tourApi.get(`${tourURL}/getAllTourTypesByLocal/${userId}`);
         return handleApiErrors(response);
     } catch (error) {
@@ -33,3 +32,13 @@ export async function createTourType(userId, attractionId, tourType) {
       return {status: false, data: error.message};
     }
   }
+
+  export async function getTourTypeByTourTypeId(tourTypeId) {
+    try {
+        const response = await tourApi.get(`${tourURL}/getTourTypeByTourTypeId/${tourTypeId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux getTourTypeByTourTypeId Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
