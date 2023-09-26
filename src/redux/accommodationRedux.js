@@ -52,3 +52,33 @@ export async function getLastAccommodationId() {
     return { status: false, data: error.message };
   }
 }
+
+export async function createRoom(accommodationId, room) {
+    try {
+      const response = await accommodationApi.post(`${accommodationURL}/createRoom/${accommodationId}`, room);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("accommodationRedux createRoom Error : ", error);
+      return {status: false, data: error.message};
+    }
+}
+
+  export async function getRoomListByAccommodation(accommodationId) {
+    try {
+      const response = await accommodationApi.get(`${accommodationURL}/getRoomListByAccommodation/${accommodationId}`);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("accommodationRedux getRoomListByAccommodation Error: ", error);
+      return { status: false, data: error.message };
+    }
+}
+
+export async function getAccommodation(accommodationId) {
+    try {
+      const response = await accommodationApi.get(`${accommodationURL}/getAccommodation/${accommodationId}`);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("accommodationRedux getAccommodation Error: ", error);
+      return { status: false, data: error.message };
+    }
+}

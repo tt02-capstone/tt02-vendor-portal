@@ -60,7 +60,7 @@ export default function ViewAccommodationModal(props) {
           return formattedStats;
         }
       
-        return <p>No rooms available.</p>;
+        return <p>No rooms available. Please create some!</p>;
       }
 
     function getPriceTierColor(priceTier) {

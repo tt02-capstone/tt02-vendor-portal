@@ -9,6 +9,7 @@ import CustomHeader from "../../components/CustomHeader";
 import CreateAccommodationModal from "./CreateAccommodationModal";
 import ViewAccommodationModal from "./ViewAccommodationModal";
 // import EditAccommodationModal from "./EditAccommodationModal";
+import RoomManagement from "./RoomManagement";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
@@ -23,7 +24,7 @@ export default function AccommodationManagement() {
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     const [getAccommodationsData, setGetAccommodationsData] = useState(true);
-    const [accommodationsData, setAccommodationsData] = useState([]); 
+    const [accommodationsData, setAccommodationsData] = useState([]);
     const [selectedAccommodationId, setSelectedAccommodationId] = useState(null);
     const [selectedAccommodation, setSelectedAccommodation] = useState([]);
     const [roomList, setRoomList] = useState([]);
@@ -31,7 +32,7 @@ export default function AccommodationManagement() {
 
     const viewAccommodationBreadCrumb = [
         {
-          title: 'Accommodation',
+            title: 'Accommodation',
         }
     ];
 
@@ -66,7 +67,7 @@ export default function AccommodationManagement() {
             dataIndex: 'type',
             key: 'type',
             render: (type) => {
-                let tagColor = 'default'; 
+                let tagColor = 'default';
                 switch (type) {
                     case 'HOTEL':
                         tagColor = 'purple';
@@ -118,7 +119,7 @@ export default function AccommodationManagement() {
             dataIndex: 'estimated_price_tier',
             key: 'estimated_price_tier',
             render: (priceTier) => {
-                let tagColor = 'default'; 
+                let tagColor = 'default';
                 switch (priceTier) {
                     case 'TIER 1':
                         tagColor = 'green';
@@ -150,17 +151,25 @@ export default function AccommodationManagement() {
             dataIndex: 'operation',
             key: 'operation',
             render: (text, record) => {
-                return <Space>
+                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ marginBottom: '10px' }}>
+                        <Space direction="horizontal">
+                            <CustomButton
+                                text="View"
+                                onClick={() => onClickOpenViewAccommodationModal(record.accommodation_id)}
+                            />
+                            <CustomButton
+                                text="Edit"
+                                onClick={() => onClickOpenEditAccommodationModal(record.accommodation_id)}
+                            />
+                        </Space>
+                    </div>
                     <CustomButton
-                        text="View"
-                        onClick={() => onClickOpenViewAccommodationModal(record.accommodation_id)}
+                        text="Rooms"
+                        onClick={() => onClickNavigateToRoomManagement(record.accommodation_id)}
                     />
-                    <CustomButton
-                        text="Edit"
-                        onClick={() => onClickOpenEditAccommodationModal(record.accommodation_id)}
-                    />
+                </div>
 
-                </Space>
             },
             width: 160,
         },
@@ -198,6 +207,7 @@ export default function AccommodationManagement() {
         if (getAccommodationsData) {
             const fetchData = async () => {
                 const response = await getAccommodationListByVendor(vendor.user_id);
+                console.log('response:', response);
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
                         ...val,
@@ -240,8 +250,8 @@ export default function AccommodationManagement() {
         const checkInHours = values.check_in_time.$H;
         const checkInMinutes = values.check_in_time.$m;
 
-        const checkIn = new Date(); 
-        checkIn.setHours(checkInHours, checkInMinutes, 0); 
+        const checkIn = new Date();
+        checkIn.setHours(checkInHours, checkInMinutes, 0);
         // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
         checkIn.setTime(checkIn.getTime() + 9 * 60 * 60 * 1000);
         const checkInIsoString = checkIn.toISOString();
@@ -250,13 +260,13 @@ export default function AccommodationManagement() {
         const checkOutHours = values.check_out_time.$H;
         const checkOutMinutes = values.check_in_time.$m;
 
-        const checkOut = new Date(); 
-        checkOut.setHours(checkOutHours, checkOutMinutes, 0); 
+        const checkOut = new Date();
+        checkOut.setHours(checkOutHours, checkOutMinutes, 0);
         // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
         checkOut.setTime(checkOut.getTime() + 9 * 60 * 60 * 1000);
         const checkOutIsoString = checkOut.toISOString();
 
-        
+
         console.log('checkInIsoString:', checkInIsoString);
         console.log('checkOutIsoString:', checkOutIsoString);
 
@@ -297,7 +307,7 @@ export default function AccommodationManagement() {
     }
 
     // VIEW ATTRACTION
-    const [isViewAccommodationModalOpen, setIsViewAccommodationModalOpen] = useState(false); 
+    const [isViewAccommodationModalOpen, setIsViewAccommodationModalOpen] = useState(false);
 
     //view attraction modal open button
     function onClickOpenViewAccommodationModal(accommodationId) {
@@ -312,7 +322,7 @@ export default function AccommodationManagement() {
     }
 
     // EDIT ATTRACTION
-    const [isEditAccommodationModalOpen, setIsEditAccommodationModalOpen] = useState(false); 
+    const [isEditAccommodationModalOpen, setIsEditAccommodationModalOpen] = useState(false);
 
     //edit attraction modal open button
     function onClickOpenEditAccommodationModal(accommodationId) {
@@ -411,30 +421,15 @@ export default function AccommodationManagement() {
         }
     }, [isEditAccommodationModalOpen]);
 
-    // const redirectToTickets = () => {
-    //     navigate('/attraction/viewTicket');
-    // }
-
-    // const updateAttractionImages = (attractionId, imageFileName) => {
-    //     setAttractionImages((prevImages) => ({
-    //         ...prevImages,
-    //         [attractionId]: [...(prevImages[attractionId] || []), imageFileName],
-    //     }));
-    // };
-
-    // const removeAttractionImage = (attractionId, imageFileName) => {
-    //     setAttractionImages((prevImages) => ({
-    //         ...prevImages,
-    //         [attractionId]: prevImages[attractionId].filter(
-    //             (fileName) => fileName !== imageFileName
-    //         ),
-    //     }));
-    // };
+    // ROOM MANAGEMENT
+    function onClickNavigateToRoomManagement(accommodationId) {
+        navigate('/accommodation/rooms', { state: { accommodationId } });
+    }
 
     return vendor ? (
         <div>
             <Layout style={styles.layout}>
-                <CustomHeader items={viewAccommodationBreadCrumb}/>
+                <CustomHeader items={viewAccommodationBreadCrumb} />
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
 
@@ -450,7 +445,7 @@ export default function AccommodationManagement() {
                             column={accommodationsColumns}
                             data={formatAccommodationData(accommodationsData)}
                             tableLayout="fixed"
-                            
+
                         />
 
                         <CreateAccommodationModal
