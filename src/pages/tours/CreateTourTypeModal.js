@@ -241,21 +241,21 @@ export default function CreateTourTypeModal(props) {
                         label="Price"
                         name="price"
                         rules={[{ required: true, message: 'Please enter price!' }]}>
-                        <InputNumber style={{ width: '110px' }} />
+                        <InputNumber style={{ width: '110px' }} prefix="$" min={0} />
                     </Form.Item>
 
                     <Form.Item
                         label="No. of Pax"
                         name="recommended_pax"
                         rules={[{ required: true, message: 'Please enter no. of pax!' }]}>
-                        <InputNumber style={{ width: '110px' }} />
+                        <InputNumber style={{ width: '110px' }} min={1} />
                     </Form.Item>
 
                     <Form.Item
                         label="Est. Duration"
                         name="estimated_duration"
                         rules={[
-                            { required: true, message: 'Please enter est. duration!' },
+                            { required: true, message: 'Please enter estimated duration!' },
                             {
                                 validator: (_, value) => {
                                     if (value <= 0) {
@@ -266,7 +266,7 @@ export default function CreateTourTypeModal(props) {
                             },
                         ]}
                     >
-                        <InputNumber suffix="Hours" min={1} />
+                        <InputNumber style={{ width: '110px' }} suffix="Hours" min={1} />
                     </Form.Item>
 
                     <Form.Item
