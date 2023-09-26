@@ -507,7 +507,6 @@ export default function AttractionManagement() {
     function onClickOpenViewAttractionModal(attractionId) {
         setSelectedAttractionId(attractionId);
         setIsViewAttractionModalOpen(true);
-
     }
 
     // view attraction modal cancel button
