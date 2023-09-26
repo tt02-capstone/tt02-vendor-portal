@@ -25,7 +25,7 @@ export async function getAccommodationByVendor(vendorStaffId, accommodationId) {
 
 export async function createAccommodation(vendorStaffId, accommodation) {
   try {
-    const response = await accommodationApi.post(`${accommodationURL}/creatAccommodation/${vendorStaffId}`, accommodation);
+    const response = await accommodationApi.post(`${accommodationURL}/createAccommodation/${vendorStaffId}`, accommodation);
     return handleApiErrors(response);
   } catch (error) {
     console.error("accommodationRedux createAccommodation Error : ", error);
@@ -43,12 +43,12 @@ export async function updateAccommodation(vendorStaffId, accommodation) {
   }
 }
 
-// export async function getLastAccommodationId() {
-//   try {
-//     const response = await accommodationApi.get(`${accommodationURL}/getLastAccommodationId`);
-//     return handleApiErrors(response);
-//   } catch (error) {
-//     console.error("accommodationRedux getLastAccommodationId Error: ", error);
-//     return { status: false, data: error.message };
-//   }
-// }
+export async function getLastAccommodationId() {
+  try {
+    const response = await accommodationApi.get(`${accommodationURL}/getLastAccommodationId`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("accommodationRedux getLastAccommodationId Error: ", error);
+    return { status: false, data: error.message };
+  }
+}

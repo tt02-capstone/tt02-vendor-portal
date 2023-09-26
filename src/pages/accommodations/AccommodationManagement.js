@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAccommodationListByVendor, getAccommodationByVendor, createAccommodation, updateAccommodation } from "../../redux/accommodationRedux";
 import CustomHeader from "../../components/CustomHeader";
-// import CreateAccommodationModal from "./CreateAccommodationModal";
+import CreateAccommodationModal from "./CreateAccommodationModal";
 import ViewAccommodationModal from "./ViewAccommodationModal";
 // import EditAccommodationModal from "./EditAccommodationModal";
 import CustomButton from "../../components/CustomButton";
@@ -168,9 +168,9 @@ export default function AccommodationManagement() {
 
     function formatAccommodationData(accommodationDataArray) {
         return accommodationDataArray.map(item => {
-            const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
-            const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-            const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
+            // const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
+            // const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+            // const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
             const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
 
             return {
@@ -178,14 +178,17 @@ export default function AccommodationManagement() {
                 name: item.name,
                 description: item.description,
                 address: item.address,
-                contact_num: formattedContactNum,
+                // contact_num: formattedContactNum,
+                contact_num: item.contact_num,
                 accommodation_image_list: item.accommodation_image_list,
                 is_published: item.is_published,
                 check_in_time: item.check_in_time,
                 check_out_time: item.check_out_time,
                 type: item.type,
-                generic_location: formattedGenericLocation,
-                estimated_price_tier: formattedPriceTier,
+                generic_location: item.generic_location,
+                estimated_price_tier: item.estimated_price_tier,
+                // generic_location: formattedGenericLocation,
+                // estimated_price_tier: formattedPriceTier,
                 room_list: item.room_list,
             };
         });
@@ -237,8 +240,8 @@ export default function AccommodationManagement() {
             contact_num: values.contact_num,
             accommodation_image_list: values.accommodation_image_list,
             is_published: true,
-            check_in_time: values.check_in_time,
-            check_out_time: values.check_out_time,
+            check_in_time: "2023-09-25T15:30:00",
+            check_out_time: "2023-09-25T19:30:00",
             type: values.type,
             generic_location: values.generic_location,
             room_list: values.room_list,
@@ -423,14 +426,12 @@ export default function AccommodationManagement() {
                             
                         />
 
-                        {/* <CreateAccommodationModal
+                        <CreateAccommodationModal
                             form={createAccommodationForm}
                             isCreateAccommodationModalOpen={isCreateAccommodationModalOpen}
                             onClickCancelCreateAccommodationModal={onClickCancelCreateAccommodationModal}
                             onClickSubmitAccommodationCreate={onClickSubmitAccommodationCreate}
-                            // onUpdateImages={updateAttractionImages}
-                            // onRemoveImage={removeAttractionImage}
-                        /> */}
+                        />
 
                         <ViewAccommodationModal
                             isViewAccommodationModalOpen={isViewAccommodationModalOpen}
