@@ -3,7 +3,7 @@ import { Modal, Tag } from "antd";
 import { getBookingById } from "../../redux/bookingRedux";
 import moment from 'moment';
 
-export default function ViewAttractionBookingModal(props) {
+export default function ViewTelecomBookingModal(props) {
 
     const [selectedBooking, setSelectedBooking] = useState();
 
@@ -47,28 +47,11 @@ export default function ViewAttractionBookingModal(props) {
         }
     }
 
-    function getAttractionCategoryColor(attractionCategory) {
-        switch (attractionCategory) {
-            case 'HISTORICAL':
-                return 'purple';
-            case 'CULTURAL':
-                return 'volcano';
-            case 'NATURE':
-                return 'magenta';
-            case 'ADVENTURE':
-                return 'geekblue';
-            case 'SHOPPING':
-                return 'gold';
-            case 'ENTERTAINMENT':
-                return 'cyan';
-        }
-    }
-
     function getPaymentStatusColor(paymentStatus) {
         switch (paymentStatus) {
-            case 'PAID':
+            case true:
                 return 'success'; 
-            case 'UNPAID':
+            case false:
                 return 'error';  
             default:
                 return '';
@@ -86,7 +69,6 @@ export default function ViewAttractionBookingModal(props) {
     }
 
     function renderProperty(label, value, color) {
-
         return (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 'bold', minWidth: '200px' }}>{label}:</div>
@@ -117,15 +99,15 @@ export default function ViewAttractionBookingModal(props) {
             <div>{tickets}</div>
           </div>
         );
-      }
+    }
 
     return (
         <div>
             {selectedBooking && <Modal
-                title={'Booking Details (Attraction): ' + selectedBooking.attraction.name}
+                title={"Booking Details (Telecom): " + selectedBooking.activity_name}
                 centered
                 open={props.openViewModal}
-                onCancel={props.onClickCancelViewAttractionBookingModal}
+                onCancel={props.onClickCancelViewTelecomBookingModal}
                 footer={[]} // hide default buttons of modal
             >
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>

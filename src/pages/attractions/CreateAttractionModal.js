@@ -406,7 +406,7 @@ export default function CreateAttractionModal(props) {
                         </Form.List>
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
                         <Button type="primary" htmlType="submit">
                             Create
                         </Button>
