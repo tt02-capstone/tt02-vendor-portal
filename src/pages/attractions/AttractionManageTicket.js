@@ -310,7 +310,7 @@ export default function AttractionManageTicket() {
             dataIndex: 'ticket_list',
             key: 'ticket_list',
             width: 230,
-            sorter: (a, b) => a.price_list.localeCompare(b.ticket_list),
+            sorter: (a, b) => a.ticket_list.localeCompare(b.ticket_list),
             ...getColumnSearchProps('ticket_list'),
         },
         {
@@ -387,4 +387,8 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center'
     },
+    button: {
+        fontSize: 13,
+        fontWeight: "bold"
+    }
 }
