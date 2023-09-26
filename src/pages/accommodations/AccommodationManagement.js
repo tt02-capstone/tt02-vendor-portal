@@ -8,7 +8,7 @@ import { getAccommodationListByVendor, getAccommodationByVendor, createAccommoda
 import CustomHeader from "../../components/CustomHeader";
 import CreateAccommodationModal from "./CreateAccommodationModal";
 import ViewAccommodationModal from "./ViewAccommodationModal";
-// import EditAccommodationModal from "./EditAccommodationModal";
+import EditAccommodationModal from "./EditAccommodationModal";
 import RoomManagement from "./RoomManagement";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
@@ -339,7 +339,7 @@ export default function AccommodationManagement() {
     async function onClickSubmitEditAccommodation(values) {
 
         let accommodationObj = {
-            accommodation_id: selectedAccommodation.accommodation,
+            accommodation_id: selectedAccommodation.accommodation_id,
             name: values.name,
             description: values.description,
             address: values.address,
@@ -350,7 +350,7 @@ export default function AccommodationManagement() {
             check_out_time: values.check_out_time,
             type: values.type,
             generic_location: values.generic_location,
-            room_list: values.room_list,
+            room_list: selectedAccommodation.room_list,
             // avg_rating_tier: values.avg_rating_tier, // doesn't exist rn
         }
 
@@ -461,12 +461,12 @@ export default function AccommodationManagement() {
                             accommodationId={selectedAccommodationId}
                         />
 
-                        {/* <EditAccommodationModal
+                        <EditAccommodationModal
                             isEditAccommodationModalOpen={isEditAccommodationModalOpen}
                             onClickCancelEditAccommodationModal={onClickCancelEditAccommodationModal}
                             onClickSubmitEditAccommodation={onClickSubmitEditAccommodation}
                             accommodationId={selectedAccommodationId}
-                        /> */}
+                        />
 
                     </Content>
                 </Layout>
