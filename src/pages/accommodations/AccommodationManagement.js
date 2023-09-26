@@ -233,6 +233,33 @@ export default function AccommodationManagement() {
     // create new attraction modal create button
     async function onClickSubmitAccommodationCreate(values) {
 
+        console.log('values.check_in_time:', values.check_in_time);
+        console.log('values.check_out_time:', values.check_out_time);
+
+        // Extract hours and minutes
+        const checkInHours = values.check_in_time.$H;
+        const checkInMinutes = values.check_in_time.$m;
+
+        const checkIn = new Date(); 
+        checkIn.setHours(checkInHours, checkInMinutes, 0); 
+        // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
+        checkIn.setTime(checkIn.getTime() + 9 * 60 * 60 * 1000);
+        const checkInIsoString = checkIn.toISOString();
+
+        // Extract hours and minutes
+        const checkOutHours = values.check_out_time.$H;
+        const checkOutMinutes = values.check_in_time.$m;
+
+        const checkOut = new Date(); 
+        checkOut.setHours(checkOutHours, checkOutMinutes, 0); 
+        // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
+        checkOut.setTime(checkOut.getTime() + 9 * 60 * 60 * 1000);
+        const checkOutIsoString = checkOut.toISOString();
+
+        
+        console.log('checkInIsoString:', checkInIsoString);
+        console.log('checkOutIsoString:', checkOutIsoString);
+
         let accommodationObj = {
             name: values.name,
             description: values.description,
@@ -240,8 +267,8 @@ export default function AccommodationManagement() {
             contact_num: values.contact_num,
             accommodation_image_list: values.accommodation_image_list,
             is_published: true,
-            check_in_time: "2023-09-25T15:30:00",
-            check_out_time: "2023-09-25T19:30:00",
+            check_in_time: checkInIsoString,
+            check_out_time: checkOutIsoString,
             type: values.type,
             generic_location: values.generic_location,
             room_list: values.room_list,
