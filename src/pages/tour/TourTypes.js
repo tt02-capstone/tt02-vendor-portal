@@ -57,6 +57,11 @@ export default function TourTypes() {
         }
     }, [getTourTypesData]);
 
+    const redirectToTours = (tourTypeId) => {
+        let path = `/tours/${tourTypeId}`;
+        navigate(path);
+    }
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -249,8 +254,14 @@ export default function TourTypes() {
                         <br /><br />
                         <CustomButton
                             text="Edit"
-                            style={{ fontSize: 13, fontWeight: "bold" }}
                             onClick={() => onClickOpenEditTourTypeModal(record.tour_type_id)}
+                        />
+                    </Space>
+                    <br /><br />
+                    <Space>
+                        <CustomButton
+                            text="Tours"
+                            onClick={() => redirectToTours(record.tour_type_id)}
                         />
                     </Space>
                 </div>
