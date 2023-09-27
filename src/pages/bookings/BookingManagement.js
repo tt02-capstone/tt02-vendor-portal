@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag, Menu, Table } from 'antd';
+import { Layout, Input, Button, Space, Tag } from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAttractionBookingListByVendor, getAttractionBookingByVendor } from "../../redux/bookingRedux";
+import { getBookingListByVendor, getBookingByVendor } from "../../redux/bookingRedux";
 import CustomHeader from "../../components/CustomHeader";
 import ViewAttractionBookingModal from "./ViewAttractionBookingModal";
 import CustomButton from "../../components/CustomButton";
@@ -12,16 +12,18 @@ import CustomTablePagination from "../../components/CustomTablePagination";
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { ToastContainer, toast } from 'react-toastify';
+import moment from 'moment';
+import ViewTelecomBookingModal from "./ViewTelecomBookingModal";
 
 export default function BookingManagement() {
 
     const navigate = useNavigate();
     const vendor = JSON.parse(localStorage.getItem("user"));
 
-    const [getAttractionBookingsData, setGetAttractionBookingsData] = useState(true);
-    const [attractionBookingsData, setAttractionBookingsData] = useState([]);
+    const [getBookingsData, setGetBookingsData] = useState(true);
+    const [bookingsData, setBookingsData] = useState([]);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
-    const [selectedBooking, setSelectedBooking] = useState([]);
+    const [selectedBooking, setSelectedBooking] = useState();
 
     const viewBookingBreadCrumb = [
         {
@@ -41,264 +43,192 @@ export default function BookingManagement() {
         clearFilters();
         setSearchText('');
     };
-      const getColumnSearchProps = (dataIndex) => ({
+    const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-          <div
-            style={{
-              padding: 8,
-            }}
-            onKeyDown={(e) => e.stopPropagation()}
-          >
-            <Input
-              ref={searchInput}
-              placeholder={`Search ${Array.isArray(dataIndex) ? dataIndex.join(', ') : dataIndex}`}
-              value={selectedKeys[0]}
-              onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-              onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-              style={{
-                marginBottom: 8,
-                display: 'block',
-              }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
-                size="small"
+            <div
                 style={{
-                  width: 90,
+                    padding: 8,
                 }}
-              >
-                Search
-              </Button>
-              <Button
-                onClick={() => clearFilters && handleReset(clearFilters)}
-                size="small"
-                style={{
-                  width: 90,
-                }}
-              >
-                Reset
-              </Button>
-              {/* <Button
-                  type="link"
-                  size="small"
-                  onClick={() => {
-                      confirm({
-                          closeDropdown: false,
-                      });
-                      setSearchText(selectedKeys[0]);
-                      setSearchedColumn(dataIndex);
-                  }}
-              >
-                  Filter
-              </Button> */}
-              <Button
-                type="link"
-                size="small"
-                onClick={() => {
-                  close();
-                }}
-              >
-                Close
-              </Button>
-            </Space>
-          </div>
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
         ),
         filterIcon: (filtered) => (
-          <SearchOutlined
-            style={{
-              color: filtered ? '#1677ff' : undefined,
-            }}
-          />
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
         ),
-        onFilter: (value, record) => {
-            console.log("onFilter value", value);
-            console.log("onFilter record", record);
-            console.log("onFilter dataIndex", dataIndex);
-            
-            if (dataIndex == 'customerName') {
-                const customerName = record.tourist_user.name;
-                console.log("customer name", customerName);
-                if (customerName) {
-                    return customerName.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            } else if (dataIndex == 'customerType') {
-                const customerType = record.tourist_user;
-                if (customerType) {
-                    return 'Tourist'.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return 'Local'.toLowerCase().includes(value.toLowerCase());
-                }
-            } else if (dataIndex == 'attractionName') {
-                const attractionName = record.attraction;
-                if (attractionName) {
-                    return attractionName.name.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            } else if (dataIndex == 'status') {
-                const status = record.status;
-                if (status) {
-                    return status.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            } else if (dataIndex == 'last_update') {
-                const lastUpdate = record.last_update;
-                if (lastUpdate) {
-                    return lastUpdate.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            } else if (dataIndex == 'start_datetime') {
-                const startDatetime = record.start_datetime;
-                if (startDatetime) {
-                    return startDatetime.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            } else if (dataIndex == 'end_datetime') {
-                const endDatetime = record.end_datetime;
-                if (endDatetime) {
-                    return endDatetime.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            } else if (dataIndex == 'payment') {
-                const payment = record.payment;
-                if (payment) {
-                    return payment.is_paid.toLowerCase().includes(value.toLowerCase());
-                } else {
-                    return false;
-                }
-            }
-        },
         onFilter: (value, record) =>
             record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
         onFilterDropdownOpenChange: (visible) => {
-          if (visible) {
-            setTimeout(() => searchInput.current?.select(), 100);
-          }
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
         },
-
-        render: (text) =>{
-            console.log("render text", text);
-            console.log("render dataIndex", dataIndex);
-            console.log("render searchedColumn", searchedColumn);
-            return searchedColumn === dataIndex ? (
-              <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[searchText]}
-                autoEscape
-                textToHighlight={text ? text.toString() : ''}
-              />
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
             ) : (
-              text
-            );
-        }
-      });     
-    
+                text
+            ),
+    });
       
     const bookingsColumns = [
         {
             title: 'Customer Name',
-            dataIndex: 'customerName',
-            key: 'customerName',
-            render: (text, record) => {
-                const customerName = record.tourist_user
-                    ? record.tourist_user.name
-                    : record.local_user
-                    ? record.local_user.name
-                    : '';
-        
-                return customerName;
-            },
-            // sorter: (a, b) => {
-            //     const nameA = a.tourist_user ? a.tourist_user.name : a.local_user ? a.local_user.name : '';
-            //     const nameB = b.tourist_user ? b.tourist_user.name : b.local_user ? b.local_user.name : '';
-        
-            //     return nameA.localeCompare(nameB);
-            // },
-            // ...getColumnSearchProps('customerName')
+            dataIndex: 'name',
+            key: 'name',
+            sorter: (a, b) => a.name > b.name,
+            ...getColumnSearchProps('name'),
         },
         {
             title: 'Customer Type',
-            dataIndex: 'booking_id',
-            key: 'booking_id',
-            // filters: [
-            //     {
-            //       text: 'Tourist',
-            //       value: false,
-            //     },
-            //     {
-            //       text: 'Local',
-            //       value: true,
-            //     },
-            // ],
-            // onFilter: (value, record) => record.tourist_user === undefined || record.local_user,
+            dataIndex: 'booked_user',
+            key: 'booked_user',
+            filters: [
+                {
+                    text: 'Local',
+                    value: 'LOCAL',
+                },
+                {
+                    text: 'Tourist',
+                    value: 'TOURIST',
+                },
+            ],
+            onFilter: (value, record) => record.booked_user === value,
             render: (text, record) => {
-              if (record.tourist_user) {
-                return 'Tourist';
-              } else if (record.local_user) {
-                return 'Local';
+              if (text === 'LOCAL') {
+                return <Tag color='success'>Local</Tag>;
+              } else if (text === 'TOURIST') {
+                return <Tag color='error'>Tourist</Tag>;
               } else {
-                return '';
+                return 'Bug';
               }
             },
-            // sorter: (a, b) => {
-            //     const getTypeValue = (record) => {
-            //         if (record.tourist_user) {
-            //             return 1; // Tourist
-            //         } else if (record.local_user) {
-            //             return 2; // Local
-            //         } else {
-            //             return 0; 
-            //         }
-            //     };
-        
-            //     const typeA = getTypeValue(a);
-            //     const typeB = getTypeValue(b);
-        
-            //     return typeA - typeB;
-            // },
-            // ...getColumnSearchProps('customerType')
-          },
+        },
         {
-            title: 'Attraction',
-            dataIndex: 'attractionName',
-            key: 'attractionName',
+            title: 'Type',
+            dataIndex: 'type',
+            key: 'type',
+            filters: [
+                {
+                    text: 'Accommodation',
+                    value: 'ACCOMMODATION',
+                },
+                {
+                    text: 'Telecom',
+                    value: 'TELECOM',
+                },
+                {
+                    text: 'Attraction',
+                    value: 'ATTRACTION',
+                },
+                {
+                    text: 'Tour',
+                    value: 'TOUR',
+                },
+            ],
+            onFilter: (value, record) => record.type === value,
             render: (text, record) => {
-                console.log("text", text);
-                console.log("record", record);
-                return record.attraction.name;
+                let color = '';
+                let value = '';
+                switch (text) {
+                    case 'ACCOMMODATION':
+                        color = 'processing';
+                        value = 'Accommodation';
+                        break;
+                    case 'TELECOM':
+                        color = 'warning';
+                        value = 'Telecom';
+                        break;
+                    case 'ATTRACTION':
+                        color = 'success';
+                        value = 'Attraction';
+                        break;
+                    case 'TOUR':
+                        color = 'error';
+                        value = 'Tour';
+                        break;
+                }
+
+                return <Tag color={color}>{value}</Tag>;
             },
-            // sorter: (a, b) => {
-            //     const nameA = (a.attraction && a.attraction.name) || ''; 
-            //     const nameB = (b.attraction && b.attraction.name) || ''; 
-        
-            //     return nameA.localeCompare(nameB);
-            // },
-            // ...getColumnSearchProps('record.attraction.name'),
         },
         {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            // filters: [
-            //     {
-            //       text: 'Upcoming',
-            //       value: 'UPCOMING',
-            //     },
-            //     {
-            //       text: 'Cancelled',
-            //       value: 'CANCELLED',
-            //     },
-            // ],
-            // onFilter: (value, record) => record.status === value,
+            filters: [
+                {
+                    text: 'Upcoming',
+                    value: 'UPCOMING',
+                },
+                {
+                    text: 'Ongoing',
+                    value: 'ONGOING',
+                },
+                {
+                    text: 'Completed',
+                    value: 'COMPLETED',
+                },
+                {
+                    text: 'Cancelled',
+                    value: 'CANCELLED',
+                },
+            ],
+            onFilter: (value, record) => record.status === value,
             render: (status) => {
                 let color = '';
                 switch (status) {
@@ -318,94 +248,43 @@ export default function BookingManagement() {
 
                 return <Tag color={color}>{status}</Tag>;
             },
-            // sorter: (a, b) => {
-            //     const statusOrder = ['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED'];
-            //     const statusA = a.status || ''; 
-            //     const statusB = b.status || ''; 
-        
-            //     return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
-            // },
-            // formatting not preserved
-            // ...getColumnSearchProps('status'),
         },
         {
             title: 'Last Updated',
             dataIndex: 'last_update',
             key: 'last_update',
-            render: (lastUpdate) => {
-                const dateObj = new Date(lastUpdate);
-                const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()} ${dateObj.toLocaleTimeString()}`;
-                return formattedDate;
-            },
-            // sorter: (a, b) => {
-            //     // Extract the underlying date values for 'a' and 'b'
-            //     const dateA = new Date(a.last_update).getTime();
-            //     const dateB = new Date(b.last_update).getTime();
-        
-            //     // Compare the date values for sorting
-            //     return dateA - dateB;
-            // },
-            // formatting not preserved
-            // ...getColumnSearchProps('last_update'),
+            sorter: (a, b) => a.last_update > b.last_update,
+            ...getColumnSearchProps('last_update'),
         },
         {
             title: 'Start Date',
             dataIndex: 'start_datetime',
             key: 'start_datetime',
-            render: (startTime) => {
-                return startTime ? new Date(startTime).toLocaleDateString() : '';
-            },
-            // sorter: (a, b) => {
-            //     // Extract the underlying date values for 'a' and 'b'
-            //     const dateA = new Date(a.start_datetime).getTime();
-            //     const dateB = new Date(b.start_datetime).getTime();
-        
-            //     // Compare the date values for sorting
-            //     return dateA - dateB;
-            // },
-            // formatting not preserved
-            // ...getColumnSearchProps('start_datetime'),
+            sorter: (a, b) => a.start_datetime > b.start_datetime,
+            ...getColumnSearchProps('start_datetime'),
         },
         {
             title: 'End Date',
             dataIndex: 'end_datetime',
             key: 'end_datetime',
-            render: (endTime) => {
-                return endTime ? new Date(endTime).toLocaleDateString() : '';
-            },
-            // sorter: (a, b) => {
-            //     // Extract the underlying date values for 'a' and 'b'
-            //     const dateA = new Date(a.end_datetime).getTime();
-            //     const dateB = new Date(b.end_datetime).getTime();
-        
-            //     // Compare the date values for sorting
-            //     return dateA - dateB;
-            // },
-            // formatting not preserved
-            // ...getColumnSearchProps('end_datetime'),
-        },
-        {
-            title: 'Tickets',
-            dataIndex: 'booking_item_list',
-            key: 'booking_item_list',
-            render: (bookingItemList) => {
-                if (bookingItemList && bookingItemList.length > 0) {
-                    const ticketDescriptions = bookingItemList.map((bookingItem) => (
-                        `${bookingItem.activity_selection} (${bookingItem.quantity})`
-                    ));
-                    const ticketDescriptionString = ticketDescriptions.join(', ');
-
-                    return <div>{ticketDescriptionString}</div>;
-                } else {
-                    return 'N/A';
-                }
-            },
+            sorter: (a, b) => a.end_datetime > b.end_datetime,
+            ...getColumnSearchProps('end_datetime'),
         },
         {
             title: 'Payment Status',
             dataIndex: 'payment',
             key: 'payment',
-            onFilter: (value, record) => record.is_paid === value,
+            filters: [
+                {
+                    text: 'Paid',
+                    value: true,
+                },
+                {
+                    text: 'Unpaid',
+                    value: false,
+                },
+            ],
+            onFilter: (value, record) => record.payment.is_paid === value,
             render: (payment) => {
                 let color = '';
                 if (payment && payment.is_paid) {
@@ -414,96 +293,95 @@ export default function BookingManagement() {
                     color = 'red';
                 }
 
-                return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
+                return <Tag color={color}>{payment ? (payment.is_paid ? 'Paid' : 'Unpaid') : 'N/A'}</Tag>;
             },
-            // sorter: (a, b) => {
-            //     const isPaidA = (a.payment && a.payment.is_paid) || false; 
-            //     const isPaidB = (b.payment && b.payment.is_paid) || false; 
-        
-            //     return isPaidA - isPaidB;
-            // },
-            // missing search
         },
         {
             title: 'Amount Earned',
-            dataIndex: 'payment',
-            key: 'payment',
-            render: (payment) => {
-                return `$${(payment.payment_amount * (1 - payment.comission_percentage)).toFixed(2)}`
-            },
-            // sorter: (a, b) => {
-            //     const amountA = a.payment.payment_amount * (1 - a.payment.comission_percentage);
-            //     const amountB = b.payment.payment_amount * (1 - b.payment.comission_percentage);
-        
-            //     return amountA - amountB;
-            // },
+            dataIndex: 'payment_amount',
+            key: 'payment_amount',
+            sorter: (a, b) => a.payment_amount > b.payment_amount,
+            ...getColumnSearchProps('payment_amount'),
         },
         {
             title: 'Action(s)',
-            dataIndex: 'operation',
-            key: 'operation',
+            dataIndex: 'type',
+            key: 'type',
             render: (text, record) => {
-                return <Space>
-                    <CustomButton
-                        text="View"
-                        onClick={() => onClickOpenViewAttractionBookingModal(record.booking_id)}
-                    />
-                </Space>
+                if (text === 'ATTRACTION') {
+                    return <Space>
+                            <CustomButton
+                                text="View"
+                                onClick={() => onClickOpenViewAttractionBookingModal(record.booking_id)}
+                            />
+                        </Space>
+                } else if (text === 'TELECOM') {
+                    return <Space>
+                            <CustomButton
+                                text="View"
+                                onClick={() => onClickOpenViewTelecomBookingModal(record.booking_id)}
+                            />
+                        </Space>
+                } else {
+                    return <p>'Bug</p>
+                }
             }
         },
     ];
 
     useEffect(() => {
-        if (getAttractionBookingsData) {
-            console.log("user id", vendor.user_id)
-            console.log("vendor vendor vendor", vendor.vendor.vendor_id)
+        if (getBookingsData) {
             const fetchData = async () => {
-                const response = await getAttractionBookingListByVendor(vendor.user_id);
-                console.log("response data", response.data)
+                const response = await getBookingListByVendor(vendor.user_id);
                 if (response.status) {
+                    console.log(response.data);
                     var tempData = response.data.map((val) => ({
                         ...val,
+                        name: val.booked_user === 'LOCAL' ? val.local_user.name : val.tourist_user.name,
+                        last_update: moment(val.last_update).format('llll'),
+                        start_datetime: moment(val.start_datetime).format('ll'),
+                        end_datetime: moment(val.end_datetime).format('ll'),
+                        payment_amount: `$${(val.payment.payment_amount * (1 - val.payment.comission_percentage)).toFixed(2)}`,
                         key: val.user_id,
                     }));
-                    setAttractionBookingsData(tempData);
-                    setGetAttractionBookingsData(false);
-                    console.log(response.data)
+                    setBookingsData(tempData);
+                    setGetBookingsData(false);
                 } else {
-                    console.log("List of attraction bookings not fetched!");
+                    console.log("List of bookings not fetched!");
                 }
             }
 
             fetchData();
-            setGetAttractionBookingsData(false);
+            setGetBookingsData(false);
         }
-    }, [getAttractionBookingsData]);
+    }, [getBookingsData]);
 
-    // VIEW BOOKING
+    // view booking modal
     const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false);
+    const [isViewTelecomBookingModalOpen, setIsViewTelecomBookingModalOpen] = useState(false);
 
-    useEffect(() => {
-
-    }, [selectedBookingId])
-
-    //view booking modal open button
+    //view attraction booking modal open button
     function onClickOpenViewAttractionBookingModal(bookingId) {
         setSelectedBookingId(bookingId);
         setIsViewAttractionBookingModalOpen(true);
     }
 
-    // view booking modal cancel button
+    // view attraction booking modal cancel button
     function onClickCancelViewAttractionBookingModal() {
         setIsViewAttractionBookingModalOpen(false);
+        setSelectedBookingId(null);
     }
 
-    async function getBooking(vendor, selectedBookingId) {
-        try {
-            let response = await getAttractionBookingByVendor(vendor.vendor_id, selectedBookingId);
-            setSelectedBooking(response.data);
-            // setPriceList(response.data.price_list);
-        } catch (error) {
-            alert('An error occurred! Failed to retrieve booking!');
-        }
+    //view telecom booking modal open button
+    function onClickOpenViewTelecomBookingModal(bookingId) {
+        setSelectedBookingId(bookingId);
+        setIsViewTelecomBookingModalOpen(true);
+    }
+
+    // view telecom booking modal cancel button
+    function onClickCancelViewTelecomBookingModal() {
+        setIsViewTelecomBookingModalOpen(false);
+        setSelectedBookingId(null);
     }
 
     return vendor ? (
@@ -516,17 +394,22 @@ export default function BookingManagement() {
                         <CustomTablePagination
                             title="Bookings"
                             column={bookingsColumns}
-                            data={attractionBookingsData}
+                            data={bookingsData}
+                            rowKey="booking_id"
                             tableLayout="fixed"
-                            
                         />
 
                         <ViewAttractionBookingModal
-                            isViewAttractionBookingModalOpen={isViewAttractionBookingModalOpen}
+                            openViewModal={isViewAttractionBookingModalOpen}
                             onClickCancelViewAttractionBookingModal={onClickCancelViewAttractionBookingModal}
-                            bookingId={selectedBookingId}
+                            id={selectedBookingId}
                         />
 
+                        <ViewTelecomBookingModal
+                            openViewModal={isViewTelecomBookingModalOpen}
+                            onClickCancelViewTelecomBookingModal={onClickCancelViewTelecomBookingModal}
+                            id={selectedBookingId}
+                        />
                     </Content>
                 </Layout>
             </Layout>
