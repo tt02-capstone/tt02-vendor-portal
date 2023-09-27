@@ -53,6 +53,16 @@ export async function getLastAttractionId() {
   }
 }
 
+export async function getPublishedAttractions() {
+  try {
+    const response = await attractionApi.get(`${attractionURL}/getAllPublishedAttraction`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("attractionRedux getPublishedAttractions Error: ", error);
+    return { status: false, data: error.message };
+  }
+}
+
 export async function createSeasonalActivity(vendor_id,attraction_id,activity) {
   try {
       const response = await attractionApi.post(`/createSeasonalActivity/${vendor_id}/${attraction_id}`, activity);

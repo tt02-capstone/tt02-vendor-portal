@@ -20,13 +20,15 @@ import {
     BarsOutlined,
     CalendarOutlined,
     BankOutlined,
-    PhoneOutlined
+    PhoneOutlined,
+    ScheduleOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
 import TelecomManagement from "./pages/telecom/TelecomManagement";
+import TourTypes from "./pages/tours/TourTypes";
 
 function AppLayout() {
 
@@ -48,6 +50,7 @@ function AppLayout() {
 
     const localMenuItems = [
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
+        {key: '/tourtypes', label: 'Tours', icon: <ScheduleOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -82,6 +85,7 @@ function AppLayout() {
                         <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
                         <Route path="/telecom" element={<TelecomManagement/>}/>
+                        <Route path="/tourtypes" element={<TourTypes />}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
