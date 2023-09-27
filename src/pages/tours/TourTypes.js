@@ -3,7 +3,7 @@ import { Layout, Form, Input, Badge, Space, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllTourTypesByLocal, createTourType } from "../../redux/tourRedux";
+import { getAllTourTypesByLocal, createTourType, updateTourType, getTourTypeByTourTypeId } from "../../redux/tourRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
@@ -14,6 +14,7 @@ import ViewTourTypeModal from "./ViewTourTypeModal";
 import { Table, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import EditTourTypeModal from './EditTourTypeModal';
 
 export default function TourTypes() {
 
@@ -23,6 +24,7 @@ export default function TourTypes() {
 
     const [getTourTypesData, setGetTourTypesData] = useState(true);
     const [tourTypes, setTourTypes] = useState([]);
+    const [selectedTourType, setSelectedTourType] = useState([]);
     const [tourTypeImages, setTourTypeImages] = useState({});
     const [selectedTourTypeId, setSelectedTourTypeId] = useState(null);
 
@@ -167,7 +169,7 @@ export default function TourTypes() {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            width: 70,
+            width: 50,
             sorter: (a, b) => a.name.localeCompare(b.name),
             ...getColumnSearchProps('name'),
         },
@@ -175,23 +177,27 @@ export default function TourTypes() {
             title: 'Description',
             dataIndex: 'description',
             key: 'description',
-            width: 100,
+            width: 70,
             sorter: (a, b) => a.description.localeCompare(b.description),
             ...getColumnSearchProps('description'),
         },
         {
-            title: 'Price',
+            title: 'Price per Pax',
             dataIndex: 'price',
             key: 'price',
             width: 40,
-            sorter: (a, b) => a.description.localeCompare(b.description),
+            sorter: (a, b) => a.price - b.price,
             ...getColumnSearchProps('price'),
+            render: (text, record) => {
+                // Assuming 'text' is the price value from your data
+                return `$${text}`;
+            },
         },
         {
             title: 'No. of Pax',
             dataIndex: 'recommended_pax',
             key: 'recommended_pax',
-            width: 50,
+            width: 40,
             sorter: (a, b) => a.recommended_pax - b.recommended_pax,
             ...getColumnSearchProps('recommended_pax'),
         },
@@ -199,15 +205,19 @@ export default function TourTypes() {
             title: 'Est. Duration',
             dataIndex: 'estimated_duration',
             key: 'estimated_duration',
-            width: 50,
+            width: 40,
             sorter: (a, b) => a.estimated_duration - b.estimated_duration,
             ...getColumnSearchProps('estimated_duration'),
+            render: (text, record) => {
+                // Assuming 'text' is the price value from your data
+                return `${text} Hours`;
+            },
         },
         {
             title: 'Special Notes',
             dataIndex: 'special_note',
             key: 'special_note',
-            width: 90,
+            width: 60,
             sorter: (a, b) => a.special_note - b.special_note,
             ...getColumnSearchProps('special_note'),
         },
@@ -228,19 +238,28 @@ export default function TourTypes() {
             title: 'Action(s)',
             dataIndex: 'operation',
             key: 'operation',
+            align: 'center',
             render: (text, record) => {
-                return <Space>
-                    <CustomButton
-                        text="View"
-                        onClick={() => onClickOpenViewTourTypeModal(record.tour_type_id)}
-                    />
-
-                </Space>
+                return <div>
+                    <Space>
+                        <CustomButton
+                            text="View"
+                            onClick={() => onClickOpenViewTourTypeModal(record.tour_type_id)}
+                        />
+                        <br /><br />
+                        <CustomButton
+                            text="Edit"
+                            style={{ fontSize: 13, fontWeight: "bold" }}
+                            onClick={() => onClickOpenEditTourTypeModal(record.tour_type_id)}
+                        />
+                    </Space>
+                </div>
             },
             width: 70,
         }
     ];
 
+    // Create new tour type
     const [createTourTypeForm] = Form.useForm();
     const [isCreateTourTypeModalOpen, setIsCreateTourTypeModalOpen] = useState(false);
 
@@ -283,7 +302,8 @@ export default function TourTypes() {
         }
     }
 
-    const [isViewTourTypeModalOpen, setIsViewTourTypeModalOpen] = useState(false); 
+    // View details of Tour Type
+    const [isViewTourTypeModalOpen, setIsViewTourTypeModalOpen] = useState(false);
 
     function onClickOpenViewTourTypeModal(tourTypeId) {
         setSelectedTourTypeId(tourTypeId);
@@ -293,6 +313,87 @@ export default function TourTypes() {
     function onClickCancelViewTourTypeModal() {
         setIsViewTourTypeModalOpen(false);
     }
+
+    // Update tour type
+    const [isEditTourTypeModalOpen, setIsEditTourTypeModalOpen] = useState(false);
+
+    function onClickOpenEditTourTypeModal(tourTypeId) {
+        setSelectedTourTypeId(tourTypeId);
+        setIsEditTourTypeModalOpen(true);
+    }
+
+    function onClickCancelEditTourTypeModal() {
+        setIsEditTourTypeModalOpen(false);
+    }
+
+    async function onClickSubmitEditTourType(values) {
+
+        let tourTypeObj = {
+            tour_type_id: selectedTourTypeId,
+            name: values.name,
+            description: values.description,
+            price: values.price,
+            recommended_pax: values.recommended_pax,
+            special_note: values.special_note,
+            estimated_duration: values.estimated_duration,
+            tour_image_list: values.tour_image_list,
+            is_published: values.is_published
+        }
+
+        let response = await updateTourType(tourTypeObj, values.attraction);
+        if (response.status) {
+            const updatedTourTypesData = tourTypes.map((tourType) => {
+                if (tourType.tour_type_id === selectedTourTypeId) {
+                    return { ...tourType, ...tourTypeObj };
+                }
+                return tourType;
+            });
+
+            setTourTypes(updatedTourTypesData);
+
+            setIsEditTourTypeModalOpen(false);
+            setGetTourTypesData(true);
+            toast.success('Tour type successfully updated!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+
+            const imageList = values.tour_image_list;
+            if (Array.isArray(imageList) && imageList.length > 0) {
+                const firstImageUrl = imageList[0];
+                setSelectedTourType({
+                    ...selectedTourType,
+                    tour_image_list: [firstImageUrl],
+                });
+            } else {
+                setSelectedTourType({
+                    ...selectedTourType,
+                    tour_image_list: [],
+                });
+            }
+
+        } else {
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+    }
+
+    async function getTourType(selectedTourTypeId) {
+        try {
+            let response = await getTourTypeByTourTypeId(selectedTourTypeId);
+            setSelectedTourType(response.data);
+        } catch (error) {
+            alert('An error occurred! Failed to retrieve tour type!');
+        }
+    }
+
+    useEffect(() => {
+        if (isEditTourTypeModalOpen) {
+            getTourType(selectedTourTypeId);
+        }
+    }, [isEditTourTypeModalOpen]);
 
     const updateTourTypeImages = (tourTypeId, imageFileName) => {
         setTourTypeImages((prevImages) => ({
@@ -346,6 +447,14 @@ export default function TourTypes() {
                         <ViewTourTypeModal
                             isViewTourTypeModalOpen={isViewTourTypeModalOpen}
                             onClickCancelViewTourTypeModal={onClickCancelViewTourTypeModal}
+                            tourTypeId={selectedTourTypeId}
+                        />
+
+                        {/* Modal to edit tour type */}
+                        <EditTourTypeModal
+                            isEditTourTypeModalOpen={isEditTourTypeModalOpen}
+                            onClickCancelEditTourTypeModal={onClickCancelEditTourTypeModal}
+                            onClickSubmitEditTourType={onClickSubmitEditTourType}
                             tourTypeId={selectedTourTypeId}
                         />
                     </Content>

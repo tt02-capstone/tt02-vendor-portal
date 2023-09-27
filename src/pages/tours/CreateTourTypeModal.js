@@ -238,9 +238,9 @@ export default function CreateTourTypeModal(props) {
                     </Form.Item>
 
                     <Form.Item
-                        label="Price"
+                        label="Price per Pax"
                         name="price"
-                        rules={[{ required: true, message: 'Please enter price!' }]}>
+                        rules={[{ required: true, message: 'Please enter price per pax!' }]}>
                         <InputNumber style={{ width: '110px' }} prefix="$" min={0} />
                     </Form.Item>
 

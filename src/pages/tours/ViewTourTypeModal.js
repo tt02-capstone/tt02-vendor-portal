@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Tag, Badge, Carousel } from "antd";
-import { getTourTypeByTourTypeId } from "../../redux/tourRedux";
+import { getTourTypeByTourTypeId, getAttractionForTourTypeId } from "../../redux/tourRedux";
 
 export default function ViewTourTypeModal(props) {
 
     const [selectedTourType, setSelectedTourType] = useState([]);
+    const [selectedAttraction, setSelectedAttraction] = useState('');
     const local = JSON.parse(localStorage.getItem("user"));
 
     async function getTourType(props) {
@@ -16,12 +17,22 @@ export default function ViewTourTypeModal(props) {
         }
     }
 
+    async function getAttraction(props) {
+        try {
+            let response = await getAttractionForTourTypeId(props.tourTypeId);
+            setSelectedAttraction(response.data);
+        } catch (error) {
+            alert('An error occurred! Failed to retrieve attraction!');
+        }
+    }
+
     useEffect(() => {
     }, [selectedTourType])
 
     useEffect(() => {
         if (props.isViewTourTypeModalOpen) {
             getTourType(props);
+            getAttraction(props);
         }
     }, [props.isViewTourTypeModalOpen]);
 
@@ -67,7 +78,7 @@ export default function ViewTourTypeModal(props) {
 
         let formattedValue = value;
 
-        if (label === 'Price') {
+        if (label === 'Price per Pax') {
             formattedValue = '$' + formattedValue;
         }
 
@@ -83,7 +94,7 @@ export default function ViewTourTypeModal(props) {
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 'bold', minWidth: '160px' }}>{label}:</div>
                 <div>
-                    {label === 'Is Published?' ? (
+                    {label === 'Published' ? (
                         <Badge status={value ? 'success' : 'error'} text={value ? 'Yes' : 'No'} />
                     ) : (
                         color ? (
@@ -108,12 +119,13 @@ export default function ViewTourTypeModal(props) {
             >
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderTourTypeImage(selectedTourType.tour_image_list)}
+                    {renderProperty('Attraction', selectedAttraction.name)}
                     {renderProperty('Description', selectedTourType.description)}
-                    {renderProperty('Price', selectedTourType.price)}
+                    {renderProperty('Price per Pax', selectedTourType.price)}
                     {renderProperty('No. of Pax', selectedTourType.recommended_pax)}
                     {renderProperty('Est. Duration', selectedTourType.estimated_duration)}
                     {renderProperty('Special Notes', selectedTourType.special_note)}
-                    {renderProperty('Is Published?', selectedTourType.is_published ? "Yes" : "No")}
+                    {renderProperty('Published', selectedTourType.is_published ? "Yes" : "No")}
                 </div>
             </Modal>
         </div>
