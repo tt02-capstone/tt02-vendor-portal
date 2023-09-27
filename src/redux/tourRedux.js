@@ -42,3 +42,23 @@ export async function createTourType(userId, attractionId, tourType) {
         return { status: false, data: error.message };
     }
 }
+
+export async function updateTourType(tourType, attractionId) {
+    try {
+        const response = await tourApi.put(`${tourURL}/updateTourType/${attractionId}`, tourType);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux updateTourType Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
+
+export async function getAttractionForTourTypeId(tourTypeId) {
+    try {
+        const response = await tourApi.get(`${tourURL}/getAttractionForTourTypeId/${tourTypeId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux getAttractionForTourTypeId Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
