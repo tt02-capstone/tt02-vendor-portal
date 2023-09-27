@@ -19,6 +19,7 @@ import {
     UsergroupAddOutlined,
     BarsOutlined,
     CalendarOutlined,
+    HomeOutlined,
     BankOutlined,
     PhoneOutlined,
     ScheduleOutlined
@@ -29,6 +30,7 @@ import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
 import TelecomManagement from "./pages/telecom/TelecomManagement";
 import TourTypes from "./pages/tours/TourTypes";
+import RestaurantManagement from "./pages/restaurant/RestaurantManagement";
 
 function AppLayout() {
 
@@ -44,6 +46,7 @@ function AppLayout() {
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
         {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
+        {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
@@ -85,6 +88,7 @@ function AppLayout() {
                         <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
                         <Route path="/telecom" element={<TelecomManagement/>}/>
+                        <Route path="/restaurant" element={<RestaurantManagement/>}/>
                         <Route path="/tourtypes" element={<TourTypes />}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
