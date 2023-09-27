@@ -53,6 +53,17 @@ export async function getLastAccommodationId() {
   }
 }
 
+export async function createRoomListExistingAccommodation(accommodationId, roomList) {
+  try {
+    const response = await accommodationApi.post(`${accommodationURL}/createRoomListExistingAccommodation/${accommodationId}`, roomList);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("accommodationRedux createRoomListExistingAccommodation Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
+
 export async function createRoom(accommodationId, room) {
     try {
       const response = await accommodationApi.post(`${accommodationURL}/createRoom/${accommodationId}`, room);

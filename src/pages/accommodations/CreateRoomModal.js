@@ -33,16 +33,6 @@ export default function CreateAccommodationModal(props) {
                     onFinish={onFinish}
                 >
                     <Form.Item
-                        label="Room Number"
-                        name="room_number"
-                        rules={[{ required: true, message: 'Please enter room number!' },
-                        { max: 64, message: 'Room Number should not exceed 64 characters!' },]}
-
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
                         label="Room Type"
                         name="room_type"
                         placeholder="Room Type"
@@ -109,6 +99,25 @@ export default function CreateAccommodationModal(props) {
                             min={0}
                             precision={2}
                         />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Number of Rooms"
+                        name="num_of_rooms"
+                        placeholder="Number of Rooms"
+                        rules={[
+                            { required: true, message: 'Please enter number of rooms to create for room type!' },
+                            {
+                                validator: (_, value) => {
+                                    if (value <= 0) {
+                                        return Promise.reject('Number of rooms must be greater than 0');
+                                    }
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                    >
+                        <InputNumber suffix="Rooms" />
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

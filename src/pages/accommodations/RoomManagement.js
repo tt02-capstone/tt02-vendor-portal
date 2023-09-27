@@ -4,7 +4,7 @@ import { useLocation, Navigate, useNavigate } from 'react-router-dom';
 import CustomHeader from '../../components/CustomHeader';
 import { Content } from "antd/es/layout/layout";
 import CustomButton from "../../components/CustomButton";
-import { getRoomListByVendor, createRoom, getAccommodation } from "../../redux/accommodationRedux";
+import { getRoomListByVendor, createRoomListExistingAccommodation, getAccommodation } from "../../redux/accommodationRedux";
 import CreateRoomModal from "./CreateRoomModal";
 import { Table, Input, Button, Space, Form } from 'antd';
 import { PlusOutlined } from "@ant-design/icons";
@@ -46,23 +46,30 @@ export default function RoomManagement() {
 
     // create new room modal create button
     async function onClickSubmitRoomCreate(values) {
-       
-        let roomObj = {
-            room_number: values.room_number,
-            amenities_description: values.amenities_description,
-            address: values.address,
-            num_of_pax: values.num_of_pax,
-            price: values.price,
-            room_type: values.room_type,
+
+        const numOfRoomsToCreate = values.num_of_rooms;
+        const roomList = [];
+
+        for (let i = 0; i < numOfRoomsToCreate; i++) {
+            const roomObj = {
+                amenities_description: values.amenities_description,
+                num_of_pax: values.num_of_pax,
+                price: values.price,
+                room_type: values.room_type,
+            };
+
+            roomList.push(roomObj);
         }
 
-        let response = await createRoom(user.user_id, roomObj);
+        console.log(roomList)
+
+        let response = await createRoomListExistingAccommodation(currentAccommodation.accommodation_id, roomList);
         if (response.status) {
             createRoomForm.resetFields();
             setGetRoomsData(true);
             setIsCreateRoomModalOpen(false);
-            console.log("createRoom response", response.status)
-            toast.success('Room successfully created!', {
+            console.log("createRoomListExistingAccommodation response", response.status)
+            toast.success('Rooms successfully created!', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
             });
@@ -96,7 +103,7 @@ export default function RoomManagement() {
 
     useEffect(() => {
         console.log("currentAccommodation", currentAccommodation);
-        
+
     }, [currentAccommodation]);
 
     // useEffect(() => {
