@@ -230,7 +230,7 @@ export default function BookingManagement() {
             ],
             onFilter: (value, record) => record.status === value,
             render: (status) => {
-                let color = '';
+                let color = 'default';
                 switch (status) {
                     case 'UPCOMING':
                         color = 'processing';
@@ -253,21 +253,21 @@ export default function BookingManagement() {
             title: 'Last Updated',
             dataIndex: 'last_update',
             key: 'last_update',
-            sorter: (a, b) => a.last_update > b.last_update,
+            sorter: (a, b) => new Date(a.last_update) > new Date(b.last_update),
             ...getColumnSearchProps('last_update'),
         },
         {
             title: 'Start Date',
             dataIndex: 'start_datetime',
             key: 'start_datetime',
-            sorter: (a, b) => a.start_datetime > b.start_datetime,
+            sorter: (a, b) => new Date(a.start_datetime) > new Date(b.start_datetime),
             ...getColumnSearchProps('start_datetime'),
         },
         {
             title: 'End Date',
             dataIndex: 'end_datetime',
             key: 'end_datetime',
-            sorter: (a, b) => a.end_datetime > b.end_datetime,
+            sorter: (a, b) => new Date(a.end_datetime) > new Date(b.end_datetime),
             ...getColumnSearchProps('end_datetime'),
         },
         {
