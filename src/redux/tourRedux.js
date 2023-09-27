@@ -62,3 +62,24 @@ export async function getAttractionForTourTypeId(tourTypeId) {
         return { status: false, data: error.message };
     }
 }
+
+export async function getAllToursByTourType(tourTypeId) {
+    try {
+        console.log(tourTypeId);
+        const response = await tourApi.get(`${tourURL}/getAllToursByTourType/${tourTypeId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux getAllToursByTourType Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
+
+export async function createTour(tourTypeId, tourObj) {
+    try {
+      const response = await tourApi.post(`${tourURL}/createTour/${tourTypeId}`, tourObj);
+      return handleApiErrors(response);
+    } catch (error) {
+      console.error("tourRedux createTour Error : ", error);
+      return {status: false, data: error.message};
+    }
+  }
