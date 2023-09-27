@@ -398,15 +398,16 @@ export default function DealManagement() {
 
     // submit edit modal
     async function onEditSubmit(values) {
+        console.log(values)
         let obj = {
             "discount_percent": values.discount_percent,
-            "start_datetime": values.promo_date_time[0],
-            "end_datetime": values.promo_date_time[1],
+            "start_datetime": values.promo_date_time[0].format('YYYY-MM-DD HH:mm:ss'),
+            "end_datetime": values.promo_date_time[1].format('YYYY-MM-DD HH:mm:ss'),
             "promo_code": values.promo_code,
             "is_govt_voucher": values.is_govt_voucher,
             "deal_image_list": values.deal_image_list,
             "is_published": values.is_published,
-            "publish_date": values.publish_date,
+            "publish_date": values.publish_date.format('YYYY-MM-DD'),
             "deal_type": values.deal_type,
             "deal_id": editDealId,
         }

@@ -1,43 +1,49 @@
-import React, {useState, useEffect} from "react";
-import {Modal, Form, Input, Switch, Button, Select, InputNumber, Upload, DatePicker} from "antd";
+import React, { useState, useEffect } from "react";
+import {Modal, Form, Input, Button, Select, Switch, InputNumber, Space, Upload, DatePicker} from "antd";
+import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import {getDealById} from "../../redux/dealRedux";
-import moment from "moment";
-import {PlusOutlined} from "@ant-design/icons";
-import AWS from "aws-sdk";
-import {toast} from "react-toastify";
+import { ToastContainer, toast } from 'react-toastify';
+import AWS from 'aws-sdk';
 import dayjs from "dayjs";
+import moment from "moment/moment";
 
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker
+
+window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export default function EditDealModal(props) {
 
-    const {TextArea} = Input;
-    const {Option} = Select;
-
+    const { TextArea } = Input;
+    const { Option } = Select;
     const [selectedDeal, setSelectedDeal] = useState([]);
     const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
+    const [file, setFile] = useState(null);
     const [existingImageUrls, setExistingImageUrls] = useState([]);
 
     async function getDeal(props) {
         try {
             let response = await getDealById(props.selectedDealId);
+            console.log("getDeal response data", response.data);
+            setSelectedDeal(response.data);
+            console.log("getDeal response data", response.data);
             const newExistingImageUrls = response.data.deal_image_list || [];
-            // console.log("editAttractionModal getAttraction newExistingImageUrls", newExistingImageUrls);
+            console.log("editDealModal getDeal newExistingImageUrls", newExistingImageUrls);
 
             setExistingImageUrls(newExistingImageUrls);
-            setSelectedDeal(response.data);
+
+            console.log("editDealModal getDeal existingImageUrls", existingImageUrls);
         } catch (error) {
-            alert('An error occurred! Failed to retrieve Deal!');
+            alert('An error occurred! Failed to retrieve deal!');
         }
     }
-
 
     useEffect(() => {
         if (props.editDealModal) {
             getDeal(props);
+
         }
-    }, [props.editDealModal])
+    }, [props.editDealModal]);
 
     useEffect(() => {
         setImageFiles(existingImageUrls.map((url, index) => ({
@@ -49,25 +55,24 @@ export default function EditDealModal(props) {
         console.log("imageFiles", imageFiles);
     }, [existingImageUrls]);
 
-
     useEffect(() => {
-        if (selectedDeal) {
-            let promo_date_time = [
-                dayjs(selectedDeal.start_datetime),
-                dayjs(selectedDeal.end_datetime)
-            ]
-            props.form.setFieldsValue({
-                promo_code: selectedDeal.promo_code,
-                discount_percent: selectedDeal.discount_percent,
-                promo_date_time: promo_date_time,
-                is_published: selectedDeal.is_published,
-                is_govt_voucher: selectedDeal.is_govt_voucher,
-                publish_date: dayjs(selectedDeal.publish_date),
-                deal_type: selectedDeal.deal_type,
-                deal_image_list: selectedDeal.deal_image_list,
-            });
-        }
-    }, [selectedDeal])
+        let promo_date_time = [
+            dayjs(selectedDeal.start_datetime),
+            dayjs(selectedDeal.end_datetime)
+        ]
+        props.form.setFieldsValue({
+            deal_id: selectedDeal.deal_id,
+            promo_code: selectedDeal.promo_code,
+            discount_percent: selectedDeal.discount_percent,
+            promo_date_time: promo_date_time,
+            is_published: selectedDeal.is_published,
+            is_govt_voucher: selectedDeal.is_govt_voucher,
+            publish_date: dayjs(selectedDeal.publish_date),
+            deal_type: selectedDeal.deal_type,
+            deal_image_list: existingImageUrls,
+        });
+
+    }, [selectedDeal, props.form]);
 
     const handleFileChange = (e) => {
         const fileList = e.fileList;
@@ -75,7 +80,6 @@ export default function EditDealModal(props) {
     };
 
     function normFile(e) {
-        console.log(e)
         if (Array.isArray(e)) {
             return e;
         }
@@ -84,8 +88,8 @@ export default function EditDealModal(props) {
 
     const uploadButton = (
         <div>
-            <PlusOutlined/>
-            <div style={{marginTop: 8}}>Upload</div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
         </div>
     );
 
@@ -93,6 +97,7 @@ export default function EditDealModal(props) {
         console.log(imageFiles, file)
         const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
         setImageFiles(updatedFiles);
+        console.log(imageFiles)
     }
 
     // upload file
@@ -101,8 +106,6 @@ export default function EditDealModal(props) {
     const ACCESS_KEY = 'AKIART7KLOHBGOHX2Y7T';
     const SECRET_ACCESS_KEY = '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';
 
-    const [file, setFile] = useState(null);
-
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
 
@@ -110,8 +113,8 @@ export default function EditDealModal(props) {
 
             console.log("existingImageUrls", existingImageUrls);
 
-            // this currentFileUrl http://tt02.s3-ap-southeast-1.amazonaws.com/deal/Deal_3_Deal_3_art science.jpeg
-            const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/deals/Deals_${selectedDeal.deal_id}_${file.name}`;
+            // this currentFileUrl http://tt02.s3-ap-southeast-1.amazonaws.com/deals/Deal_3_Deal_3_art science.jpeg
+            const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/deals/Deal_${selectedDeal.deal_id}_${file.name}`;
 
             console.log("currentFileUrl", currentFileUrl);
 
@@ -133,7 +136,7 @@ export default function EditDealModal(props) {
                         secretAccessKey: SECRET_ACCESS_KEY,
                     });
                     const s3 = new AWS.S3({
-                        params: {Bucket: S3_BUCKET},
+                        params: { Bucket: S3_BUCKET },
                         region: REGION,
                     });
 
@@ -177,10 +180,10 @@ export default function EditDealModal(props) {
             });
         } catch (error) {
             console.error("Error uploading images:", error);
-            // toast.error('Upload failed!', {
-            //     position: toast.POSITION.TOP_RIGHT,
-            //     autoClose: 1500
-            // });
+            toast.error('Upload failed!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
         }
     };
 
@@ -189,11 +192,10 @@ export default function EditDealModal(props) {
             let str = 'http://tt02.s3-ap-southeast-1.amazonaws.com';
             str = str + '/' + 'deals';
             str = str + '/' + file.name;
-            console.log("useEffect", str);
+            // console.log("useEffect", str);
         }
 
     }, [file]);
-
 
     return (
         <div>
@@ -203,14 +205,14 @@ export default function EditDealModal(props) {
                 open={props.editDealModal}
                 onCancel={props.onCancelEditModal}
                 style={{minWidth: 650}}
-                footer={[]}
+                footer={[]} // hide default buttons of modal
             >
                 <Form
-                    name="editForm"
+                    name="editDeal"
                     form={props.form}
-                    labelCol={{span: 8}}
-                    wrapperCol={{span: 16}}
-                    style={{maxWidth: 600}}
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 800 }}
                     required={true}
                     requiredMark={true}
                     onFinish={onFinish}
@@ -226,30 +228,33 @@ export default function EditDealModal(props) {
                         <Input placeholder="Promo_code"/>
                     </Form.Item>
 
-
                     <Form.Item
                         label="Images"
-                        name="deal_image_list"
-                        valuePropName="fileList"
                         labelAlign="left"
+                        name="deal_image_list"
                         getValueFromEvent={normFile}
                         rules={[
-                            {required: true, message: 'Please upload at least one image!'},
+                            { required: true, message: 'Please upload at least one image!' },
                         ]}
                     >
                         <Upload
-                            beforeUpload={() => false} // To prevent auto-upload on file selection
+                            beforeUpload={() => false}
                             multiple
                             listType="picture-card"
                             fileList={imageFiles}
                             onRemove={handleRemove}
-                            onChange={handleFileChange}
                             showUploadList={{
                                 showPreviewIcon: true,
                                 showRemoveIcon: true,
                             }}
+                            onChange={handleFileChange}
                         >
-                            {imageFiles.length >= 8 ? null : uploadButton}
+                            {imageFiles.length >= 8 ? null : (
+                                <div>
+                                    <PlusOutlined />
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </div>
+                            )}
                         </Upload>
                     </Form.Item>
 
@@ -328,7 +333,7 @@ export default function EditDealModal(props) {
                             disabledDate={(current) => current && current < moment().startOf('day')}/>
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{offset: 11, span: 16}}>
+                    <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
                         <Button type="primary" htmlType="submit">
                             Update
                         </Button>
