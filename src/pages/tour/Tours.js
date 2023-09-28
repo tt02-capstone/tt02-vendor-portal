@@ -13,6 +13,7 @@ import { Table, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import CreateTourModal from './CreateTourModal';
+import moment from 'moment';
 
 export default function TourTypes() {
 
@@ -43,6 +44,12 @@ export default function TourTypes() {
                         ...val,
                         key: val.user_id,
                     }));
+                    tempData.sort((a, b) => {
+                        const dateA = new Date(a.date);
+                        const dateB = new Date(b.date);
+
+                        return dateA - dateB;
+                    });
                     setTours(tempData);
                     setGetToursData(false);
                 } else {
@@ -60,7 +67,8 @@ export default function TourTypes() {
             title: 'Date',
             dataIndex: 'date',
             key: 'date',
-            width: 100,
+            width: 50,
+            render: (text) => moment(text).format('DD MMM YYYY'),
             sorter: (a, b) => {
                 const dateA = new Date(a.date);
                 const dateB = new Date(b.date);
@@ -78,7 +86,8 @@ export default function TourTypes() {
             title: 'Start Time',
             dataIndex: 'start_time',
             key: 'start_time',
-            width: 100,
+            width: 50,
+            render: (text) => moment(text).format('h.mm a'),
             sorter: (a, b) => {
                 const timeA = a.start_time;
                 const timeB = b.start_time;
@@ -99,7 +108,8 @@ export default function TourTypes() {
             title: 'End Time',
             dataIndex: 'end_time',
             key: 'end_time',
-            width: 100,
+            width: 50,
+            render: (text) => moment(text).format('h.mm a'),
             sorter: (a, b) => {
                 const timeA = a.end_time;
                 const timeB = b.end_time;
@@ -121,7 +131,7 @@ export default function TourTypes() {
             dataIndex: 'operation',
             key: 'operation',
             align: 'center',
-            width: 100,
+            width: 80,
             render: (text, record) => {
                 return <div>
 
