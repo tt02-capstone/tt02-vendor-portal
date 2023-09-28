@@ -12,6 +12,7 @@ export default function ViewDealModal(props) {
             const fetchData = async (id) => {
                 const response = await getDealById(id);
                 if (response.status) {
+                    console.log(response.data)
                     setSelectedDeal(response.data);
 
                 } else {
@@ -21,7 +22,7 @@ export default function ViewDealModal(props) {
             console.log('fetch');
             fetchData(props.selectedDealId);
         }
-    }, [props.selectedDealId]);
+    }, [props.selectedDealId, props.viewDealModal]);
 
     function renderDealImage(imageList) {
         if (Array.isArray(imageList) && imageList.length > 0) {
@@ -60,8 +61,46 @@ export default function ViewDealModal(props) {
         return 'No Image';
     }
 
+
+    function getDealTypeColour(type) {
+        switch (type) {
+            case 'CHINESE_NEW_YEAR':
+                return "green"
+            case 'NATIONAL_DAY':
+                return 'cyan';
+            case 'DEEPAVALLI':
+                return 'blue';
+            case 'NUS_WELLBEING_DAY':
+                return 'geekblue';
+            case 'SINGLES_DAY':
+                return 'purple';
+            case 'VALENTINES':
+                return "pink"
+            case 'HARI_RAYA':
+                return 'yellow';
+            case 'NEW_YEAR_DAY':
+                return 'volcano';
+            case 'BLACK_FRIDAY':
+                return 'lime';
+            case 'CHRISTMAS':
+                return 'gold';
+            case 'GOVERNMENT':
+                return 'orange';
+            default:
+                return 'default';
+        }
+    }
     function renderProperty(label, value, color) {
 
+        let formattedValue = typeof value === 'string' && value.includes('_') && label !== 'Promo Code'
+            ? value.split('_').join(' ')
+            : typeof value === 'string' && label === 'Contact Number'
+                ? value.replace(/(\d{4})(\d{4})/, '$1 $2')
+                : typeof value === 'string' && label === 'Area'
+                    ? value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+                    : label === 'Avg Rating' && value === 0
+                        ? 'N/A'
+                        : value;
         return (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 'bold', minWidth: '200px' }}>{label}:</div>
@@ -70,9 +109,9 @@ export default function ViewDealModal(props) {
                         <Badge status={value ? 'success' : 'error'} text={value ? 'Yes' : 'No'} />
                     ) : (
                         color ? (
-                            <Tag color={color}>{value}</Tag>
+                            <Tag color={color}>{formattedValue}</Tag>
                         ) : (
-                            value
+                            formattedValue
                         )
                     )}
                 </div>
@@ -92,12 +131,12 @@ export default function ViewDealModal(props) {
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderDealImage(selectedDeal.deal_image_list)}
                     {renderProperty('Promo Code', selectedDeal.promo_code)}
-                    {renderProperty('Deal Type', selectedDeal.deal_type, 'blue')}
+                    {renderProperty('Deal Type', selectedDeal.deal_type, getDealTypeColour(selectedDeal.deal_type))}
                     {renderProperty('Discount Percentage', selectedDeal.discount_percent + '%', 'green')}
                     {renderProperty('Start DateTime', moment(selectedDeal.start_datetime).format('llll'))}
                     {renderProperty('End Day Time Group', moment(selectedDeal.end_datetime).format('llll'))}
-                    {renderProperty('Is Government Voucher?', selectedDeal.is_govt_voucher ? "Yes" : "No")}
-                    {renderProperty('Is Published?', selectedDeal.is_published ? "Yes" : "No")}
+                    {renderProperty('Is Government Voucher?', selectedDeal.is_govt_voucher)}
+                    {renderProperty('Is Published?', selectedDeal.is_published)}
                     {renderProperty('Publish Date', moment(selectedDeal.publish_date).format('ll'))}
 
                 </div>

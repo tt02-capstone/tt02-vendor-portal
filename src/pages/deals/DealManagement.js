@@ -163,7 +163,7 @@ export default function DealManagement() {
             ...getColumnSearchProps('name'),
         },
         {
-            title: 'Discount Percentage',
+            title: 'Discount %',
             dataIndex: 'discount_percent',
             key: 'discount_percent',
             sorter: (a, b) => a.discount_percent > b.discount_percent,
@@ -221,52 +221,78 @@ export default function DealManagement() {
             key: 'deal_type',
             filters: [
                 {
-                    "text": "Chinese New Year",
+                    "text": "CHINESE NEW YEAR",
                     "value": "CHINESE_NEW_YEAR"
                 },
                 {
-                    "text": "National Day",
+                    "text": "NATIONAL DAY",
                     "value": "NATIONAL_DAY"
                 },
                 {
-                    "text": "Deepavalli",
+                    "text": "DEEPAVALLI",
                     "value": "DEEPAVALLI"
                 },
                 {
-                    "text": "Valentines",
+                    "text": "VALENTINES",
                     "value": "VALENTINES"
                 },
                 {
-                    "text": "New Year Day",
+                    "text": "NEW YEAR DAY",
                     "value": "NEW_YEAR_DAY"
                 },
                 {
-                    "text": "Hari Raya",
+                    "text": "HARI RAYA",
                     "value": "HARI_RAYA"
                 },
                 {
-                    "text": "NUS Wellbeing Day",
+                    "text": "NUS WELLBEING DAY",
                     "value": "NUS_WELLBEING_DAY"
                 },
                 {
-                    "text": "Singles Day",
+                    "text": "SINGLES DAY",
                     "value": "SINGLES_DAY"
                 },
                 {
-                    "text": "Black Friday",
+                    "text": "BLACK FRIDAY",
                     "value": "BLACK_FRIDAY"
                 },
                 {
-                    "text": "Christmas",
+                    "text": "CHRISTMAS",
                     "value": "CHRISTMAS"
                 },
                 {
-                    "text": "Government",
+                    "text": "GOVERNMENT",
                     "value": "GOVERNMENT"
                 }
             ],
             onFilter: (value, record) => record.deal_type === value,
-            render: (text, record) => {
+            render: (text, record) => { //"pink", "red", "orange", "yellow", "volcano", "geekblue", "lime", "gold"
+                if (text === 'CHINESE_NEW_YEAR') {
+                    return <Tag color="green">CHINESE NEW YEAR</Tag>
+                } else if (text === 'NATIONAL_DAY') {
+                    return <Tag color="cyan">NATIONAL DAY</Tag>
+                } else if (text === 'DEEPAVALLI') {
+                    return <Tag color="blue">DEEPAVALLI</Tag>
+                } else if (text === 'NUS_WELLBEING_DAY') {
+                    return <Tag color="geekblue">NUS WELLBEING DAY</Tag>
+                } else if (text === 'SINGLES_DAY') {
+                    return <Tag color="purple">SINGLES DAY</Tag>
+                } else if (text === 'VALENTINES') {
+                    return <Tag color="pink">VALENTINES</Tag>
+                } else if (text === 'HARI_RAYA') {
+                    return <Tag color="yellow">HARI RAYA</Tag>
+                } else if (text === 'NEW_YEAR_DAY') {
+                    return <Tag color="volcano">NEW YEAR DAY</Tag>
+                } else if (text === 'BLACK_FRIDAY') {
+                    return <Tag color="lime">BLACK FRIDAY</Tag>
+                } else if (text === 'CHRISTMAS') {
+                    return <Tag color="gold">CHRISTMAS</Tag>
+                } else if (text === 'GOVERNMENT') {
+                    return <Tag color="orange">GOVERNMENT</Tag>
+                } else {
+                    return <p>Bug</p>
+                }
+
                     return <Tag color="magenta">{text}</Tag>
                 }
         },

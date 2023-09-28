@@ -48,7 +48,7 @@ export const dealsApi = axios.create({
     baseURL: HOST_WITH_PORT + '/deal'
 })
 
-const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, telecomApi]
+const instanceList = [userApi, dealsApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, telecomApi]
 
 instanceList.map((api) => {
     api.interceptors.request.use( (config) => {
@@ -80,11 +80,13 @@ instanceList.map((api) => {
                 const resp = await refreshToken();
                 const newToken = resp.refreshToken;
                 console.log("Refresh token", newToken)
-
-                localStorage.setItem(TOKEN_KEY, newToken);
-                axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-                api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-                return api(originalRequest);
+                if (newToken) {
+                    localStorage.setItem(TOKEN_KEY, newToken);
+                    axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                    api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                    return api(originalRequest);
+                }
+                return null
             }
             return Promise.reject(error);
         }
