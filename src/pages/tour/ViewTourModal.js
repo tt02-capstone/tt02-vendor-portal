@@ -43,14 +43,16 @@ export default function ViewTourModal(props) {
     }
 
     const calculateDuration = (start, end) => {
-        const startTime = new Date(start);
-        const endTime = new Date(end);
+        const startTime = new Date(Date.parse(start));
+        const endTime = new Date(Date.parse(end));
         const timeDifference = Math.abs(endTime - startTime);
         const hours = Math.floor(timeDifference / 3600000); 
         const minutes = Math.floor((timeDifference % 3600000) / 60000); 
         
-        if (hours <= 1) {
+        if (hours < 1) {
             return `${minutes} minutes`;
+        } else if (hours == 1) {
+            return `${hours} hour ${minutes} minutes`;
         } else {
             return `${hours} hours ${minutes} minutes`;
         }

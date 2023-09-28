@@ -3,7 +3,7 @@ import { Layout, Form, Input, Badge, Space, Tag } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllToursByTourType, createTour } from "../../redux/tourRedux";
+import { getAllToursByTourType, createTour, updateTour, getTourByTourId } from "../../redux/tourRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import Highlighter from 'react-highlight-words';
 import CreateTourModal from './CreateTourModal';
 import moment from 'moment';
 import ViewTourModal from './ViewTourModal';
+import EditTourModal from './EditTourModal';
 
 export default function TourTypes() {
 
@@ -141,6 +142,10 @@ export default function TourTypes() {
                             onClick={() => onClickOpenViewTourModal(record.tour_id)}
                         />
                         <br /><br />
+                        <CustomButton
+                            text="Edit"
+                            onClick={() => onClickOpenEditTourModal(record.tour_id)}
+                        />
                     </Space>
                 </div>
             },
@@ -203,6 +208,72 @@ export default function TourTypes() {
         setIsViewTourModalOpen(false);
     }
 
+    // Update tour
+    const [isEditTourModalOpen, setIsEditTourModalOpen] = useState(false);
+
+    function onClickOpenEditTourModal(tourId) {
+        setSelectedTourId(tourId);
+        setIsEditTourModalOpen(true);
+    }
+
+    function onClickCancelEditTourModal() {
+        setIsEditTourModalOpen(false);
+    }
+
+    async function onClickSubmitEditTour(values) {
+        const selectedDate = values.date.format('YYYY-MM-DD');
+        const selectedStartTime = values.start_time.format('HH:mm');
+        const selectedEndTime = values.end_time.format('HH:mm');
+        const isoStartDateTime = `${selectedDate}T${selectedStartTime}:00`;
+        const isoEndDateTime = `${selectedDate}T${selectedEndTime}:00`;
+
+        let tourObj = {
+            tour_id: selectedTourId,
+            date: isoStartDateTime,
+            start_time: isoStartDateTime,
+            end_time: isoEndDateTime
+        }
+
+        let response = await updateTour(tourObj);
+        if (response.status) {
+            const updatedToursData = tours.map((tour) => {
+                if (tour.tour_id === selectedTourId) {
+                    return { ...tour, ...tourObj };
+                }
+                return tour;
+            });
+
+            setTours(updatedToursData);
+
+            setIsEditTourModalOpen(false);
+            setGetToursData(true);
+            toast.success('Tour successfully updated!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        } else {
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+    }
+
+    async function getTour(selectedTourId) {
+        try {
+            let response = await getTourByTourId(selectedTourId);
+            setSelectedTour(response.data);
+        } catch (error) {
+            alert('An error occurred! Failed to retrieve tour!');
+        }
+    }
+
+    useEffect(() => {
+        if (isEditTourModalOpen) {
+            getTour(selectedTourId);
+        }
+    }, [isEditTourModalOpen]);
+
     return local ? (
         <div>
             <Layout style={styles.layout}>
@@ -237,6 +308,14 @@ export default function TourTypes() {
                         <ViewTourModal
                             isViewTourModalOpen={isViewTourModalOpen}
                             onClickCancelViewTourModal={onClickCancelViewTourModal}
+                            tourId={selectedTourId}
+                        />
+
+                        {/* Modal to edit tour */}
+                        <EditTourModal
+                            isEditTourModalOpen={isEditTourModalOpen}
+                            onClickCancelEditTourModal={onClickCancelEditTourModal}
+                            onClickSubmitEditTour={onClickSubmitEditTour}
                             tourId={selectedTourId}
                         />
                     </Content>

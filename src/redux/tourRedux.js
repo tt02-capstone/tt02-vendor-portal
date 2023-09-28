@@ -93,3 +93,14 @@ export async function getTourByTourId(tourId) {
         return { status: false, data: error.message };
     }
 }
+
+export async function updateTour(tour) {
+    try {
+        console.log('gab tour', tour);
+        const response = await tourApi.put(`${tourURL}/updateTour`, tour);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux updateTour Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
