@@ -21,6 +21,7 @@ import {
     CalendarOutlined,
     HomeOutlined,
     BankOutlined,
+    MoneyCollectOutlined,
     PhoneOutlined,
     ScheduleOutlined
 } from '@ant-design/icons';
@@ -29,6 +30,7 @@ import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
 import TelecomManagement from "./pages/telecom/TelecomManagement";
+import DealManagement from "./pages/deals/DealManagement";
 import RestaurantManagement from "./pages/restaurant/RestaurantManagement";
 import DishManagement from "./pages/restaurant/DishManagment";
 import TourTypes from "./pages/tour/TourTypes";
@@ -49,6 +51,7 @@ function AppLayout() {
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
         {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
         {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
+        {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
@@ -94,6 +97,7 @@ function AppLayout() {
                         <Route path="/dish" element={<DishManagement/>}/>
                         <Route path="/tourtypes" element={<TourTypes />}/>
                         <Route path="/tours/:tourTypeId" element={<Tours />}/>
+                        <Route path="/deal" element={<DealManagement/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
