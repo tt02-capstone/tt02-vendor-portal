@@ -1,4 +1,5 @@
 import { attractionApi } from "./api";
+import { handleApiErrors } from "../helper/errorCatching";
 
 export async function getAttractionList(vendor_id) {
     try {
@@ -52,6 +53,16 @@ export async function getAllTicketListedByAttraction(attraction_id) {
         }   
     } catch (error) {
         console.error("Get all tickets associated with attraction error!");
+        return {status: false, data: error.message};
+    }
+}
+
+export async function getAllTicketListedByAttractionInTimeRange(attractionId, startDate, endDate) {
+    try {
+        const response = await attractionApi.get(`/getAllTicketListedByAttractionInTimeRange/${attractionId}/${startDate}/${endDate}`)
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("localRedux editLocalProfile Error : ", error);
         return {status: false, data: error.message};
     }
 }

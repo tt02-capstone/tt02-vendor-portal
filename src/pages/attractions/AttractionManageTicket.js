@@ -1,6 +1,8 @@
-import { Layout } from 'antd';
 import { React , useEffect, useState , useRef } from 'react';
+import { Layout, Tag } from 'antd';
 import CustomHeader from '../../components/CustomHeader';
+import CustomButton from '../../components/CustomButton';
+import ViewTicketModal from './ViewTicketModal';
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link } from 'react-router-dom';
 import { getAttractionList, getTicketEnumByAttraction, createTickets, updateTicketPerDay } from '../../redux/attractionManageTicketRedux';
@@ -10,6 +12,7 @@ import EditTicketModal from './EditTicketModal';
 import { ToastContainer, toast } from 'react-toastify';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import dayjs from 'dayjs';
 
 export default function AttractionManageTicket() {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -19,6 +22,9 @@ export default function AttractionManageTicket() {
     const [editModal, setEditModal] = useState(false);
     const [ticketType, setTicketType] = useState(null);
     const [attr_id, setAttrId] = useState(null);
+
+    const [viewModal, setViewModal] = useState(false);
+    const [viewId, setViewId] = useState();
 
     const viewTicketBreadCrumb = [
         {
@@ -39,10 +45,10 @@ export default function AttractionManageTicket() {
 
     const addModalSubmit = async (values) => {
         values.ticketCount = Number(values.ticketCount);
-        values.startDate = values.startDate.format('YYYY-MM-DD');
-        values.endDate = values.endDate.format('YYYY-MM-DD');
+        let startDate = dayjs(values.dateRange[0]).format("YYYY-MM-DD");
+        let endDate = dayjs(values.dateRange[1]).format("YYYY-MM-DD");
 
-        let createTicket = await createTickets(values.startDate,values.endDate,values.ticketType,values.ticketCount,attr_id)
+        let createTicket = await createTickets(startDate, endDate, values.ticketType, values.ticketCount,attr_id)
         let updatedAttrList = await getAttractionList(user.user_id);
 
         setData(updatedAttrList);
@@ -86,6 +92,16 @@ export default function AttractionManageTicket() {
                 autoClose: 1000
             });
         } 
+    }    
+
+    const showViewModal = (id) => {
+        setViewId(id)
+        setViewModal(true);
+    }
+
+    const viewModalCancel = () => {
+        setViewModal(false);
+        setViewId(null);
     }
 
     useEffect(() => {
@@ -201,19 +217,6 @@ export default function AttractionManageTicket() {
                         type="link"
                         size="small"
                         onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
                             close();
                         }}
                     >
@@ -264,6 +267,7 @@ export default function AttractionManageTicket() {
             title: 'Address',
             dataIndex: 'address',
             key: 'address',
+            width: 350,
             sorter: (a, b) => a.address.localeCompare(b.address),
             ...getColumnSearchProps('address')
         },
@@ -271,7 +275,7 @@ export default function AttractionManageTicket() {
             title: 'Age Group',
             dataIndex: 'age_group',
             key: 'age_group',
-            width: 350,
+            width: 150,
             sorter: (a, b) => a.age_group.localeCompare(b.age_group),
             ...getColumnSearchProps('age_group')
         },
@@ -280,7 +284,36 @@ export default function AttractionManageTicket() {
             dataIndex: 'category',
             key: 'category',
             sorter: (a, b) => a.category.localeCompare(b.category),
-            ...getColumnSearchProps('category')
+            ...getColumnSearchProps('category'),
+            render: (category) => {
+                let tagColor = 'default'; 
+                switch (category) {
+                    case 'HISTORICAL':
+                        tagColor = 'purple';
+                        break;
+                    case 'CULTURAL':
+                        tagColor = 'volcano';
+                        break;
+                    case 'NATURE':
+                        tagColor = 'magenta';
+                        break;
+                    case 'ADVENTURE':
+                        tagColor = 'geekblue';
+                        break;
+                    case 'SHOPPING':
+                        tagColor = 'gold';
+                        break;
+                    case 'ENTERTAINMENT':
+                        tagColor = 'cyan';
+                        break;
+                    default:
+                        break;
+                }
+
+                return (
+                    <Tag color={tagColor}>{category}</Tag>
+                );
+            }
         },
         {
             title: 'Description',
@@ -291,11 +324,28 @@ export default function AttractionManageTicket() {
             ...getColumnSearchProps('description')
         },
         {
-            title: 'Status',
+            title: 'Visibility',
             dataIndex: 'status',
             key: 'status',
             sorter: (a, b) => a.status.localeCompare(b.status),
-            ...getColumnSearchProps('status')
+            ...getColumnSearchProps('status'),
+            render: (text) => {
+                let tagColor = 'default'; 
+                switch (text) {
+                    case 'Published':
+                        tagColor = 'blue';
+                        break;
+                    case 'Not Published':
+                        tagColor = 'red';
+                        break;
+                    default:
+                        break;
+                }
+
+                return (
+                    <Tag color={tagColor}>{text}</Tag>
+                );
+            }
         },
         {
             title: 'Price List',
@@ -306,28 +356,23 @@ export default function AttractionManageTicket() {
             ...getColumnSearchProps('price_list'),
         },
         {
-            title: 'Ticket List',
-            dataIndex: 'ticket_list',
-            key: 'ticket_list',
-            width: 230,
-            sorter: (a, b) => a.ticket_list.localeCompare(b.ticket_list),
-            ...getColumnSearchProps('ticket_list'),
-        },
-        {
-            title: 'Add or Edit Tickets',
+            title: 'Action(s)',
             key: 'add_edit',
             dataIndex: 'add_edit',
             width: 160,
             align: 'center',
             render: (text, record) => (
                 <div>
-                    <Button type="primary" onClick={() => addTicket(record)} loading={loading} style={styles.button}>
-                        Add
-                    </Button>
+                    <CustomButton text="View Current Ticket(s)" onClick={() => showViewModal(record.attraction_id)} style={styles.button} />
                     <br /><br />
-                    <Button type="primary" onClick={() => editTicket(record)} loading={loading} style={styles.button}>
-                        Edit
+                    <Button type="primary" onClick={() => addTicket(record)} loading={loading} style={styles.button}>
+                        Set Ticket(s) Count
                     </Button>
+                    {/* not needed anymore */}
+                    {/* <br /><br />
+                    <Button type="primary" onClick={() => editTicket(record)} loading={loading} style={styles.button}>
+                        Edit Ticket(s)
+                    </Button> */}
                 </div>
             ),
         }
@@ -352,7 +397,6 @@ export default function AttractionManageTicket() {
              <CustomHeader items={viewTicketBreadCrumb}/>
              <Content style={styles.content}>
              <div>
-                <h1>Attraction Ticket Details</h1>
                 <Table dataSource={datasource} columns={columns} style={{ width : '98%' }} />
                 <AddTicketModal
                     isVisible={addModal}
@@ -360,11 +404,17 @@ export default function AttractionManageTicket() {
                     onSubmit={addModalSubmit}
                     value={ticketType}
                 />
-                <EditTicketModal
+                {/* not needed anymore */}
+                {/* <EditTicketModal
                     isVisible={editModal}
                     onCancel={editModalCancel}
                     onSubmit={editModalSubmit}
                     value={ticketType}
+                /> */}
+                <ViewTicketModal
+                    isVisible={viewModal}
+                    onCancel={viewModalCancel}
+                    id={viewId}
                 />
             </div>
             <ToastContainer />
