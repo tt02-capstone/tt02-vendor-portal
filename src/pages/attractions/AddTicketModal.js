@@ -19,7 +19,7 @@ export default function AddTicketModal(props) {
     return (
         <div>
             <Modal
-                title="Add Tickets"
+                title="Set Tickets Count"
                 centered
                 open={props.isVisible}
                 onCancel={props.onCancel}
@@ -33,9 +33,10 @@ export default function AddTicketModal(props) {
                     style={{ maxWidth: 600 }}
                     onFinish={props.onSubmit}
                 >
+                    <p style={{fontWeight: '500'}}>Please set the new ticket count for the selected dates!</p>
                     <Form.Item
                         name="dateRange"
-                        label="Select Date Range:"
+                        label="Date Range:"
                         labelAlign='left'
                         rules={[{ required: true, message: 'Date range is required!'}]}
                     >

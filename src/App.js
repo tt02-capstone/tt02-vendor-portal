@@ -29,9 +29,10 @@ import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
 import TelecomManagement from "./pages/telecom/TelecomManagement";
-import TourTypes from "./pages/tours/TourTypes";
 import RestaurantManagement from "./pages/restaurant/RestaurantManagement";
 import DishManagement from "./pages/restaurant/DishManagment";
+import TourTypes from "./pages/tour/TourTypes";
+import Tours from "./pages/tour/Tours";
 
 function AppLayout() {
 
@@ -54,7 +55,7 @@ function AppLayout() {
 
     const localMenuItems = [
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
-        {key: '/tourtypes', label: 'Tours', icon: <ScheduleOutlined/>},
+        {key: '/tourtypes', label: 'Tour Types', icon: <ScheduleOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -92,6 +93,7 @@ function AppLayout() {
                         <Route path="/restaurant" element={<RestaurantManagement/>}/>
                         <Route path="/dish" element={<DishManagement/>}/>
                         <Route path="/tourtypes" element={<TourTypes />}/>
+                        <Route path="/tours/:tourTypeId" element={<Tours />}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>

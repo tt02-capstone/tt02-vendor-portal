@@ -366,12 +366,13 @@ export default function AttractionManageTicket() {
                     <CustomButton text="View Current Ticket(s)" onClick={() => showViewModal(record.attraction_id)} style={styles.button} />
                     <br /><br />
                     <Button type="primary" onClick={() => addTicket(record)} loading={loading} style={styles.button}>
-                        Add Ticket(s)
+                        Set Ticket(s) Count
                     </Button>
-                    <br /><br />
+                    {/* not needed anymore */}
+                    {/* <br /><br />
                     <Button type="primary" onClick={() => editTicket(record)} loading={loading} style={styles.button}>
                         Edit Ticket(s)
-                    </Button>
+                    </Button> */}
                 </div>
             ),
         }
@@ -403,12 +404,13 @@ export default function AttractionManageTicket() {
                     onSubmit={addModalSubmit}
                     value={ticketType}
                 />
-                <EditTicketModal
+                {/* not needed anymore */}
+                {/* <EditTicketModal
                     isVisible={editModal}
                     onCancel={editModalCancel}
                     onSubmit={editModalSubmit}
                     value={ticketType}
-                />
+                /> */}
                 <ViewTicketModal
                     isVisible={viewModal}
                     onCancel={viewModalCancel}
