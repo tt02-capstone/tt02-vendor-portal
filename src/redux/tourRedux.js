@@ -94,6 +94,16 @@ export async function getTourByTourId(tourId) {
     }
 }
 
+export async function deleteTour(tourId) {
+    try {
+        const response = await tourApi.delete(`${tourURL}/deleteTour/${tourId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux deleteTour Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
+
 export async function updateTour(tour) {
     try {
         console.log('gab tour', tour);

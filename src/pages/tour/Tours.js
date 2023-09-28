@@ -1,9 +1,9 @@
 import { React, useEffect, useState, useRef } from 'react';
-import { Layout, Form, Input, Badge, Space, Tag } from 'antd';
+import { Layout, Form, Input, Badge, Space, Tag, Modal } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllToursByTourType, createTour, updateTour, getTourByTourId } from "../../redux/tourRedux";
+import { getAllToursByTourType, createTour, updateTour, getTourByTourId, deleteTour } from "../../redux/tourRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
@@ -115,6 +115,11 @@ export default function TourTypes() {
                         <CustomButton
                             text="Edit"
                             onClick={() => onClickOpenEditTourModal(record.tour_id)}
+                        />
+                        <br /><br />
+                        <CustomButton
+                            text="Delete"
+                            onClick={() => openDeleteConfirmation(record.tour_id)}
                         />
                     </Space>
                 </div>
@@ -238,6 +243,37 @@ export default function TourTypes() {
         }
     }
 
+    const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+    const [tourIdToDelete, setTourIdToDelete] = useState('');
+
+    const openDeleteConfirmation = (tourId) => {
+        setTourIdToDelete(tourId);
+        setDeleteConfirmationVisible(true);
+    };
+
+    const closeDeleteConfirmation = () => {
+        setDeleteConfirmationVisible(false);
+    };
+
+    const onDeleteConfirmed = async () => {
+        let response = await deleteTour(tourIdToDelete);
+        if (response.status) {
+            toast.success('Tour successfully deleted!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+            setGetToursData(true);
+            setTourIdToDelete('');
+        } else {
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+
+        closeDeleteConfirmation();
+    };
+
     useEffect(() => {
         if (isEditTourModalOpen) {
             getTour(selectedTourId);
@@ -288,6 +324,16 @@ export default function TourTypes() {
                             onClickSubmitEditTour={onClickSubmitEditTour}
                             tourId={selectedTourId}
                         />
+
+                        {/* Delete Confirmation Modal */}
+                        <Modal
+                            title="Confirm Delete"
+                            visible={isDeleteConfirmationVisible}
+                            onOk={() => onDeleteConfirmed()}
+                            onCancel={closeDeleteConfirmation}
+                        >
+                            <p>Are you sure you want to delete this tour?</p>
+                        </Modal>
                     </Content>
                 </Layout>
             </Layout>
