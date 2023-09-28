@@ -31,6 +31,7 @@ import {AuthContext, AuthProvider} from "./redux/AuthContext";
 import TelecomManagement from "./pages/telecom/TelecomManagement";
 import TourTypes from "./pages/tours/TourTypes";
 import RestaurantManagement from "./pages/restaurant/RestaurantManagement";
+import DishManagement from "./pages/restaurant/DishManagment";
 
 function AppLayout() {
 
@@ -89,6 +90,7 @@ function AppLayout() {
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
                         <Route path="/telecom" element={<TelecomManagement/>}/>
                         <Route path="/restaurant" element={<RestaurantManagement/>}/>
+                        <Route path="/dish" element={<DishManagement/>}/>
                         <Route path="/tourtypes" element={<TourTypes />}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>

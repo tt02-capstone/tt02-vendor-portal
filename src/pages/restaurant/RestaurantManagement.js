@@ -1,10 +1,10 @@
 import { React , useEffect, useState , useRef } from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import CustomButton from '../../components/CustomButton';
-import { createRestaurant, updateRestaurant, addDish, updateDish, deleteDish, getAllRestaurantByVendor, getRestaurant } from '../../redux/restaurantRedux';
+import { createRestaurant, updateRestaurant, getAllRestaurantByVendor, getRestaurant } from '../../redux/restaurantRedux';
 import  { Table, Input, Button, Space , Badge, Layout, Form, Tag} from 'antd';
 import { Content } from "antd/es/layout/layout";
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
@@ -12,21 +12,21 @@ import CustomTablePagination from "../../components/CustomTablePagination";
 import ViewRestaurantModal from './ViewRestaurantModal';
 import CreateRestaurantModal from './CreateRestaurantModal';
 import EditRestaurantModal from './EditRestaurantModal';
-import ViewAllDishModal from './ViewAllDishModal';
 import { PlusOutlined } from "@ant-design/icons";
 
 
-export default function RestaurantManagement() {
+export default function RestaurantManagement(navigation) {
     const user = JSON.parse(localStorage.getItem("user"));
     const [getRestaurantData, setGetRestaurantData] = useState(true);
     const [selectedRestaurant, setSelectedRestaurant] = useState([]);
     const [data, setData] = useState([]); // list of restaurant 
     const [restaurantImages, setRestaurantImages] = useState({});
     const [selectedRestId, setSelectedRestId] = useState("");
+    const navigate = useNavigate();
 
     const restBreadCrumb = [
         {
-          title: 'Restaurant',
+          title: 'Restaurants',
         }
     ];
 
@@ -175,14 +175,16 @@ export default function RestaurantManagement() {
             dataIndex: 'name',
             key: 'name',
             sorter: (a, b) => a.name.localeCompare(b.name),
-            ...getColumnSearchProps('name')
+            ...getColumnSearchProps('name'),
+            width: 150
         },
         {
             title: 'Description',
             dataIndex: 'description',
             key: 'description',
             sorter: (a, b) => a.description.localeCompare(b.description),
-            ...getColumnSearchProps('description')
+            ...getColumnSearchProps('description'),
+            width: 150,
         },
         {
             title: 'Type',
@@ -218,30 +220,33 @@ export default function RestaurantManagement() {
                 return (
                     <Tag color={tagColor}>{type}</Tag>
                 );
-            }
+            },
+            width: 150
         },
         {
             title: 'Address',
             dataIndex: 'address',
             key: 'address',
             sorter: (a, b) => a.address.localeCompare(b.address),
-            ...getColumnSearchProps('address')
+            ...getColumnSearchProps('address'),
+            width: 150,
         },
         {
             title: 'Opening Hours',
             dataIndex: 'opening_hours',
             key: 'opening_hours',
             sorter: (a, b) => a.opening_hours.localeCompare(b.opening_hours),
-            ...getColumnSearchProps('opening_hours')
+            ...getColumnSearchProps('opening_hours'),
+            width: 150,
         },
         {
-            title: 'Contact Num',
+            title: 'Contact No.',
             dataIndex: 'contact_num',
             key: 'contact_num',
             width: 120,
             sorter: (a, b) => a.contact_num.localeCompare(b.contact_num),
-            ...getColumnSearchProps('contact_num')
-            
+            ...getColumnSearchProps('contact_num'),
+            width: 150,
         },
         {
             title: 'Published',
@@ -302,23 +307,23 @@ export default function RestaurantManagement() {
             render: (text, record) => {
                 return <div>
                     <CustomButton
-                        text="View Restaurant Details"
+                        text="View Restaurant"
                         style ={{ fontSize : 11, fontWeight: "bold"}}
                         onClick={() => onClickOpenViewRestaurantModal(record.restaurant_id)}
                     />
                     <br/><br/>
 
                     <CustomButton
-                        text="Edit Restaurant Details"
+                        text="Edit Restaurant"
                         style ={{ fontSize : 11, fontWeight: "bold"}}
                         onClick={() => onClickOpenEditRestaurantModal(record.restaurant_id)}
                     />
                     <br/><br/>
 
                     <CustomButton
-                        text="View All Dish"
+                        text="Manage Dish(es)"
                         style ={{ fontSize : 11, fontWeight: "bold"}}
-                        onClick={() => onClickViewAllDish(record.restaurant_id)}
+                        onClick={() => goToDish(record.restaurant_id)}
                     />
                     <br/><br/>
                 </div>
@@ -327,16 +332,9 @@ export default function RestaurantManagement() {
         },
     ];
 
-    // view all dish 
-    const[isViewAllDishModalOpen, setIsViewAllDishModalOpen] = useState(false);
-
-    function onClickViewAllDish(restId) {
-        setSelectedRestId(restId);
-        setIsViewAllDishModalOpen(true);
-    }
-
-    function onClickCancelViewAllDish() {
-        setIsViewAllDishModalOpen(false);
+    // 
+    const goToDish = (restId) => {
+        navigate('/dish', { state : {restId}})
     }
 
     // view restaurant details  
@@ -503,8 +501,8 @@ export default function RestaurantManagement() {
              <CustomHeader items={restBreadCrumb}/>
              <Content style={styles.content}>
                 <CustomButton
-                    text="Create Restaurant"
-                    style={{ marginLeft: '3px', marginBottom: '20px' }}
+                    text="Add Restaurant"
+                    style={{ marginLeft: '3px', marginBottom:'10px', fontWeight:"bold"}}
                     icon={<PlusOutlined />}
                     onClick={onClickOpenCreateRestaurantModal}
                 />
@@ -540,13 +538,6 @@ export default function RestaurantManagement() {
                     isEditRestaurantModalOpen={isEditRestaurantModalOpen}
                     onClickCancelEditRestaurantModal={onClickCancelEditRestaurantModal}
                     onClickSubmitEditRestaurant={onClickSubmitEditRestaurant}
-                    restId={selectedRestId}
-                />
-
-                {/* view all dish by restaurant */}
-                <ViewAllDishModal
-                    isViewAllDishModalOpen={isViewAllDishModalOpen}
-                    onClickCancelViewAllDish={onClickCancelViewAllDish}
                     restId={selectedRestId}
                 />
 
