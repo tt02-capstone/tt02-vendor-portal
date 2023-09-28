@@ -92,3 +92,14 @@ export async function getLastRestId() {
     return { status: false, data: error.message };
   }
 }
+
+export async function getDish(dishId) {
+  try {
+    const response = await restaurantApi.get(`${restURL}/getDish/${dishId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("restaurantRedux getDish Error: ", error);
+    return { status: false, data: error.message };
+  }
+}
+
