@@ -19,9 +19,11 @@ import {
     UsergroupAddOutlined,
     BarsOutlined,
     CalendarOutlined,
+    HomeOutlined,
     BankOutlined,
+    MoneyCollectOutlined,
     PhoneOutlined,
-    MoneyCollectOutlined
+    ScheduleOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
@@ -29,6 +31,10 @@ import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
 import TelecomManagement from "./pages/telecom/TelecomManagement";
 import DealManagement from "./pages/deals/DealManagement";
+import RestaurantManagement from "./pages/restaurant/RestaurantManagement";
+import DishManagement from "./pages/restaurant/DishManagment";
+import TourTypes from "./pages/tour/TourTypes";
+import Tours from "./pages/tour/Tours";
 
 function AppLayout() {
 
@@ -44,6 +50,7 @@ function AppLayout() {
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
         {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
+        {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/', label: 'Logout', icon: <Logout/>,}
@@ -51,6 +58,7 @@ function AppLayout() {
 
     const localMenuItems = [
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
+        {key: '/tourtypes', label: 'Tour Types', icon: <ScheduleOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -85,6 +93,10 @@ function AppLayout() {
                         <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
                         <Route path="/telecom" element={<TelecomManagement/>}/>
+                        <Route path="/restaurant" element={<RestaurantManagement/>}/>
+                        <Route path="/dish" element={<DishManagement/>}/>
+                        <Route path="/tourtypes" element={<TourTypes />}/>
+                        <Route path="/tours/:tourTypeId" element={<Tours />}/>
                         <Route path="/deal" element={<DealManagement/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
