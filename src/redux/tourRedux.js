@@ -25,15 +25,15 @@ export async function getLastTourTypeId() {
 
 export async function createTourType(userId, attractionId, tourType) {
     try {
-      const response = await tourApi.post(`${tourURL}/createTourType/${userId}/${attractionId}`, tourType);
-      return handleApiErrors(response);
+        const response = await tourApi.post(`${tourURL}/createTourType/${userId}/${attractionId}`, tourType);
+        return handleApiErrors(response);
     } catch (error) {
-      console.error("tourRedux createTourType Error : ", error);
-      return {status: false, data: error.message};
+        console.error("tourRedux createTourType Error : ", error);
+        return { status: false, data: error.message };
     }
-  }
+}
 
-  export async function getTourTypeByTourTypeId(tourTypeId) {
+export async function getTourTypeByTourTypeId(tourTypeId) {
     try {
         const response = await tourApi.get(`${tourURL}/getTourTypeByTourTypeId/${tourTypeId}`);
         return handleApiErrors(response);
@@ -76,10 +76,20 @@ export async function getAllToursByTourType(tourTypeId) {
 
 export async function createTour(tourTypeId, tourObj) {
     try {
-      const response = await tourApi.post(`${tourURL}/createTour/${tourTypeId}`, tourObj);
-      return handleApiErrors(response);
+        const response = await tourApi.post(`${tourURL}/createTour/${tourTypeId}`, tourObj);
+        return handleApiErrors(response);
     } catch (error) {
-      console.error("tourRedux createTour Error : ", error);
-      return {status: false, data: error.message};
+        console.error("tourRedux createTour Error : ", error);
+        return { status: false, data: error.message };
     }
-  }
+}
+
+export async function getTourByTourId(tourId) {
+    try {
+        const response = await tourApi.get(`${tourURL}/getTourByTourId/${tourId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux getTourByTourId Error : ", error);
+        return { status: false, data: error.message };
+    }
+}

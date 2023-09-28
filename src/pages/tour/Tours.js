@@ -14,6 +14,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import CreateTourModal from './CreateTourModal';
 import moment from 'moment';
+import ViewTourModal from './ViewTourModal';
 
 export default function TourTypes() {
 
@@ -134,7 +135,13 @@ export default function TourTypes() {
             width: 80,
             render: (text, record) => {
                 return <div>
-
+                    <Space>
+                        <CustomButton
+                            text="View"
+                            onClick={() => onClickOpenViewTourModal(record.tour_id)}
+                        />
+                        <br /><br />
+                    </Space>
                 </div>
             },
         }
@@ -184,6 +191,18 @@ export default function TourTypes() {
         }
     }
 
+    // View details of Tour
+    const [isViewTourModalOpen, setIsViewTourModalOpen] = useState(false);
+
+    function onClickOpenViewTourModal(tourId) {
+        setSelectedTourId(tourId);
+        setIsViewTourModalOpen(true);
+    }
+
+    function onClickCancelViewTourModal() {
+        setIsViewTourModalOpen(false);
+    }
+
     return local ? (
         <div>
             <Layout style={styles.layout}>
@@ -212,6 +231,13 @@ export default function TourTypes() {
                             isCreateTourModalOpen={isCreateTourModalOpen}
                             onClickCancelCreateTourModal={onClickCancelCreateTourModal}
                             onClickSubmitTourCreate={onClickSubmitTourCreate}
+                        />
+
+                        {/* Modal to view tour */}
+                        <ViewTourModal
+                            isViewTourModalOpen={isViewTourModalOpen}
+                            onClickCancelViewTourModal={onClickCancelViewTourModal}
+                            tourId={selectedTourId}
                         />
                     </Content>
                 </Layout>
