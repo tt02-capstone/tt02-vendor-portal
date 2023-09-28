@@ -90,21 +90,6 @@ export default function TourTypes() {
             key: 'start_time',
             width: 50,
             render: (text) => moment(text).format('h.mm a'),
-            sorter: (a, b) => {
-                const timeA = a.start_time;
-                const timeB = b.start_time;
-
-                const timeAObj = new Date(`2022-01-01T${timeA}`);
-                const timeBObj = new Date(`2022-01-01T${timeB}`);
-
-                if (timeAObj < timeBObj) {
-                    return -1;
-                }
-                if (timeAObj > timeBObj) {
-                    return 1;
-                }
-                return 0;
-            },
         },
         {
             title: 'End Time',
@@ -112,21 +97,6 @@ export default function TourTypes() {
             key: 'end_time',
             width: 50,
             render: (text) => moment(text).format('h.mm a'),
-            sorter: (a, b) => {
-                const timeA = a.end_time;
-                const timeB = b.end_time;
-
-                const timeAObj = new Date(`2022-01-01T${timeA}`);
-                const timeBObj = new Date(`2022-01-01T${timeB}`);
-
-                if (timeAObj < timeBObj) {
-                    return -1;
-                }
-                if (timeAObj > timeBObj) {
-                    return 1;
-                }
-                return 0;
-            },
         },
         {
             title: 'Action(s)',
