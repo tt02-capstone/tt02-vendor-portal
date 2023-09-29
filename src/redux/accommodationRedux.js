@@ -66,6 +66,8 @@ export async function createRoomListExistingAccommodation(accommodationId, roomL
 
 export async function createRoom(accommodationId, room) {
     try {
+      console.log("accommodationId", accommodationId);
+      console.log("room", room);
       const response = await accommodationApi.post(`${accommodationURL}/createRoom/${accommodationId}`, room);
       return handleApiErrors(response);
     } catch (error) {
@@ -92,4 +94,14 @@ export async function getAccommodation(accommodationId) {
       console.error("accommodationRedux getAccommodation Error: ", error);
       return { status: false, data: error.message };
     }
+}
+
+export async function getLastRoomId() {
+  try {
+    const response = await accommodationApi.get(`${accommodationURL}/getLastRoomId`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("accommodationRedux getLastRoomId Error: ", error);
+    return { status: false, data: error.message };
+  }
 }

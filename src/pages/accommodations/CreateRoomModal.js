@@ -2,16 +2,138 @@ import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Space, Button, Select, InputNumber, Upload, TimePicker } from "antd";
 import { MinusCircleOutlined, PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import { ToastContainer, toast } from 'react-toastify';
+import { getLastRoomId } from "../../redux/accommodationRedux";
+import AWS from 'aws-sdk';
 
-export default function CreateAccommodationModal(props) {
+window.Buffer = window.Buffer || require("buffer").Buffer;
+
+export default function CreateRoomModal(props) {
 
     const { TextArea } = Input;
     const { Option } = Select;
-    const [accommodationId, setAccommodationId] = useState(null);
+    const [roomId, setRoomId] = useState(null);
+    const [lastRoomId, setLastRoomId] = useState(null);
+    const [accommodation, setAccommodation] = useState([]);
+    const [imageFiles, setImageFiles] = useState([]);
+    const [uploadedImage, setUploadedImage] = useState([]);
+
+    function normFile(e) {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e && e.fileList;
+    }
+
+    const uploadButton = (
+        <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
+
+    function handleRemove(file) {
+        const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
+        setImageFiles(updatedFiles);
+    }
+
+    // upload file
+    const S3BUCKET = 'tt02/accommodation/room';
+    const TT02REGION = 'ap-southeast-1';
+    const ACCESS_KEY = 'AKIART7KLOHBGOHX2Y7T';
+    const SECRET_ACCESS_KEY = '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';
+
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        const fileList = e.fileList;
+        setImageFiles(fileList);
+    }
 
     const onFinish = async (values) => {
-        props.onClickSubmitRoomCreate({ ...props.form.getFieldsValue()});
-    }
+        const uploadPromises = imageFiles.map(async (file) => {
+            const roomImageName = 'Room_' + roomId + '_' + file.name;
+            const blob = new Blob([file.originFileObj]);
+
+            if (blob) {
+                const S3_BUCKET = S3BUCKET;
+                const REGION = TT02REGION;
+
+                AWS.config.update({
+                    accessKeyId: ACCESS_KEY,
+                    secretAccessKey: SECRET_ACCESS_KEY,
+                });
+                const s3 = new AWS.S3({
+                    params: { Bucket: S3_BUCKET },
+                    region: REGION,
+                });
+
+                const params = {
+                    Bucket: S3_BUCKET,
+                    Key: roomImageName,
+                    Body: blob,
+                };
+
+                return new Promise((resolve, reject) => {
+                    s3.putObject(params)
+                        .on("httpUploadProgress", (evt) => {
+                            console.log(
+                                "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+                            );
+                        })
+                        .send((err, data) => {
+                            if (err) {
+                                console.log(err);
+                                reject(err);
+                            } else {
+                                const imageUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/room/${roomImageName}`;
+                                console.log("imageUrl", imageUrl);
+                                resolve(imageUrl);
+                            }
+                        });
+                });
+            }
+        });
+
+        try {
+            const uploadedImage = await Promise.all(uploadPromises);
+            console.log("Image uploaded:", uploadedImage);
+
+            setUploadedImage(uploadedImage);
+
+            const newRoomId = roomId + 1;
+            setRoomId(newRoomId);
+            console.log("nextRoomId", roomId);
+
+            props.onClickSubmitRoomCreate({ ...props.form.getFieldsValue(), room_image: uploadedImage });
+
+        } catch (error) {
+            console.error("Error uploading image:", error);
+        }
+    };
+
+    useEffect(() => {
+        setAccommodation(props.accommodation);
+        console.log("accommodation", accommodation);
+    }, []);
+    
+    useEffect(() => {
+        async function fetchLastRoomId() {
+            try {
+                const response = await getLastRoomId();
+                if (response.status) {
+                    setLastRoomId(response.data);
+                    const newRoomId = response.data + 1;
+                    setRoomId(newRoomId);
+                } else {
+                    console.error("Error fetching last room_id: ", response.data);
+                }
+            } catch (error) {
+                console.error("Error fetching roomId: ", error);
+            }
+        }
+
+        fetchLastRoomId();
+    }, [roomId]);
 
     return (
         <div>
@@ -45,6 +167,26 @@ export default function CreateAccommodationModal(props) {
                             <Option value='JUNIOR_SUITE'>Junior Suite</Option>
                             <Option value='DELUXE_SUITE'>Deluxe Suite</Option>
                         </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Image"
+                        name="room_image"
+                        valuePropName="fileList"
+                        getValueFromEvent={normFile}
+                        rules={[
+                            { required: true, message: 'Please upload an image!' },
+                        ]}
+                    >
+                        <Upload
+                            beforeUpload={() => false} // To prevent auto-upload on file selection
+                            maxCount={1}     
+                            fileList={imageFiles}
+                            onRemove={handleRemove}
+                            onChange={handleFileChange}
+                        >
+                            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                        </Upload>
                     </Form.Item>
 
                     <Form.Item

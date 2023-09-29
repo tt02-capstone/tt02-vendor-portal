@@ -50,17 +50,21 @@ export default function RoomManagement() {
 
         const numOfRoomsToCreate = values.num_of_rooms;
 
+        console.log("values.room_image", values.room_image);
 
         const roomObj = {
             amenities_description: values.amenities_description,
             num_of_pax: values.num_of_pax,
             price: values.price,
             room_type: values.room_type,
-            quantity: values.num_of_rooms
+            quantity: values.num_of_rooms,
+            room_image: values.room_image[0]
         };
 
+        console.log("roomObj", roomObj);
 
         let response = await createRoom(currentAccommodation.accommodation_id, roomObj);
+        console.log("createRoom response", response);
         if (response.status) {
             createRoomForm.resetFields();
             setGetRoomsData(true);
@@ -244,6 +248,7 @@ export default function RoomManagement() {
                         isCreateRoomModalOpen={isCreateRoomModalOpen}
                         onClickCancelCreateRoomModal={onClickCancelCreateRoomModal}
                         onClickSubmitRoomCreate={onClickSubmitRoomCreate}
+                        accommodation={currentAccommodation}
                     />
                 </div>
                 <ToastContainer />
