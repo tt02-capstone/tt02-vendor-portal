@@ -319,7 +319,7 @@ export default function AttractionManageTicket() {
             title: 'Description',
             dataIndex: 'description',
             key: 'description', 
-            width: 750,
+            width: 600,
             sorter: (a, b) => a.description.localeCompare(b.description),
             ...getColumnSearchProps('description')
         },
@@ -351,7 +351,7 @@ export default function AttractionManageTicket() {
             title: 'Price List',
             dataIndex: 'price_list',
             key: 'price_list', 
-            width: 250,
+            width: 300,
             sorter: (a, b) => a.price_list.localeCompare(b.price_list),
             ...getColumnSearchProps('price_list'),
         },
