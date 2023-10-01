@@ -137,8 +137,6 @@ export default function ViewDealModal(props) {
                     {renderProperty('End Day Time Group', moment(selectedDeal.end_datetime).format('llll'))}
                     {renderProperty('Is Government Voucher?', selectedDeal.is_govt_voucher)}
                     {renderProperty('Is Published?', selectedDeal.is_published)}
-                    {renderProperty('Publish Date', moment(selectedDeal.publish_date).format('ll'))}
-
                 </div>
             </Modal>
         </div>
