@@ -4,12 +4,14 @@ import { useLocation, Navigate, useNavigate } from 'react-router-dom';
 import CustomHeader from '../../components/CustomHeader';
 import { Content } from "antd/es/layout/layout";
 import CustomButton from "../../components/CustomButton";
-import { getRoomListByVendor, createRoomListExistingAccommodation,createRoom, getAccommodation } from "../../redux/accommodationRedux";
+import { getRoomListByVendor, createRoomListExistingAccommodation,createRoom, getAccommodation, updateRoom } from "../../redux/accommodationRedux";
 import CreateRoomModal from "./CreateRoomModal";
 import { Table, Input, Button, Space, Badge, Tag, Form } from 'antd';
 import { PlusOutlined } from "@ant-design/icons";
 import { ToastContainer, toast } from 'react-toastify';
 import CustomTablePagination from "../../components/CustomTablePagination";
+import UpdateRoomModal from "./UpdateRoomModal";
+
 
 export default function RoomManagement() {
 
@@ -37,8 +39,11 @@ export default function RoomManagement() {
 
     // form inputs for room creation
     const [createRoomForm] = Form.useForm();
+    const [updateRoomForm] = Form.useForm();
     const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] = useState(false); // boolean to open modal
-
+    const [isUpdateRoomModalOpen, setIsUpdateRoomModalOpen] = useState(false);
+    const [selectedRoomId, setSelectedRoomId] = useState(null);
+    const [selectedRoom, setSelectedRoom] = useState(null);
     // create new room modal open button
     function onClickOpenCreateRoomModal() {
         setIsCreateRoomModalOpen(true);
@@ -73,6 +78,61 @@ export default function RoomManagement() {
             createRoomForm.resetFields();
             setGetRoomsData(true);
             setIsCreateRoomModalOpen(false);
+            console.log("createRoomListExistingAccommodation response", response.status)
+            toast.success('Rooms successfully created!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+
+            console.log(response.data)
+            retrieveAccommodation(accommodationId);
+
+        } else {
+            console.log("Room creation failed!");
+            console.log(response.data);
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+    }
+
+    function onClickOpenUpdateRoomModal(roomId, room) {
+        setSelectedRoomId(roomId);
+        setSelectedRoom(room);  
+        setIsUpdateRoomModalOpen(true);
+    }
+
+    // create new room modal cancel button
+    function onClickCancelUpdateRoomModal() {
+        setIsUpdateRoomModalOpen(false);
+    }
+
+    // create new room modal create button
+    async function onClickSubmitRoomUpdate(values) {
+
+        const numOfRoomsToCreate = values.num_of_rooms;
+
+        console.log("values.room_image", values.room_image);
+
+        const roomObj = {
+            amenities_description: values.amenities_description,
+            num_of_pax: values.num_of_pax,
+            price: values.price,
+            room_type: values.room_type,
+            quantity: values.num_of_rooms,
+            room_image: values.room_image[0],
+            room_id: values.room_id
+        };
+
+        console.log("roomObj", roomObj);
+
+        let response = await updateRoom(currentAccommodation.accommodation_id, roomObj);
+        console.log("createRoom response", response);
+        if (response.status) {
+            updateRoomForm.resetFields();
+            setGetRoomsData(true);
+            setIsUpdateRoomModalOpen(false);
             console.log("createRoomListExistingAccommodation response", response.status)
             toast.success('Rooms successfully created!', {
                 position: toast.POSITION.TOP_RIGHT,
@@ -287,7 +347,7 @@ export default function RoomManagement() {
  
                             <CustomButton
                                 text="Edit"
-                                //onClick={() => onClickOpenEditAccommodationModal(record.accommodation_id)}
+                                onClick={() => onClickOpenUpdateRoomModal(record.room_id, record)}
                             />
                         </Space>
                     </div>
@@ -317,7 +377,7 @@ export default function RoomManagement() {
                     room_type: item.room_type,
                     room_image: item.room_image,
                     quantity: item.quantity,
-                   
+                    room_id: item.room_id
                 };
             });
         }
@@ -366,6 +426,15 @@ export default function RoomManagement() {
                         onClickCancelCreateRoomModal={onClickCancelCreateRoomModal}
                         onClickSubmitRoomCreate={onClickSubmitRoomCreate}
                         accommodation={currentAccommodation}
+                    />
+
+                    <UpdateRoomModal
+                        isUpdateRoomModalOpen={isUpdateRoomModalOpen}
+                        onClickCancelUpdateRoomModal={onClickCancelUpdateRoomModal}
+                        onClickSubmitRoomUpdate={onClickSubmitRoomUpdate}
+                        accommodation={currentAccommodation}
+                        roomId={selectedRoomId}
+                        room={selectedRoom}
                     />
                 </div>
                 <ToastContainer />
