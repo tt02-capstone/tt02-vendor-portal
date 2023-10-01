@@ -95,12 +95,36 @@ export default function RoomManagement() {
             setCurrentAccommodation(response.data);
             console.log("currentAccommodation", currentAccommodation);
             setRoomList(response.data.room_list);
+            console.log(roomList)
         } catch (error) {
             alert('An error occurred! Failed to retrieve accommodation!');
         }
     }
 
     const roomColumns = [
+        {
+            title: 'Cover Image',
+            dataIndex: 'room_image',
+            key: 'room_image',
+            width: '15%',
+            render: (room_image) => {
+                console.log(room_image);
+                if (room_image) {
+                    // If 'room_image' is not null or undefined
+                    return (
+                        <div style={styles.imageContainer}>
+                            <img
+                                src={room_image} // Assuming 'room_image' is the URL of the image
+                                alt="Room"
+                                style={styles.image}
+                            />
+                        </div>
+                    );
+                }
+                // If 'room_image' is null or undefined
+                return 'No Image';
+            },
+        },
 
         {
             title: 'Type',
@@ -132,7 +156,7 @@ export default function RoomManagement() {
                     <Tag color={tagColor}>{type}</Tag>
                 );
             },
-            width: '15%',
+            width: '10%',
         },
         {
             title: 'No. of Pax',
@@ -157,7 +181,7 @@ export default function RoomManagement() {
             dataIndex: 'amenities_description',
             key: 'amenities_description',
 
-            width: '40%',
+            width: '30%',
         },
         {
             title: 'Action(s)',
@@ -198,7 +222,7 @@ export default function RoomManagement() {
                     num_of_pax: item.num_of_pax,
                     price: item.price,
                     room_type: item.room_type,
-                    // contact_num: formattedContactNum,
+                    room_image: item.room_image,
                     quantity: item.quantity,
                    
                 };
@@ -270,5 +294,15 @@ const styles = {
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+
+    imageContainer: {
+        maxWidth: '180px',
+        maxHeight: '100px',
+        overflow: 'hidden',
+    },
+    image: {
+        width: '100%',
+        height: 'auto',
     },
 }
