@@ -5,6 +5,7 @@ import {PlusOutlined} from "@ant-design/icons";
 import AWS from "aws-sdk";
 import {getLastDealId} from "../../redux/dealRedux";
 import {toast} from "react-toastify";
+import {disabledTimeChecker, disabledDateChecker} from "../../helper/dateFormat";
 
 const {RangePicker} = DatePicker;
 
@@ -265,7 +266,12 @@ export default function CreateDealModal(props) {
                                labelAlign="left"
                                rules={[{required: true, message: 'Please enter the validity duration of deal!'}]}
                     >
-                        <RangePicker showTime format="YYYY-MM-DD HH:mm:ss"/>
+                        <RangePicker
+                            showTime
+                            format="YYYY-MM-DD HH:mm:ss"
+                            disabledDate= {disabledDateChecker}
+                            disabledTime={disabledTimeChecker}
+                        />
                     </Form.Item>
 
                     <Form.Item
@@ -278,7 +284,8 @@ export default function CreateDealModal(props) {
                         <DatePicker
                             style={{width: '100%'}}
                             format="YYYY-MM-DD"
-                            disabledDate={(current) => current && current < moment().startOf('day')}/>
+                            disabledDate = {disabledDateChecker}
+                        />
                     </Form.Item>
 
                     <Form.Item wrapperCol={{offset: 11, span: 16}}>

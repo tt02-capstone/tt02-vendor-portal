@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words';
 import CustomTablePagination from "../../components/CustomTablePagination"
 import moment from 'moment';
 import { getAllTicketListedByAttractionInTimeRange } from '../../redux/attractionManageTicketRedux';
+import {disabledDateChecker} from "../../helper/dateFormat";
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -237,6 +238,8 @@ export default function ViewTicketModal(props) {
                             >
                                 <RangePicker
                                     format="YYYY-MM-DD"
+                                    disabledDate={disabledDateChecker}
+
                                 />
                             </Form.Item>
                         </Col>

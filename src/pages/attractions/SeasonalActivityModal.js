@@ -1,6 +1,8 @@
 import { React , useEffect} from 'react';
 import { Modal, Form, Input, Button, Select, DatePicker, InputNumber } from "antd";
 import moment from 'moment';
+import {disabledDateChecker} from "../../helper/dateFormat";
+const { RangePicker } = DatePicker
 
 export default function SeasonalActivityModal(props) {
     const [form] = Form.useForm();
@@ -47,25 +49,15 @@ export default function SeasonalActivityModal(props) {
                     </Form.Item>
 
                     <Form.Item
-                        label="Start Date"
-                        name="startDate"
-                        rules={[{ required: true, message: 'Please select a start date!' }]}
+                        name="dateRange"
+                        label="Start and End Date:"
+                        labelAlign='left'
+                        rules={[{ required: true, message: 'Date range is required!'}]}
                     >
-                        <DatePicker 
-                            style={{ width: '100%' }} 
-                            format="YYYY-MM-DD" 
-                            disabledDate={(current) => current && current < moment().startOf('day')}/>
-                    </Form.Item>
-
-                    <Form.Item
-                        label="End Date"
-                        name="endDate"
-                        rules={[{ required: true, message: 'Please select an end date!' }]}
-                    >
-                        <DatePicker 
-                            style={{ width: '100%' }} 
+                        <RangePicker
                             format="YYYY-MM-DD"
-                            disabledDate={(current) => current && current < moment().startOf('day')} />
+                            disabledDate={disabledDateChecker}
+                        />
                     </Form.Item>
 
                     <Form.Item

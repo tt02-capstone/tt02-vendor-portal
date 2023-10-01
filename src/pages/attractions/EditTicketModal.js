@@ -1,6 +1,7 @@
 import { React , useEffect} from 'react';
 import { Modal, Form, Input, Button, Select, DatePicker } from "antd";
 import moment from 'moment';
+import {disabledDateChecker} from "../../helper/dateFormat";
 
 const { Option } = Select;
 
@@ -37,8 +38,9 @@ export default function EditTicketModal(props) {
                     >
                        <DatePicker 
                             style={{ width: '100%' }} 
-                            format="YYYY-MM-DD" 
-                            disabledDate={(current) => current && current < moment().startOf('day')}/>
+                            format="YYYY-MM-DD"
+                            disabledDate = {disabledDateChecker}
+                       />
                     </Form.Item>
 
                     <Form.Item
