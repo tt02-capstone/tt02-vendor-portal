@@ -76,6 +76,18 @@ export async function createRoom(accommodationId, room) {
     }
 }
 
+export async function updateRoom(accommodationId, room) {
+  try {
+    console.log("accommodationId", accommodationId);
+    console.log("room", room);
+    const response = await accommodationApi.post(`${accommodationURL}/updateRoom/${accommodationId}`, room);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("accommodationRedux updateRoom Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
   export async function getRoomListByAccommodation(accommodationId) {
     try {
       const response = await accommodationApi.get(`${accommodationURL}/getRoomListByAccommodation/${accommodationId}`);
