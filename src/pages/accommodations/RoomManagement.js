@@ -20,6 +20,10 @@ export default function RoomManagement() {
     const [currentAccommodation, setCurrentAccommodation] = useState([]);
     const [getRoomsData, setGetRoomsData] = useState(true);
     const [roomList, setRoomList] = useState(true);
+    const [priceMin, setPriceMin] = useState('');
+    const [priceMax, setPriceMax] = useState('');
+    const [quantityMin, setQuantityMin] = useState('');
+    const [quantityMax, setQuantityMax] = useState('');
 
     const viewRoomBreadCrumb = [
         {
@@ -101,27 +105,61 @@ export default function RoomManagement() {
         }
     }
 
+    const handlePriceFilter = (value, old_price) => {
+        const min = parseFloat(priceMin);
+        const max = parseFloat(priceMax);
+
+        const price = parseFloat(old_price);
+      
+        if (!isNaN(min) && !isNaN(max)) {
+          return price >= min && price <= max;
+        } else if (!isNaN(min)) {
+          return price >= min;
+        } else if (!isNaN(max)) {
+          return price <= max;
+        } else {
+          return true;
+        }
+      };
+      
+      const handleQuantityFilter = (value, record) => {
+        const min = parseInt(quantityMin);
+        const max = parseInt(quantityMax);
+        const quantity = parseInt(record.quantity);
+      
+        if (!isNaN(min) && !isNaN(max)) {
+          return quantity >= min && quantity <= max;
+        } else if (!isNaN(min)) {
+          return quantity >= min;
+        } else if (!isNaN(max)) {
+          return quantity <= max;
+        } else {
+          return true;
+        }
+      };
+
+    const handleTypeFilter = (value, record) => record.room_type === value;
+
     const roomColumns = [
         {
             title: 'Cover Image',
             dataIndex: 'room_image',
             key: 'room_image',
             width: '15%',
+            onFilter: (value, record) => handleTypeFilter(value, record),
             render: (room_image) => {
                 console.log(room_image);
                 if (room_image) {
-                    // If 'room_image' is not null or undefined
                     return (
                         <div style={styles.imageContainer}>
                             <img
-                                src={room_image} // Assuming 'room_image' is the URL of the image
+                                src={room_image} 
                                 alt="Room"
                                 style={styles.image}
                             />
                         </div>
                     );
                 }
-                // If 'room_image' is null or undefined
                 return 'No Image';
             },
         },
@@ -130,6 +168,14 @@ export default function RoomManagement() {
             title: 'Type',
             dataIndex: 'room_type',
             key: 'room_type',
+            filters: [
+                { text: 'STANDARD', value: 'STANDARD' },
+                { text: 'DOUBLE', value: 'DOUBLE' },
+                { text: 'SUITE', value: 'SUITE' },
+                { text: 'JUNIOR_SUITE', value: 'JUNIOR_SUITE' },
+                { text: 'DELUXE_SUITE', value: 'DELUXE_SUITE' },
+              ],
+            onFilter: (value, record) => handleTypeFilter(value, record),
             render: (type) => {
                 let tagColor = 'default';
                 switch (type) {
@@ -162,18 +208,65 @@ export default function RoomManagement() {
             title: 'No. of Pax',
             dataIndex: 'num_of_pax',
             key: 'num_of_pax',
+            filters: [
+                { text: '1', value: '1' },
+                { text: '2', value: '2' },
+                { text: '3', value: '3' },
+                
+            ],
+            onFilter: (value, record) => record.num_of_pax.toString() === value,
             width:'10%'
         },
         {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
+            filterDropdown: (
+                <div style={{ padding: 8 }}>
+                  <Input
+                    placeholder="Min"
+                    style={{ width: 100, marginRight: 8 }}
+                    value={priceMin}
+                    onChange={(e) => setPriceMin(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Max"
+                    style={{ width: 100, marginRight: 8 }}
+                    value={priceMax}
+                    onChange={(e) => setPriceMax(e.target.value)}
+                  />
+                  <Button type="primary" onClick={handlePriceFilter}>
+                    Filter
+                  </Button>
+                </div>
+              ),
+            onFilter: (value, price) => handlePriceFilter(value, price),
             width: '10%',
         },
         {
             title: 'Quantity',
             dataIndex: 'quantity',
             key: 'quantity',
+            filterDropdown: (
+                <div style={{ padding: 8 }}>
+                  <Input
+                    placeholder="Min"
+                    style={{ width: 100, marginRight: 8 }}
+                    value={quantityMin}
+                    onChange={(e) => setQuantityMin(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Max"
+                    style={{ width: 100, marginRight: 8 }}
+                    value={quantityMax}
+                    onChange={(e) => setQuantityMax(e.target.value)}
+                  />
+                  <Button type="primary" onClick={handleQuantityFilter}>
+                    Filter
+                  </Button>
+                </div>
+              ),
+            onFilter: (value, record) => handleQuantityFilter(value, record),
             width: '10%',
         },
         {
