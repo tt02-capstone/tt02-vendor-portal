@@ -1,11 +1,14 @@
 import { attractionApi } from "./api";
+import { handleApiErrors } from "../helper/errorCatching";
 
 export async function getAttractionList(vendor_id) {
     try {
         const response = await attractionApi.get(`/getAttractionListByVendor/${vendor_id}`)
-        if (response.data != []) {
+        if (Array.isArray(response.data) && response.data.length === 0) {
+            return [];
+        } else {
             return response.data;
-        }    
+        }   
     } catch (error) {
         console.error("Retrieve vendor attraction list error!");
         return {status: false, data: error.message};
@@ -15,7 +18,9 @@ export async function getAttractionList(vendor_id) {
 export async function createTickets(start_date,end_date,ticket_type,ticket_count,attraction_id) {
     try {
         const response = await attractionApi.post(`/createTicketsPerDay/${start_date}/${end_date}/${ticket_type}/${ticket_count}/${attraction_id}`);
-        if (response.data != []) {
+        if (Array.isArray(response.data) && response.data.length === 0) {
+            return [];
+        } else {
             return response.data;
         }    
     } catch (error) {
@@ -27,7 +32,6 @@ export async function createTickets(start_date,end_date,ticket_type,ticket_count
 export async function updateTicketPerDay(attraction_id,requestBody) {
     try {
         const attrTicketList = await attractionApi.put(`/updateTicketsPerDay/${attraction_id}`,requestBody)
-        console.log(attrTicketList.data)
         if (attrTicketList.data.httpStatusCode = 404) {
             return {error : attrTicketList.data.errorMessage};
         }  else {
@@ -42,11 +46,23 @@ export async function updateTicketPerDay(attraction_id,requestBody) {
 export async function getAllTicketListedByAttraction(attraction_id) {
     try {
         const response = await attractionApi.get(`/getAllTicketListedByAttraction/${attraction_id}`)
-        if (response.data !== []) {
+        if (Array.isArray(response.data) && response.data.length === 0) {
+            return [];
+        } else {
             return response.data;
-        }    
+        }   
     } catch (error) {
         console.error("Get all tickets associated with attraction error!");
+        return {status: false, data: error.message};
+    }
+}
+
+export async function getAllTicketListedByAttractionInTimeRange(attractionId, startDate, endDate) {
+    try {
+        const response = await attractionApi.get(`/getAllTicketListedByAttractionInTimeRange/${attractionId}/${startDate}/${endDate}`)
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("localRedux editLocalProfile Error : ", error);
         return {status: false, data: error.message};
     }
 }
@@ -55,9 +71,11 @@ export async function getAllTicketListedByAttraction(attraction_id) {
 export async function getTicketEnumByAttraction(attraction_id) {
     try {
         const response = await attractionApi.get(`/getTicketEnumByAttraction/${attraction_id}`)
-        if (response.data !== []) {
-            return response.data;
-        }    
+        if (Array.isArray(response.data) && response.data.length === 0) {
+            return [];
+        } else {
+            return response.data
+        }   
     } catch (error) {
         console.error("Get attraction ticket enum attraction error!");
         return {status: false, data: error.message};

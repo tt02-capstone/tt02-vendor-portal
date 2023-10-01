@@ -256,7 +256,32 @@ export default function Profile() {
       if (response.data) {
 
         setIsBAModalOpen(false);
-        setBankAccounts([...bankAccounts, response.data]);
+
+
+
+        async function getBankAccounts() {
+
+          const userId = parseInt(user.user_id);
+  
+          const response = await (user.user_type === 'VENDOR_STAFF' ? vendorStaffApi : paymentApi).get(`/getBankAccounts/${userId}`);
+  
+          if (response.status) {
+            const bankAccounts = response.data;
+            //console.log(bankAccounts);
+            if (bankAccounts) {
+              setBankAccounts(bankAccounts);
+            }
+            
+        
+        } else {
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+      }
+  
+      getBankAccounts();
          //Temporary measure will directly update bankAccount state
         toast.success('Bank account created successfully!', {
           position: toast.POSITION.TOP_RIGHT,

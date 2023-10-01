@@ -1,6 +1,9 @@
 import { React , useEffect} from 'react';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Modal, Form, Input, Button, Select, DatePicker } from "antd";
-import moment from 'moment';
+dayjs.extend(customParseFormat);
+const { RangePicker } = DatePicker;
 
 const { Option } = Select;
 
@@ -16,7 +19,7 @@ export default function AddTicketModal(props) {
     return (
         <div>
             <Modal
-                title="Add Tickets"
+                title="Set Tickets Count"
                 centered
                 open={props.isVisible}
                 onCancel={props.onCancel}
@@ -30,31 +33,22 @@ export default function AddTicketModal(props) {
                     style={{ maxWidth: 600 }}
                     onFinish={props.onSubmit}
                 >
+                    <p style={{fontWeight: '500'}}>Please set the new ticket count for the selected dates!</p>
                     <Form.Item
-                        label="Start Date"
-                        name="startDate"
-                        rules={[{ required: true, message: 'Please select a start date!' }]}
+                        name="dateRange"
+                        label="Date Range:"
+                        labelAlign='left'
+                        rules={[{ required: true, message: 'Date range is required!'}]}
                     >
-                        <DatePicker 
-                            style={{ width: '100%' }} 
-                            format="YYYY-MM-DD" 
-                            disabledDate={(current) => current && current < moment().startOf('day')}/>
-                    </Form.Item>
-
-                    <Form.Item
-                        label="End Date"
-                        name="endDate"
-                        rules={[{ required: true, message: 'Please select an end date!' }]}
-                    >
-                        <DatePicker 
-                            style={{ width: '100%' }} 
+                        <RangePicker
                             format="YYYY-MM-DD"
-                            disabledDate={(current) => current && current < moment().startOf('day')} />
+                        />
                     </Form.Item>
 
                     <Form.Item
                         label="Ticket Type"
                         name="ticketType"
+                        labelAlign='left'
                         rules={[{ required: true, message: 'Please select a ticket type!' }]}
                     >
                         {/* do it based on the value which is set in the modal which is a lsit of ticket type */}
@@ -83,6 +77,7 @@ export default function AddTicketModal(props) {
                     <Form.Item
                         label="Ticket Count"
                         name="ticketCount"
+                        labelAlign='left'
                         rules={[
                             { required: true, message: 'Please enter the ticket count!' },
                             {
@@ -101,7 +96,7 @@ export default function AddTicketModal(props) {
 
                     <Form.Item wrapperCol={{ offset: 11, span: 10 }}>
                         <Button type="primary" htmlType="submit">
-                            Submit
+                            Add
                         </Button>
                     </Form.Item>
                 </Form>

@@ -1,4 +1,8 @@
 export const validatePassword = (_, value) => {
+    if (value === undefined) {
+      return Promise.reject('');
+    }
+
     if (value.length < 8) {
       return Promise.reject('Password must be at least 8 characters long');
     }

@@ -24,13 +24,13 @@ export default function EditAttractionModal(props) {
     async function getAttraction(vendor, props) {
         try {
             let response = await getAttractionByVendor(vendor.user_id, props.attractionId);
-            // console.log("getAttraction response data", response.data);
+            console.log("getAttraction response data", response.data);
             setSelectedAttraction(response.data);
             setPriceList(response.data.price_list);
             
-            // console.log("getAttraction response data", response.data);
+            console.log("getAttraction response data", response.data);
             const newExistingImageUrls = response.data.attraction_image_list || [];
-            // console.log("editAttractionModal getAttraction newExistingImageUrls", newExistingImageUrls);
+            console.log("editAttractionModal getAttraction newExistingImageUrls", newExistingImageUrls);
 
             setExistingImageUrls(newExistingImageUrls);
             
@@ -98,6 +98,7 @@ export default function EditAttractionModal(props) {
     );
 
     function handleRemove(file) {
+        console.log(imageFiles, file)
         const updatedFiles = imageFiles.filter((item) => item.uid !== file.uid);
         setImageFiles(updatedFiles);
     }
@@ -441,7 +442,7 @@ export default function EditAttractionModal(props) {
                         </Form.List>
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
                         <Button type="primary" htmlType="submit">
                             Update
                         </Button>

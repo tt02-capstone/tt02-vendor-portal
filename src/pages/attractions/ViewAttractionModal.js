@@ -203,4 +203,4 @@ const styles = {
       height: '100%',
       objectFit: 'cover', 
     },
-  };
+};

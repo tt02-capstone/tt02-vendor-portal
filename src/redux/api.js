@@ -44,7 +44,25 @@ export const paymentApi = axios.create({
     baseURL: HOST_WITH_PORT + '/payment'
 })
 
-const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, accommodationApi]
+export const telecomApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/telecom'
+})
+
+export const tourApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/tour'
+})
+
+export const restaurantApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/restaurant'
+})
+
+export const dealsApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/deal'
+})
+
+
+const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi]
+
 
 instanceList.map((api) => {
     api.interceptors.request.use( (config) => {
