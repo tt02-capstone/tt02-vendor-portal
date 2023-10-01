@@ -353,8 +353,8 @@ export default function AttractionManagement() {
         let activity = {
             name: values.name,
             description: values.description,
-            start_date : values.startDate.format('YYYY-MM-DD'),
-            end_date : values.endDate.format('YYYY-MM-DD'),
+            start_date : values.dateRange[0].format('YYYY-MM-DD'),
+            end_date : values.dateRange[1].format('YYYY-MM-DD'),
             suggested_duration: values.suggested_duration,
         }
 

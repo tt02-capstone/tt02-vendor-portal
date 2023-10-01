@@ -93,6 +93,8 @@ export default function EditTourModal(props) {
                 }}
                 footer={[]}
             >
+                //we're using 24h format, also there is a dateformat.js folder so you can add your function there, can try range picker if you havent already
+
                 <Form
                     name="editTour"
                     form={form}
