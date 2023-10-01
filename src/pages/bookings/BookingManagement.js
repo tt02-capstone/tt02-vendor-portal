@@ -14,6 +14,7 @@ import Highlighter from 'react-highlight-words';
 import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
 import ViewTelecomBookingModal from "./ViewTelecomBookingModal";
+import ViewRoomBookingModal from "./ViewRoomBookingModal";
 
 export default function BookingManagement() {
 
@@ -322,7 +323,14 @@ export default function BookingManagement() {
                                 onClick={() => onClickOpenViewTelecomBookingModal(record.booking_id)}
                             />
                         </Space>
-                } else {
+                } else if (text === 'ACCOMMODATION') {
+                    return <Space>
+                            <CustomButton
+                                text="View"
+                                onClick={() => onClickOpenViewRoomBookingModal(record.booking_id)}
+                            />
+                        </Space>
+                }  else {
                     return <p>'Bug</p>
                 }
             }
@@ -359,6 +367,7 @@ export default function BookingManagement() {
     // view booking modal
     const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false);
     const [isViewTelecomBookingModalOpen, setIsViewTelecomBookingModalOpen] = useState(false);
+    const [isViewRoomBookingModalOpen, setIsViewRoomBookingModalOpen] = useState(false);
 
     //view attraction booking modal open button
     function onClickOpenViewAttractionBookingModal(bookingId) {
@@ -381,6 +390,17 @@ export default function BookingManagement() {
     // view telecom booking modal cancel button
     function onClickCancelViewTelecomBookingModal() {
         setIsViewTelecomBookingModalOpen(false);
+        setSelectedBookingId(null);
+    }
+
+    function onClickOpenViewRoomBookingModal(bookingId) {
+        setSelectedBookingId(bookingId);
+        setIsViewRoomBookingModalOpen(true);
+    }
+
+    // view telecom booking modal cancel button
+    function onClickCancelViewRoomBookingModal() {
+        setIsViewRoomBookingModalOpen(false);
         setSelectedBookingId(null);
     }
 
@@ -408,6 +428,12 @@ export default function BookingManagement() {
                         <ViewTelecomBookingModal
                             openViewModal={isViewTelecomBookingModalOpen}
                             onClickCancelViewTelecomBookingModal={onClickCancelViewTelecomBookingModal}
+                            id={selectedBookingId}
+                        />
+
+                        <ViewRoomBookingModal
+                            openViewModal={isViewRoomBookingModalOpen}
+                            onClickCancelViewTelecomBookingModal={onClickCancelViewRoomBookingModal}
                             id={selectedBookingId}
                         />
                     </Content>
