@@ -122,19 +122,19 @@ export default function RoomManagement() {
             room_type: values.room_type,
             quantity: values.num_of_rooms,
             room_image: values.room_image[0],
-            room_id: values.room_id
+            room_id: selectedRoomId
         };
 
         console.log("roomObj", roomObj);
 
         let response = await updateRoom(currentAccommodation.accommodation_id, roomObj);
-        console.log("createRoom response", response);
+        console.log("updateRoom response", response);
         if (response.status) {
             updateRoomForm.resetFields();
             setGetRoomsData(true);
             setIsUpdateRoomModalOpen(false);
             console.log("createRoomListExistingAccommodation response", response.status)
-            toast.success('Rooms successfully created!', {
+            toast.success('Rooms successfully updated!', {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
             });

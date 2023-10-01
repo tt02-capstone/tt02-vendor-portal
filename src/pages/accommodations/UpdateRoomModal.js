@@ -143,7 +143,7 @@ export default function UpdatedRoomModal(props) {
     return (
         <div>
             <Modal
-                title="Update Room Variant"
+                title="Update Rooms"
                 centered
                 open={props.isUpdateRoomModalOpen}
                 onCancel={props.onClickCancelUpdateRoomModal}
