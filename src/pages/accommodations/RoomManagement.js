@@ -10,6 +10,8 @@ import { Table, Input, Button, Space, Badge, Tag, Form } from 'antd';
 import { PlusOutlined } from "@ant-design/icons";
 import { ToastContainer, toast } from 'react-toastify';
 import CustomTablePagination from "../../components/CustomTablePagination";
+import UpdateRoomModal from "./UpdateRoomModal";
+
 
 export default function RoomManagement() {
 
@@ -40,6 +42,8 @@ export default function RoomManagement() {
     const [updateRoomForm] = Form.useForm();
     const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] = useState(false); // boolean to open modal
     const [isUpdateRoomModalOpen, setIsUpdateRoomModalOpen] = useState(false);
+    const [selectedRoomId, setSelectedRoomId] = useState(null);
+    const [selectedRoom, setSelectedRoom] = useState(null);
     // create new room modal open button
     function onClickOpenCreateRoomModal() {
         setIsCreateRoomModalOpen(true);
@@ -93,7 +97,9 @@ export default function RoomManagement() {
         }
     }
 
-    function onClickOpenUpdateRoomModal() {
+    function onClickOpenUpdateRoomModal(roomId, room) {
+        setSelectedRoomId(roomId);
+        setSelectedRoom(room);  
         setIsUpdateRoomModalOpen(true);
     }
 
@@ -341,7 +347,7 @@ export default function RoomManagement() {
  
                             <CustomButton
                                 text="Edit"
-                                onClick={() => onClickOpenUpdateRoomModal(record.room_id)}
+                                onClick={() => onClickOpenUpdateRoomModal(record.room_id, record)}
                             />
                         </Space>
                     </div>
@@ -422,12 +428,13 @@ export default function RoomManagement() {
                         accommodation={currentAccommodation}
                     />
 
-                    <CreateRoomModal
-                        form={updateRoomForm}
-                        isCreateRoomModalOpen={isUpdateRoomModalOpen}
-                        onClickCancelCreateRoomModal={onClickCancelUpdateRoomModal}
-                        onClickSubmitRoomCreate={onClickSubmitRoomUpdate}
+                    <UpdateRoomModal
+                        isUpdateRoomModalOpen={isUpdateRoomModalOpen}
+                        onClickCancelUpdateRoomModal={onClickCancelUpdateRoomModal}
+                        onClickSubmitRoomUpdate={onClickSubmitRoomUpdate}
                         accommodation={currentAccommodation}
+                        roomId={selectedRoomId}
+                        room={selectedRoom}
                     />
                 </div>
                 <ToastContainer />
