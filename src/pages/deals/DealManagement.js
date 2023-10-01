@@ -297,13 +297,6 @@ export default function DealManagement() {
                 }
         },
         {
-            title: 'Publish Date',
-            dataIndex: 'publish_date',
-            key: 'publish_date',
-            sorter: (a, b) => a.publish_date > b.publish_date,
-            ...getColumnSearchProps('publish_date'),
-        },
-        {
             title: 'Start Date',
             dataIndex: 'start_datetime',
             key: 'start_datetime',
@@ -343,7 +336,6 @@ export default function DealManagement() {
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
                         ...val,
-                        publish_date: moment(val.publish_date).format('ll'),
                         start_datetime: moment(val.start_datetime).format('llll'),
                         end_datetime: moment(val.end_datetime).format('llll'),
                         key: val.user_id,
@@ -361,7 +353,6 @@ export default function DealManagement() {
 
     // on submit create modal
     async function onCreateSubmit(values) {
-        console.log(values);
         let obj = {
             "discount_percent": values.discount_percent,
             "start_datetime": values.promo_date_time[0].format('YYYY-MM-DD HH:mm:ss'),
@@ -370,7 +361,6 @@ export default function DealManagement() {
             "is_govt_voucher": values.is_govt_voucher,
             "deal_image_list": values.deal_image_list,
             "is_published": values.is_published,
-            "publish_date": values.publish_date.format('YYYY-MM-DD'),
             "deal_type": values.deal_type
         };
 
@@ -433,7 +423,6 @@ export default function DealManagement() {
             "is_govt_voucher": values.is_govt_voucher,
             "deal_image_list": values.deal_image_list,
             "is_published": values.is_published,
-            "publish_date": values.publish_date.format('YYYY-MM-DD'),
             "deal_type": values.deal_type,
             "deal_id": editDealId,
         }

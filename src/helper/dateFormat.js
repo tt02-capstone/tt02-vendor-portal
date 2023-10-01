@@ -4,13 +4,10 @@ export const disabledTimeChecker = (current, type) => {
         const currentMoment = moment();
 
         const selectedMoment = moment(current.$d);
-        console.log(selectedMoment)
         // Check if the year, month, and day of the selected date match the current date
         const isSameYear = selectedMoment.year() === currentMoment.year();
         const isSameMonth = selectedMoment.month() === currentMoment.month();
         const isSameDay = selectedMoment.date() === currentMoment.date();
-
-        console.log(isSameDay, isSameMonth, isSameYear)
 
         if (type === 'start' && isSameYear && isSameMonth && isSameDay) {
             const currentHour = moment().hour();

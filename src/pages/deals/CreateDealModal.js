@@ -274,20 +274,6 @@ export default function CreateDealModal(props) {
                         />
                     </Form.Item>
 
-                    <Form.Item
-                        label="Publish Date"
-                        name="publish_date"
-                        labelAlign="left"
-
-                        rules={[{required: true, message: 'Please select a publish date!'}]}
-                    >
-                        <DatePicker
-                            style={{width: '100%'}}
-                            format="YYYY-MM-DD"
-                            disabledDate = {disabledDateChecker}
-                        />
-                    </Form.Item>
-
                     <Form.Item wrapperCol={{offset: 11, span: 16}}>
                         <Button type="primary" htmlType="submit">
                             Create
