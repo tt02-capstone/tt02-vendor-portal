@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Layout, Spin, Form, Input, Button, Modal, Badge, Space, Tag, Image } from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
 import { PlusOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
-
+import Highlighter from 'react-highlight-words';
 
 export default function AccommodationManagement() {
 
@@ -35,6 +35,113 @@ export default function AccommodationManagement() {
             title: 'Accommodation',
         }
     ];
+
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
 
     const accommodationsColumns = [
         {
@@ -61,11 +168,15 @@ export default function AccommodationManagement() {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
+            sorter: (a, b) => a.name.localeCompare(b.name),
+            ...getColumnSearchProps('name'),
         },
         {
             title: 'Type',
             dataIndex: 'type',
             key: 'type',
+            sorter: (a, b) => a.type.localeCompare(b.type),
+            ...getColumnSearchProps('type'),
             render: (type) => {
                 let tagColor = 'default';
                 switch (type) {
@@ -88,16 +199,22 @@ export default function AccommodationManagement() {
             title: 'Area',
             dataIndex: 'generic_location',
             key: 'generic_location',
+            sorter: (a, b) => a.generic_location.localeCompare(b.generic_location),
+            ...getColumnSearchProps('generic_location'),
         },
         {
             title: 'Address',
             dataIndex: 'address',
             key: 'address',
+            sorter: (a, b) => a.address.localeCompare(b.address),
+            ...getColumnSearchProps('address'),
         },
         {
             title: 'Contact Num',
             dataIndex: 'contact_num',
             key: 'contact_num',
+            sorter: (a, b) => a.contact_num.localeCompare(b.contact_num),
+            ...getColumnSearchProps('contact_num'),
             width: 120,
         },
         {
@@ -144,6 +261,12 @@ export default function AccommodationManagement() {
                     <Tag color={tagColor}>{priceTier}</Tag>
                 );
             },
+            sorter: (a, b) => {
+                const tierA = a.estimated_price_tier || '';
+                const tierB = b.estimated_price_tier || '';
+            
+                return tierA.localeCompare(tierB);
+              },
             width: 100,
         },
         {
