@@ -120,16 +120,19 @@ export default function Tours() {
                     <Space>
                         <CustomButton
                             text="View"
+                            style={{fontWeight:"bold"}}
                             onClick={() => onClickOpenViewTourModal(record.tour_id)}
                         />
                         <br /><br />
                         <CustomButton
                             text="Edit"
+                            style={{fontWeight:"bold"}}
                             onClick={() => onClickOpenEditTourModal(record.tour_id)}
                         />
                         <br /><br />
                         <CustomButton
                             text="Delete"
+                            style={{fontWeight:"bold"}}
                             onClick={() => openDeleteConfirmation(record.tour_id)}
                         />
                     </Space>

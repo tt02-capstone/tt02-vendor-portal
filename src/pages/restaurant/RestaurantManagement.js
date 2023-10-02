@@ -502,7 +502,7 @@ export default function RestaurantManagement(navigation) {
              <Content style={styles.content}>
                 <CustomButton
                     text="Add Restaurant"
-                    style={{ marginLeft: '3px', marginBottom:'10px', fontWeight:"bold"}}
+                    style={{ marginLeft: '3px', marginBottom:'10px'}}
                     icon={<PlusOutlined />}
                     onClick={onClickOpenCreateRestaurantModal}
                 />

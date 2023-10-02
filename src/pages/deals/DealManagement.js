@@ -8,7 +8,7 @@ import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { createDeal, getAssociatedDealList, updateDeal } from "../../redux/dealRedux";
-import { SearchOutlined, StarFilled, PlusCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, StarFilled, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import ViewDealModal from "./ViewDealModal";
 import EditDealModal from "./EditDealModal";
@@ -318,8 +318,9 @@ export default function DealManagement() {
             align: 'center',
             render: (text, record) => (
                 <div>
-                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.deal_id)} style={{marginRight: '10px'}} />
-                    <CustomButton key='2' text="Edit" onClick={() => onOpenEditModal(record.deal_id)}/>
+                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.deal_id)} style={{marginRight: '8px', fontWeight:"bold"}} />
+                    <br/><br/>
+                    <CustomButton key='2' text="Edit" style={{fontWeight:"bold"}} onClick={() => onOpenEditModal(record.deal_id)}/>
                 </div>
             ),
         }
@@ -449,7 +450,7 @@ export default function DealManagement() {
             <Layout style={styles.layout}>
                 <CustomHeader items={breadcrumbItems}/>
                 <Content style={styles.content}>
-                    <CustomButton text="Create Deal" icon={<PlusCircleOutlined />} onClick={() => setCreateDealModal(true)}/>
+                    <CustomButton text="Create Deal" icon={<PlusOutlined />} onClick={() => setCreateDealModal(true)}/>
                     <br /><br />
                     <CustomTablePagination column={column} data={dealList} rowKey="deal_id" tableLayout={"fixed"}/>
 

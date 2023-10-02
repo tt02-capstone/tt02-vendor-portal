@@ -218,13 +218,13 @@ export default function AttractionManagement() {
         //     sorter: (a, b) => a.generic_location.localeCompare(b.generic_location),
         //     ...getColumnSearchProps('generic_location')
         // },
-        // {
-        //     title: 'Address',
-        //     dataIndex: 'address',
-        //     key: 'address',
-        //     sorter: (a, b) => a.address.localeCompare(b.address),
-        //     ...getColumnSearchProps('address')
-        // },
+        {
+            title: 'Address',
+            dataIndex: 'address',
+            key: 'address',
+            sorter: (a, b) => a.address.localeCompare(b.address),
+            ...getColumnSearchProps('address')
+        },
         {
             title: 'Opening Hours',
             dataIndex: 'opening_hours',
@@ -233,7 +233,7 @@ export default function AttractionManagement() {
             ...getColumnSearchProps('opening_hours')
         },
         {
-            title: 'Contact Num',
+            title: 'Contact No.',
             dataIndex: 'contact_num',
             key: 'contact_num',
             width: 120,
@@ -255,14 +255,14 @@ export default function AttractionManagement() {
             },
             width: 150,
         },
-        {
-            title: 'Avg Rating',
-            dataIndex: 'avg_rating_tier',
-            key: 'avg_rating_tier',
-            sorter: (a, b) => a.avg_rating_tier.localeCompare(b.avg_rating_tier),
-            ...getColumnSearchProps('avg_rating_tier'),
-            width: 100,
-        },
+        // {
+        //     title: 'Avg Rating',
+        //     dataIndex: 'avg_rating_tier',
+        //     key: 'avg_rating_tier',
+        //     sorter: (a, b) => a.avg_rating_tier.localeCompare(b.avg_rating_tier),
+        //     ...getColumnSearchProps('avg_rating_tier'),
+        //     width: 100,
+        // },
         {
             title: 'Price Tier',
             dataIndex: 'estimated_price_tier',

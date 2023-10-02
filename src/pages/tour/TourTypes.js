@@ -248,11 +248,13 @@ export default function TourTypes() {
                     <Space>
                         <CustomButton
                             text="View"
+                            style={{fontWeight:"bold"}}
                             onClick={() => onClickOpenViewTourTypeModal(record.tour_type_id)}
                         />
                         <br /><br />
                         <CustomButton
                             text="Edit"
+                            style={{fontWeight:"bold"}}
                             onClick={() => onClickOpenEditTourTypeModal(record.tour_type_id)}
                         />
                     </Space>
@@ -260,6 +262,7 @@ export default function TourTypes() {
                     <Space>
                         <CustomButton
                             text="Tours"
+                            style={{fontWeight:"bold"}}
                             onClick={() => redirectToTours(record.tour_type_id)}
                         />
                     </Space>
