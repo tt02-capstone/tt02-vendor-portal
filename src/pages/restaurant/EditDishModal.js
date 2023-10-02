@@ -63,7 +63,7 @@ export default function EditDishModal(props) {
                         name="name"
                         rules={[{ required: true, message: 'Please enter name of the dish!' }]}
                     >
-                        <Input  placeholder="Dish Name"  />
+                        <Input placeholder="Dish Name"  />
                     </Form.Item>
 
                     <Form.Item
@@ -71,7 +71,7 @@ export default function EditDishModal(props) {
                         name="price"
                         rules={[{ required: true, message: 'Please enter price of the dish!' }]}
                     >
-                        <InputNumber />
+                        <InputNumber  min={0} />
                     </Form.Item>
 
                     <Form.Item
