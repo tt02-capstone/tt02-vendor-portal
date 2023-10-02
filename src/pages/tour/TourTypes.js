@@ -194,7 +194,6 @@ export default function TourTypes() {
             sorter: (a, b) => a.price - b.price,
             ...getColumnSearchProps('price'),
             render: (text, record) => {
-                // Assuming 'text' is the price value from your data
                 return `$${text}`;
             },
         },

@@ -11,7 +11,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import { ToastContainer, toast } from 'react-toastify';
 import CustomTablePagination from "../../components/CustomTablePagination";
 import UpdateRoomModal from "./UpdateRoomModal";
-
+import { SearchOutlined } from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
 
 export default function RoomManagement() {
 
@@ -181,7 +182,7 @@ export default function RoomManagement() {
           return true;
         }
       };
-      
+    
       const handleQuantityFilter = (value, record) => {
         const min = parseInt(quantityMin);
         const max = parseInt(quantityMax);
@@ -199,6 +200,113 @@ export default function RoomManagement() {
       };
 
     const handleTypeFilter = (value, record) => record.room_type === value;
+
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{
+                        marginBottom: 8,
+                        display: 'block',
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? '#1677ff' : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{
+                        backgroundColor: '#ffc069',
+                        padding: 0,
+                    }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
 
     const roomColumns = [
         {
@@ -281,59 +389,27 @@ export default function RoomManagement() {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-            filterDropdown: (
-                <div style={{ padding: 8 }}>
-                  <Input
-                    placeholder="Min"
-                    style={{ width: 100, marginRight: 8 }}
-                    value={priceMin}
-                    onChange={(e) => setPriceMin(e.target.value)}
-                  />
-                  <Input
-                    placeholder="Max"
-                    style={{ width: 100, marginRight: 8 }}
-                    value={priceMax}
-                    onChange={(e) => setPriceMax(e.target.value)}
-                  />
-                  <Button type="primary" onClick={handlePriceFilter}>
-                    Filter
-                  </Button>
-                </div>
-              ),
-            onFilter: (value, price) => handlePriceFilter(value, price),
+            sorter: (a, b) => a.price - b.price,
+            ...getColumnSearchProps('price'),
             width: '10%',
         },
         {
             title: 'Quantity',
             dataIndex: 'quantity',
             key: 'quantity',
-            filterDropdown: (
-                <div style={{ padding: 8 }}>
-                  <Input
-                    placeholder="Min"
-                    style={{ width: 100, marginRight: 8 }}
-                    value={quantityMin}
-                    onChange={(e) => setQuantityMin(e.target.value)}
-                  />
-                  <Input
-                    placeholder="Max"
-                    style={{ width: 100, marginRight: 8 }}
-                    value={quantityMax}
-                    onChange={(e) => setQuantityMax(e.target.value)}
-                  />
-                  <Button type="primary" onClick={handleQuantityFilter}>
-                    Filter
-                  </Button>
-                </div>
-              ),
-            onFilter: (value, record) => handleQuantityFilter(value, record),
+            sorter: (a, b) => a.quantity - b.quantity,
+            ...getColumnSearchProps('quantity'),
             width: '10%',
         },
         {
             title: 'Description',
             dataIndex: 'amenities_description',
             key: 'amenities_description',
-
+            sorter: (a, b) => {
+                const descriptionA = a.amenities_description.toUpperCase(); 
+                const descriptionB = b.amenities_description.toUpperCase();
+                return descriptionA.localeCompare(descriptionB);
+              },
             width: '30%',
         },
         {
