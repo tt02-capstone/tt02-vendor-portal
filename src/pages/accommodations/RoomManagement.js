@@ -423,6 +423,7 @@ export default function RoomManagement() {
  
                             <CustomButton
                                 text="Edit"
+                                style={{fontWeight:"bold"}}
                                 onClick={() => onClickOpenUpdateRoomModal(record.room_id, record)}
                             />
                         </Space>

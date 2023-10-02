@@ -210,7 +210,7 @@ export default function AccommodationManagement() {
             ...getColumnSearchProps('address'),
         },
         {
-            title: 'Contact Num',
+            title: 'Contact No.',
             dataIndex: 'contact_num',
             key: 'contact_num',
             sorter: (a, b) => a.contact_num.localeCompare(b.contact_num),
@@ -274,21 +274,24 @@ export default function AccommodationManagement() {
             dataIndex: 'operation',
             key: 'operation',
             render: (text, record) => {
-                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                     <div style={{ marginBottom: '10px' }}>
                         <Space direction="horizontal">
                             <CustomButton
                                 text="View"
+                                style={{fontWeight:"bold"}}
                                 onClick={() => onClickOpenViewAccommodationModal(record.accommodation_id)}
                             />
                             <CustomButton
                                 text="Edit"
+                                style={{fontWeight:"bold"}}
                                 onClick={() => onClickOpenEditAccommodationModal(record.accommodation_id)}
                             />
                         </Space>
                     </div>
                     <CustomButton
                         text="Rooms"
+                        style={{fontWeight:"bold"}}
                         onClick={() => onClickNavigateToRoomManagement(record.accommodation_id)}
                     />
                 </div>
@@ -429,36 +432,36 @@ export default function AccommodationManagement() {
         }
     }
 
-    // VIEW ATTRACTION
+    // VIEW ACCOMMMODATION
     const [isViewAccommodationModalOpen, setIsViewAccommodationModalOpen] = useState(false);
 
-    //view attraction modal open button
+    //view accom modal open button
     function onClickOpenViewAccommodationModal(accommodationId) {
         setSelectedAccommodationId(accommodationId);
         setIsViewAccommodationModalOpen(true);
 
     }
 
-    // view attraction modal cancel button
+    // view accom modal cancel button
     function onClickCancelViewAccommodationModal() {
         setIsViewAccommodationModalOpen(false);
     }
 
-    // EDIT ATTRACTION
+    // EDIT ACCOMMMODATION
     const [isEditAccommodationModalOpen, setIsEditAccommodationModalOpen] = useState(false);
 
-    //edit attraction modal open button
+    //edit accom modal open button
     function onClickOpenEditAccommodationModal(accommodationId) {
         setSelectedAccommodationId(accommodationId);
         setIsEditAccommodationModalOpen(true);
     }
 
-    // edit attraction modal cancel button
+    // edit accom modal cancel button
     function onClickCancelEditAccommodationModal() {
         setIsEditAccommodationModalOpen(false);
     }
 
-    // edit attraction modal button
+    // edit accom modal button
     async function onClickSubmitEditAccommodation(values) {
 
         console.log('values.check_in_time:', values.check_in_time);
