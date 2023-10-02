@@ -42,7 +42,7 @@ export default function AddDishModal(props) {
                         name="price"
                         rules={[{ required: true, message: 'Please enter price of the dish!' }]}
                     >
-                        <InputNumber />
+                        <InputNumber  min={0} />
                     </Form.Item>
 
                     <Form.Item

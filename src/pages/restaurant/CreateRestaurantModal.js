@@ -230,7 +230,7 @@ export default function CreateRestaurantModal(props) {
                         name="suggested_duration"
                         placeholder="Hours"
                         rules={[{ required: true, message: 'Please enter suggested duration for attraction in hours!' }]}>
-                        <InputNumber suffix="Hours" />
+                        <InputNumber suffix="Hours"  min={0} />
                     </Form.Item>
 
                     <Form.Item
