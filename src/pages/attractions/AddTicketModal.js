@@ -2,6 +2,7 @@ import { React , useEffect} from 'react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Modal, Form, Input, Button, Select, DatePicker } from "antd";
+import {disabledDateChecker} from "../../helper/dateFormat";
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
 
@@ -42,6 +43,7 @@ export default function AddTicketModal(props) {
                     >
                         <RangePicker
                             format="YYYY-MM-DD"
+                            disabledDate={disabledDateChecker}
                         />
                     </Form.Item>
 

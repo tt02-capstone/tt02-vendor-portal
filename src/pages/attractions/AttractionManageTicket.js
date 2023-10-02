@@ -6,6 +6,7 @@ import ViewTicketModal from './ViewTicketModal';
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link } from 'react-router-dom';
 import { getAttractionList, getTicketEnumByAttraction, createTickets, updateTicketPerDay } from '../../redux/attractionManageTicketRedux';
+import CustomTablePagination from "../../components/CustomTablePagination";
 import  { Table, Input, Button, Space } from 'antd';
 import AddTicketModal from './AddTicketModal';
 import EditTicketModal from './EditTicketModal';
@@ -267,7 +268,6 @@ export default function AttractionManageTicket() {
             title: 'Address',
             dataIndex: 'address',
             key: 'address',
-            width: 350,
             sorter: (a, b) => a.address.localeCompare(b.address),
             ...getColumnSearchProps('address')
         },
@@ -275,7 +275,6 @@ export default function AttractionManageTicket() {
             title: 'Age Group',
             dataIndex: 'age_group',
             key: 'age_group',
-            width: 150,
             sorter: (a, b) => a.age_group.localeCompare(b.age_group),
             ...getColumnSearchProps('age_group')
         },
@@ -319,7 +318,6 @@ export default function AttractionManageTicket() {
             title: 'Description',
             dataIndex: 'description',
             key: 'description', 
-            width: 600,
             sorter: (a, b) => a.description.localeCompare(b.description),
             ...getColumnSearchProps('description')
         },
@@ -375,6 +373,7 @@ export default function AttractionManageTicket() {
                     </Button> */}
                 </div>
             ),
+            width: 200
         }
     ];
 
@@ -397,7 +396,14 @@ export default function AttractionManageTicket() {
              <CustomHeader items={viewTicketBreadCrumb}/>
              <Content style={styles.content}>
              <div>
-                <Table dataSource={datasource} columns={columns} style={{ width : '98%' }} />
+                {/* <Table dataSource={datasource} columns={columns} style={{ width : '98%' }} /> */}
+                <CustomTablePagination
+                    title="AttractionTicket"
+                    column={columns}
+                    data={datasource}
+                    tableLayout="fixed"
+                />
+
                 <AddTicketModal
                     isVisible={addModal}
                     onCancel={addModalCancel}
@@ -429,7 +435,7 @@ export default function AttractionManageTicket() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '90vw',
+        minWidth: '90vw'
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
@@ -438,7 +444,7 @@ const styles = {
         justifyContent: 'center'
     },
     button: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: "bold"
     }
 }

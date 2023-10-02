@@ -69,24 +69,7 @@ export default function CreateTourModal(props) {
                         rules={[{ required: true, message: 'Please select a start time!' }]}
                     >
                         <TimePicker
-                            format="h:mm a"
-                            use12Hours
-                            disabledHours={() => Array.from({ length: 24 }, (_, i) => i < 4 ? i : false)}
-                            disabledMinutes={() => Array.from({ length: 60 }, (_, i) => false)}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="end_time"
-                        label="End Time"
-                        rules={[
-                            { required: true, message: 'Please select an end time!' },
-                            { validator: validateEndTime },
-                        ]}
-                    >
-                        <TimePicker
-                            format="h:mm a"
-                            use12Hours
+                            format="HH:mm"
                             disabledHours={() => Array.from({ length: 24 }, (_, i) => i < 4 ? i : false)}
                             disabledMinutes={() => Array.from({ length: 60 }, (_, i) => false)}
                         />

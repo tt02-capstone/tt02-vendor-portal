@@ -17,7 +17,7 @@ export async function getLastDealId() {
     const response = await dealsApi.get(`/getLastDealId`);
     return handleApiErrors(response);
   } catch (error) {
-    console.error("attractionRedux getLastAttractionId Error: ", error);
+    console.error("dealRedux getLastAttractionId Error: ", error);
     return { status: false, data: error.message };
   }
 }

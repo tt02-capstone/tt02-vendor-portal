@@ -8,7 +8,7 @@ import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { createDeal, getAssociatedDealList, updateDeal } from "../../redux/dealRedux";
-import { SearchOutlined, StarFilled, PlusCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, StarFilled, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import ViewDealModal from "./ViewDealModal";
 import EditDealModal from "./EditDealModal";
@@ -297,13 +297,6 @@ export default function DealManagement() {
                 }
         },
         {
-            title: 'Publish Date',
-            dataIndex: 'publish_date',
-            key: 'publish_date',
-            sorter: (a, b) => a.publish_date > b.publish_date,
-            ...getColumnSearchProps('publish_date'),
-        },
-        {
             title: 'Start Date',
             dataIndex: 'start_datetime',
             key: 'start_datetime',
@@ -325,8 +318,9 @@ export default function DealManagement() {
             align: 'center',
             render: (text, record) => (
                 <div>
-                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.deal_id)} style={{marginRight: '10px'}} />
-                    <CustomButton key='2' text="Edit" onClick={() => onOpenEditModal(record.deal_id)}/>
+                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.deal_id)} style={{marginRight: '8px', fontWeight:"bold"}} />
+                    <br/><br/>
+                    <CustomButton key='2' text="Edit" style={{fontWeight:"bold"}} onClick={() => onOpenEditModal(record.deal_id)}/>
                 </div>
             ),
         }
@@ -343,7 +337,6 @@ export default function DealManagement() {
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
                         ...val,
-                        publish_date: moment(val.publish_date).format('ll'),
                         start_datetime: moment(val.start_datetime).format('llll'),
                         end_datetime: moment(val.end_datetime).format('llll'),
                         key: val.user_id,
@@ -361,7 +354,6 @@ export default function DealManagement() {
 
     // on submit create modal
     async function onCreateSubmit(values) {
-        console.log(values);
         let obj = {
             "discount_percent": values.discount_percent,
             "start_datetime": values.promo_date_time[0].format('YYYY-MM-DD HH:mm:ss'),
@@ -370,7 +362,6 @@ export default function DealManagement() {
             "is_govt_voucher": values.is_govt_voucher,
             "deal_image_list": values.deal_image_list,
             "is_published": values.is_published,
-            "publish_date": values.publish_date.format('YYYY-MM-DD'),
             "deal_type": values.deal_type
         };
 
@@ -433,7 +424,6 @@ export default function DealManagement() {
             "is_govt_voucher": values.is_govt_voucher,
             "deal_image_list": values.deal_image_list,
             "is_published": values.is_published,
-            "publish_date": values.publish_date.format('YYYY-MM-DD'),
             "deal_type": values.deal_type,
             "deal_id": editDealId,
         }
@@ -460,7 +450,7 @@ export default function DealManagement() {
             <Layout style={styles.layout}>
                 <CustomHeader items={breadcrumbItems}/>
                 <Content style={styles.content}>
-                    <CustomButton text="Create Deal" icon={<PlusCircleOutlined />} onClick={() => setCreateDealModal(true)}/>
+                    <CustomButton text="Create Deal" icon={<PlusOutlined />} onClick={() => setCreateDealModal(true)}/>
                     <br /><br />
                     <CustomTablePagination column={column} data={dealList} rowKey="deal_id" tableLayout={"fixed"}/>
 

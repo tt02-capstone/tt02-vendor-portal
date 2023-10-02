@@ -8,7 +8,7 @@ import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { createTelecom, getAssociatedTelecomList, updateTelecom } from "../../redux/telecomRedux";
-import { SearchOutlined, StarFilled, PlusCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, StarFilled, PlusOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import ViewTelecomModal from "./ViewTelecomModal";
 import EditTelecomModal from "./EditTelecomModal";
@@ -327,8 +327,9 @@ export default function TelecomManagement() {
             align: 'center',
             render: (text, record) => (
                 <div>
-                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.telecom_id)} style={{marginRight: '10px'}} />
-                    <CustomButton key='2' text="Edit" onClick={() => onOpenEditModal(record.telecom_id)}/>
+                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.telecom_id)} style={{marginRight: '7px', fontWeight:"bold"}} />
+                    <br/><br/>
+                    <CustomButton key='2' text="Edit" style={{fontWeight:"bold"}} onClick={() => onOpenEditModal(record.telecom_id)}/>
                 </div>
             ),
         }
@@ -445,7 +446,7 @@ export default function TelecomManagement() {
             <Layout style={styles.layout}>
                 <CustomHeader items={breadcrumbItems}/>
                 <Content style={styles.content}>
-                    <CustomButton text="Create Telecom" icon={<PlusCircleOutlined />} onClick={() => setCreateTelecomModal(true)}/>
+                    <CustomButton text="Create Telecom" icon={<PlusOutlined/>} onClick={() => setCreateTelecomModal(true)}/>
                     <br /><br />
                     <CustomTablePagination column={column} data={telecomList} rowKey="telecom_id" tableLayout={"fixed"}/>
 
