@@ -3,7 +3,7 @@ import { Layout, Form, Input, Badge, Space, Tag, Modal } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllToursByTourType, createTour, updateTour, getTourByTourId, deleteTour } from "../../redux/tourRedux";
+import { getAllToursByTourType, createTour, updateTour, getTourByTourId, deleteTour, getTourTypeByTourTypeId } from "../../redux/tourRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,7 +17,7 @@ import moment from 'moment';
 import ViewTourModal from './ViewTourModal';
 import EditTourModal from './EditTourModal';
 
-export default function TourTypes() {
+export default function Tours() {
 
     const navigate = useNavigate();
     const { Header, Content, Sider, Footer } = Layout;
@@ -27,6 +27,7 @@ export default function TourTypes() {
     const [tours, setTours] = useState([]);
     const [selectedTour, setSelectedTour] = useState([]);
     const [selectedTourId, setSelectedTourId] = useState(null);
+    const [selectedTourType, setSelectedTourType] = useState();
 
     const viewToursBreadCrumb = [
         {
@@ -59,7 +60,17 @@ export default function TourTypes() {
                 }
             }
 
+            const fetchTourTypeData = async () => {
+                try {
+                    let response = await getTourTypeByTourTypeId(tourTypeId);
+                    setSelectedTourType(response.data);
+                } catch (error) {
+                    alert('An error occurred! Failed to retrieve tour type!');
+                }
+            }
+
             fetchToursData();
+            fetchTourTypeData();
             setGetToursData(false);
         }
     }, [getToursData]);
@@ -142,7 +153,8 @@ export default function TourTypes() {
     async function onClickSubmitTourCreate(values) {
         const selectedDate = values.date.format('YYYY-MM-DD');
         const selectedStartTime = values.start_time.format('HH:mm');
-        const selectedEndTime = values.end_time.format('HH:mm');
+        const estimatedDuration = moment.duration(selectedTourType.estimated_duration, 'hours');
+        const selectedEndTime = values.start_time.add(estimatedDuration).format('HH:mm');
         const isoStartDateTime = `${selectedDate}T${selectedStartTime}:00`;
         const isoEndDateTime = `${selectedDate}T${selectedEndTime}:00`;
 
@@ -198,7 +210,8 @@ export default function TourTypes() {
     async function onClickSubmitEditTour(values) {
         const selectedDate = values.date.format('YYYY-MM-DD');
         const selectedStartTime = values.start_time.format('HH:mm');
-        const selectedEndTime = values.end_time.format('HH:mm');
+        const estimatedDuration = moment.duration(selectedTourType.estimated_duration, 'hours');
+        const selectedEndTime = values.start_time.add(estimatedDuration).format('HH:mm');
         const isoStartDateTime = `${selectedDate}T${selectedStartTime}:00`;
         const isoEndDateTime = `${selectedDate}T${selectedEndTime}:00`;
 
