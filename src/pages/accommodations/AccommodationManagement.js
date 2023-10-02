@@ -15,7 +15,7 @@ import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
 import { PlusOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
-
+import moment from 'moment';
 
 export default function AccommodationManagement() {
 
@@ -252,8 +252,8 @@ export default function AccommodationManagement() {
 
         const checkIn = new Date();
         checkIn.setHours(checkInHours, checkInMinutes, 0);
-        // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
-        checkIn.setTime(checkIn.getTime() + 9 * 60 * 60 * 1000);
+        // Add 8 hours (8 * 60 * 60 * 1000 milliseconds) to the Date object
+        checkIn.setTime(checkIn.getTime() + 8 * 60 * 60 * 1000);
         const checkInIsoString = checkIn.toISOString();
 
         // Extract hours and minutes
@@ -262,10 +262,9 @@ export default function AccommodationManagement() {
 
         const checkOut = new Date();
         checkOut.setHours(checkOutHours, checkOutMinutes, 0);
-        // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
-        checkOut.setTime(checkOut.getTime() + 9 * 60 * 60 * 1000);
+        // Add 8 hours (8 * 60 * 60 * 1000 milliseconds) to the Date object
+        checkOut.setTime(checkOut.getTime() + 8 * 60 * 60 * 1000);
         const checkOutIsoString = checkOut.toISOString();
-
 
         console.log('checkInIsoString:', checkInIsoString);
         console.log('checkOutIsoString:', checkOutIsoString);
@@ -338,27 +337,52 @@ export default function AccommodationManagement() {
     // edit attraction modal button
     async function onClickSubmitEditAccommodation(values) {
 
+        let checkInHours;
+        let checkInMinutes;
+        let checkOutHours;
+        let checkOutMinutes;
+
         console.log('values.check_in_time:', values.check_in_time);
         console.log('values.check_out_time:', values.check_out_time);
+        
+        if(moment.isMoment(values.check_in_time)) {
+            const checkInMomentObject = values.check_in_time;
+            checkInHours = checkInMomentObject.hours();
+            console.log('MomentObject checkInHours:', checkInHours);
+            checkInMinutes = checkInMomentObject.minutes();
+            console.log('MomentObject checkInMinutes:', checkInMinutes);
+        } else {
+            // Extract hours and minutes
+            checkInHours = values.check_in_time.$H;
+            console.log('New checkInHours:', checkInHours);
+            checkInMinutes = values.check_in_time.$m;
+            console.log('New checkInMinutes:', checkInMinutes);
+        }
 
-        // Extract hours and minutes
-        const checkInHours = values.check_in_time.$H;
-        const checkInMinutes = values.check_in_time.$m;
+        if(moment.isMoment(values.check_out_time)) {
+            const checkOutMomentObject = values.check_out_time;
+            checkOutHours = checkOutMomentObject.hours();
+            console.log('MomentObject checkOutHours:', checkOutHours);
+            checkOutMinutes = checkOutMomentObject.minutes();
+            console.log('MomentObject checkOutMinutes:', checkOutMinutes);
+        } else {
+            // Extract hours and minutes
+            checkOutHours = values.check_out_time.$H;
+            console.log('New checkOutHours:', checkOutHours);
+            checkOutMinutes = values.check_out_time.$m;
+            console.log('New checkOutMinutes:', checkOutMinutes);
+        }
 
         const checkIn = new Date();
         checkIn.setHours(checkInHours, checkInMinutes, 0);
-        // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
-        checkIn.setTime(checkIn.getTime() + 9 * 60 * 60 * 1000);
+        // Add 9 hours (8 * 60 * 60 * 1000 milliseconds) to the Date object
+        checkIn.setTime(checkIn.getTime() + 8 * 60 * 60 * 1000);
         const checkInIsoString = checkIn.toISOString();
-
-        // Extract hours and minutes
-        const checkOutHours = values.check_out_time.$H;
-        const checkOutMinutes = values.check_in_time.$m;
 
         const checkOut = new Date();
         checkOut.setHours(checkOutHours, checkOutMinutes, 0);
-        // Add 9 hours (9 * 60 * 60 * 1000 milliseconds) to the Date object
-        checkOut.setTime(checkOut.getTime() + 9 * 60 * 60 * 1000);
+        // Add 9 hours (8 * 60 * 60 * 1000 milliseconds) to the Date object
+        checkOut.setTime(checkOut.getTime() + 8 * 60 * 60 * 1000);
         const checkOutIsoString = checkOut.toISOString();
 
         console.log('checkInIsoString:', checkInIsoString);

@@ -69,9 +69,9 @@ export default function ViewAccommodationModal(props) {
           margin: 0,
           padding: 0,
         };
-  
+
         const cleanedType = item.room_type.charAt(0).toUpperCase() + item.room_type.slice(1).toLowerCase();
-  
+
         return (
           <p key={index} style={index === 0 ? { marginTop: 0 } : itemStyle}>
             {index === 0 ? null : <br />}
@@ -80,7 +80,7 @@ export default function ViewAccommodationModal(props) {
         );
       });
     }
-  
+
     return <p>No rooms available. Please create some!</p>;
   }
 
@@ -160,6 +160,14 @@ export default function ViewAccommodationModal(props) {
       formattedValue = value.replace(/(\d{4})(\d{4})/, '$1 $2');
     } else if (typeof value === 'string' && label === 'Area') {
       formattedValue = value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    } else if (label === 'Check In Time' || label === 'Check Out Time') {
+      const dateObj = new Date(value);
+      const hours = dateObj.getHours();
+      const minutes = dateObj.getMinutes();
+      const period = hours < 12 ? 'am' : 'pm';
+      const formattedHours = hours % 12 || 12;
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      formattedValue = `${formattedHours}:${formattedMinutes}${period}`;
     } else {
       formattedValue = value;
     }

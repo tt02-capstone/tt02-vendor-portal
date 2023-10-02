@@ -3,6 +3,7 @@ import { Modal, Form, Input, Button, Select, Switch, InputNumber, Space, Upload,
 import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { getAccommodationByVendor } from "../../redux/accommodationRedux";
 import { ToastContainer, toast } from 'react-toastify';
+import moment from 'moment';
 import AWS from 'aws-sdk';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
@@ -27,13 +28,13 @@ export default function EditAccommodationModal(props) {
             console.log("getAccommodation response data", response.data);
             setSelectedAccommodation(response.data);
             setPriceList(response.data.price_list);
-            
+
             // console.log("getAccommodation response data", response.data);
             const newExistingImageUrls = response.data.accommodation_image_list || [];
             // console.log("editAccommodationModal getAccommodation newExistingImageUrls", newExistingImageUrls);
 
             setExistingImageUrls(newExistingImageUrls);
-            
+
             console.log("editAccommodationModal getAccommodation existingImageUrls", existingImageUrls);
         } catch (error) {
             alert('An error occurred! Failed to retrieve accommodation!');
@@ -58,6 +59,16 @@ export default function EditAccommodationModal(props) {
     }, [existingImageUrls]);
 
     useEffect(() => {
+
+        const checkInTime = new Date(selectedAccommodation.check_in_time);
+        const checkOutTime = new Date(selectedAccommodation.check_out_time);
+
+        const formattedCheckInTime = moment(checkInTime).format("HH:mm");
+        const formattedCheckOutTime = moment(checkOutTime).format("HH:mm");
+
+        const momentCheckInTime = moment(formattedCheckInTime.toString(), 'HH:mm');
+        const momentCheckOutTime = moment(formattedCheckOutTime.toString(), 'HH:mm');
+
         form.setFieldsValue({
             accommodation_id: selectedAccommodation.accommodation_id,
             name: selectedAccommodation.name,
@@ -66,18 +77,17 @@ export default function EditAccommodationModal(props) {
             contact_num: selectedAccommodation.contact_num,
             accommodation_image_list: existingImageUrls,
             is_published: selectedAccommodation.is_published,
-            // check_in_time: selectedAccommodation.check_in_time,
-            // check_out_time: selectedAccommodation.check_out_time,
+            check_in_time: momentCheckInTime,
+            check_out_time: momentCheckOutTime,
             type: selectedAccommodation.type,
             generic_location: selectedAccommodation.generic_location,
             room_list: selectedAccommodation.room_list,
-            // est price tier
         });
 
     }, [selectedAccommodation, form]);
 
     const handleFileChange = (e) => {
-        const fileList = e.fileList; 
+        const fileList = e.fileList;
         setImageFiles(fileList);
     };
 
@@ -108,29 +118,29 @@ export default function EditAccommodationModal(props) {
 
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
-    
-        const accommodationImageName = 'Accommodation_' + selectedAccommodation.accommodation_id + '_' + file.name;
 
-        console.log("existingImageUrls", existingImageUrls);
+            const accommodationImageName = 'Accommodation_' + selectedAccommodation.accommodation_id + '_' + file.name;
 
-        // this currentFileUrl http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_3_Accommodation_3_art science.jpeg
-        const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_${selectedAccommodation.accommodation_id}_${file.name}`;
+            console.log("existingImageUrls", existingImageUrls);
 
-        console.log("currentFileUrl", currentFileUrl);
+            // this currentFileUrl http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_3_Accommodation_3_art science.jpeg
+            const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_${selectedAccommodation.accommodation_id}_${file.name}`;
 
-        console.log(file.name, " is a new image? ", !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_${selectedAccommodation.accommodation_id}`));
+            console.log("currentFileUrl", currentFileUrl);
+
+            console.log(file.name, " is a new image? ", !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_${selectedAccommodation.accommodation_id}`));
 
             // Check if the file is a new image (not an existing one)
-            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_${selectedAccommodation.accommodation_id}_${file.name}`) 
-            && !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/${file.name}`)) {
-                
+            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/Accommodation_${selectedAccommodation.accommodation_id}_${file.name}`)
+                && !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/${file.name}`)) {
+
                 const blob = new Blob([file.originFileObj]);
                 console.log("blob", blob);
-    
+
                 if (blob) {
                     const S3_BUCKET = S3BUCKET;
                     const REGION = TT02REGION;
-    
+
                     AWS.config.update({
                         accessKeyId: ACCESS_KEY,
                         secretAccessKey: SECRET_ACCESS_KEY,
@@ -139,13 +149,13 @@ export default function EditAccommodationModal(props) {
                         params: { Bucket: S3_BUCKET },
                         region: REGION,
                     });
-    
+
                     const params = {
                         Bucket: S3_BUCKET,
                         Key: accommodationImageName,
                         Body: blob,
                     };
-    
+
                     return new Promise((resolve, reject) => {
                         s3.putObject(params)
                             .on("httpUploadProgress", (evt) => {
@@ -167,13 +177,13 @@ export default function EditAccommodationModal(props) {
                 return `http://tt02.s3-ap-southeast-1.amazonaws.com/accommodation/${file.name}`;
             }
         });
-    
+
         try {
             const uploadedImageUrls = await Promise.all(uploadPromises);
             // Now all image URLs are collected, including both new and existing ones
-    
+
             setUploadedImageUrls(uploadedImageUrls);
-    
+
             props.onClickSubmitEditAccommodation({
                 ...form.getFieldsValue(),
                 accommodation_image_list: uploadedImageUrls, // Combined list of new and existing URLs
@@ -272,7 +282,7 @@ export default function EditAccommodationModal(props) {
                     >
                         <Input />
                     </Form.Item>
-                    
+
                     <Form.Item
                         label="Contact Number"
                         name="contact_num"
