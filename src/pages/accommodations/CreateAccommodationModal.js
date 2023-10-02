@@ -247,10 +247,10 @@ export default function CreateAccommodationModal(props) {
                     </Form.Item>
 
                     <Form.Item
-                        label="Accommodation Type"
+                        label="Type"
                         name="type"
                         placeholder="Accommodation Type"
-                        rules={[{ required: true, message: 'Please select accommodation type of the accommodation!' }]}
+                        rules={[{ required: true, message: 'Please select accommodation type!' }]}
                     >
                         <Select>
                             <Option value='HOTEL'>Hotel</Option>

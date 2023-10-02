@@ -311,22 +311,24 @@ export default function AttractionManagement() {
             key: 'operation',
             align: 'center',
             render: (text, record) => {
-                return <div>
-                    <CustomButton
-                        text="View"
-                        style ={{ fontSize : 13, fontWeight: "bold"}}
-                        onClick={() => onClickOpenViewAttractionModal(record.attraction_id)}
-                    />
-                    <br/><br/>
-                    <CustomButton
-                        text="Edit"
-                        style ={{ fontSize : 13, fontWeight: "bold"}}
-                        onClick={() => onClickOpenEditAttractionModal(record.attraction_id)}
-                    />
-                    <br/><br/>
+                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <div style={{ marginBottom: '10px' }}>
+                        <Space direction="horizontal">
+                            <CustomButton
+                                text="View"
+                                style={{fontWeight:"bold"}}
+                                onClick={() => onClickOpenViewAttractionModal(record.attraction_id)}
+                            />
+                            <CustomButton
+                                text="Edit"
+                                style={{fontWeight:"bold"}}
+                                onClick={() => onClickOpenEditAttractionModal(record.attraction_id)}
+                            />
+                        </Space>
+                    </div>
                     <CustomButton
                         text= " + Seasonal Activity"
-                        style ={{ fontSize : 13, fontWeight: "bold"}}
+                        style ={{fontWeight: "bold"}}
                         onClick={() => createSeasonal(record.attraction_id)}
                         loading={loading}
                     />

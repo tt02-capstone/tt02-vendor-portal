@@ -24,7 +24,7 @@ export default function TelecomManagement() {
 
     const breadcrumbItems = [
         {
-          title: 'Telecoms',
+            title: 'Telecoms',
         },
     ];
 
@@ -182,9 +182,9 @@ export default function TelecomManagement() {
             onFilter: (value, record) => record.type.indexOf(value) === 0,
             render: (text, record) => {
                 if (text === 'ESIM') {
-                    return <Tag color="magenta">E-Sim</Tag>
+                    return <Tag color="magenta">E-SIM</Tag>
                 } else if (text === 'PHYSICALSIM') {
-                    return <Tag color="cyan">Physical Sim</Tag>
+                    return <Tag color="cyan">PHYSICAL SIM</Tag>
                 } else {
                     return <p>Bug</p>
                 }
@@ -262,15 +262,15 @@ export default function TelecomManagement() {
             onFilter: (value, record) => record.plan_duration_category.indexOf(value) === 0,
             render: (text, record) => {
                 if (text === 'ONE_DAY') {
-                    return <Tag color="green">1 Day</Tag>
+                    return <Tag color="green">1 DAY</Tag>
                 } else if (text === 'THREE_DAY') {
-                    return <Tag color="cyan">3 Day</Tag>
+                    return <Tag color="cyan">3 DAYS</Tag>
                 } else if (text === 'SEVEN_DAY') {
-                    return <Tag color="blue">7 Day</Tag>
+                    return <Tag color="blue">7 DAYS</Tag>
                 } else if (text === 'FOURTEEN_DAY') {
-                    return <Tag color="geekblue">14 Day</Tag>
+                    return <Tag color="geekblue">14 DAYS</Tag>
                 } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
-                    return <Tag color="purple">More Than 14 Days</Tag>
+                    return <Tag color="purple">MORE THAN 14 DAYS</Tag>
                 } else {
                     return <p>Bug</p>
                 }
@@ -326,14 +326,19 @@ export default function TelecomManagement() {
             width: 160,
             align: 'center',
             render: (text, record) => (
-                <div>
-                    <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.telecom_id)} style={{marginRight: '7px', fontWeight:"bold"}} />
-                    <br/><br/>
-                    <CustomButton key='2' text="Edit" style={{fontWeight:"bold"}} onClick={() => onOpenEditModal(record.telecom_id)}/>
+
+                <div style={{ marginBottom: '10px' }}>
+                    <Space direction="horizontal">
+                        <CustomButton key='1' text="View" onClick={() => onOpenViewModal(record.telecom_id)} style={{ marginRight: '7px', fontWeight: "bold" }} />
+
+                        <CustomButton key='2' text="Edit" style={{ fontWeight: "bold" }} onClick={() => onOpenEditModal(record.telecom_id)} />
+                    </Space>
                 </div>
             ),
         }
     ];
+
+
 
     // fetch telecom list
     const [telecomList, setTelecomList] = useState([]);
@@ -353,7 +358,7 @@ export default function TelecomManagement() {
 
             fetchData();
         }
-    },[user, fetchTelecomList]);
+    }, [user, fetchTelecomList]);
 
     // on submit create modal
     async function onCreateSubmit(values) {
@@ -444,11 +449,11 @@ export default function TelecomManagement() {
     return user ? (
         <div>
             <Layout style={styles.layout}>
-                <CustomHeader items={breadcrumbItems}/>
+                <CustomHeader items={breadcrumbItems} />
                 <Content style={styles.content}>
-                    <CustomButton text="Create Telecom" icon={<PlusOutlined/>} onClick={() => setCreateTelecomModal(true)}/>
+                    <CustomButton text="Create Telecom" icon={<PlusOutlined />} onClick={() => setCreateTelecomModal(true)} />
                     <br /><br />
-                    <CustomTablePagination column={column} data={telecomList} rowKey="telecom_id" tableLayout={"fixed"}/>
+                    <CustomTablePagination column={column} data={telecomList} rowKey="telecom_id" tableLayout={"fixed"} />
 
                     {/* Modal to create telecom */}
                     <CreateTelecomModal
