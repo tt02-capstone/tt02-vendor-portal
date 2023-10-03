@@ -300,14 +300,14 @@ export default function DealManagement() {
             title: 'Start Date',
             dataIndex: 'start_datetime',
             key: 'start_datetime',
-            sorter: (a, b) => a.start_datetime > b.start_datetime,
+            sorter: (a, b) => new Date(a.start_datetime) > new Date(b.start_datetime),
             ...getColumnSearchProps('start_datetime'),
         },
         {
             title: 'End Date',
             dataIndex: 'end_datetime',
             key: 'end_datetime',
-            sorter: (a, b) => a.end_datetime > b.end_datetime,
+            sorter: (a, b) => new Date(a.end_datetime) > new Date(b.end_datetime),
             ...getColumnSearchProps('end_datetime'),
         },
         {
