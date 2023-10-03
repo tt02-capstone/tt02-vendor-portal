@@ -304,27 +304,24 @@ export default function AccommodationManagement() {
 
     function formatAccommodationData(accommodationDataArray) {
         return accommodationDataArray.map(item => {
-            // const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
-            // const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-            // const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
+            const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
+            const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+            const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
             const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
-
+      
             return {
                 accommodation_id: item.accommodation_id,
                 name: item.name,
                 description: item.description,
                 address: item.address,
-                // contact_num: formattedContactNum,
-                contact_num: item.contact_num,
+                contact_num: formattedContactNum,
                 accommodation_image_list: item.accommodation_image_list,
                 is_published: item.is_published,
                 check_in_time: item.check_in_time,
                 check_out_time: item.check_out_time,
                 type: item.type,
-                generic_location: item.generic_location,
-                estimated_price_tier: item.estimated_price_tier,
-                // generic_location: formattedGenericLocation,
-                // estimated_price_tier: formattedPriceTier,
+                estimated_price_tier: formattedPriceTier,
+                generic_location: formattedGenericLocation,
                 room_list: item.room_list,
             };
         });

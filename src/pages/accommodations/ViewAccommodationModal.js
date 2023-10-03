@@ -29,39 +29,6 @@ export default function ViewAccommodationModal(props) {
     }
   }, [props.isViewAccommodationModalOpen]);
 
-  // function formattedRoomList() {
-  //     const roomTypes = {};
-
-  //     if (roomList && roomList.length > 0) {
-  //       roomList.forEach((room) => {
-  //         const { room_type } = room;
-  //         const cleanedType = room_type.charAt(0).toUpperCase() + room_type.slice(1).toLowerCase();
-  //         if (roomTypes[cleanedType]) {
-  //           roomTypes[cleanedType] += 1;
-  //         } else {
-  //           roomTypes[cleanedType] = 1;
-  //         }
-  //       });
-
-  //       const formattedStats = Object.keys(roomTypes).map((type, index) => {
-  //         const itemStyle = {
-  //           margin: 0,
-  //           padding: 0,
-  //         };
-
-  //         return (
-  //           <p key={index} style={index === 0 ? { marginTop: 0 } : itemStyle}>
-  //             <span>{type} Rooms: {roomTypes[type]}</span>
-  //           </p>
-  //         );
-  //       });
-
-  //       return formattedStats;
-  //     }
-
-  //     return <p>No rooms available. Please create some!</p>;
-  //   }
-
   function formattedRoomList() {
     if (roomList && roomList.length > 0) {
       return roomList.map((item, index) => {
@@ -70,18 +37,20 @@ export default function ViewAccommodationModal(props) {
           padding: 0,
         };
 
-        const cleanedType = item.room_type.charAt(0).toUpperCase() + item.room_type.slice(1).toLowerCase();
+        let value = item.room_type;
+
+        const cleanedType = value.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 
         return (
           <p key={index} style={index === 0 ? { marginTop: 0 } : itemStyle}>
-            {index === 0 ? null : <br />}
-            <span>{cleanedType} Rooms: {item.quantity}</span><br />
+            {/* {index === 0 ? null : <br />} */}
+            <span>{cleanedType} - {item.quantity}</span><br />
           </p>
         );
       });
     }
 
-    return <p>No rooms available. Please create some!</p>;
+    return <p style={{ marginTop: 0 }} >No rooms available. Please create some!</p>;
   }
 
   function getPriceTierColor(priceTier) {
@@ -152,9 +121,12 @@ export default function ViewAccommodationModal(props) {
 
   function renderProperty(label, value, color) {
 
+    console.log('Label:', label);
+    console.log('Value:', value); 
+
     let formattedValue;
 
-    if (typeof value === 'string' && value.includes('_')) {
+    if (typeof value === 'string' && value.includes('_') && label !== 'Area') {
       formattedValue = value.split('_').join(' ');
     } else if (typeof value === 'string' && label === 'Contact Number') {
       formattedValue = value.replace(/(\d{4})(\d{4})/, '$1 $2');

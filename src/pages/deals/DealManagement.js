@@ -147,7 +147,7 @@ export default function DealManagement() {
                         <div style={styles.imageContainer}>
                             <img
                                 src={firstImageUrl}
-                                alt="Attraction"
+                                alt="Deal"
                                 style={styles.image}
                             />
                         </div>
@@ -159,8 +159,8 @@ export default function DealManagement() {
             title: 'Promo Code',
             dataIndex: 'promo_code',
             key: 'promo_code',
-            sorter: (a, b) => a.name.localeCompare(b.name),
-            ...getColumnSearchProps('name'),
+            sorter: (a, b) => a.promo_code.localeCompare(b.promo_code),
+            ...getColumnSearchProps('promo_code'),
         },
         {
             title: 'Discount %',

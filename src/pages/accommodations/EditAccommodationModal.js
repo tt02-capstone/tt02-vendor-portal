@@ -328,7 +328,7 @@ export default function EditAccommodationModal(props) {
                     </Form.Item>
 
                     <Form.Item
-                        label="Accommodation Type"
+                        label="Type"
                         name="type"
                         placeholder="Accommodation Type"
                         rules={[{ required: true, message: 'Please select accommodation type of the accommodation!' }]}

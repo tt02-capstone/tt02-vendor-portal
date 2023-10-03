@@ -1,8 +1,8 @@
-import { React , useEffect, useState , useRef } from 'react';
+import { React, useEffect, useState, useRef } from 'react';
 import CustomHeader from '../../components/CustomHeader';
 import CustomButton from '../../components/CustomButton';
 import { createRestaurant, updateRestaurant, getAllRestaurantByVendor, getRestaurant } from '../../redux/restaurantRedux';
-import  { Table, Input, Button, Space , Badge, Layout, Form, Tag} from 'antd';
+import { Table, Input, Button, Space, Badge, Layout, Form, Tag } from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -26,7 +26,7 @@ export default function RestaurantManagement(navigation) {
 
     const restBreadCrumb = [
         {
-          title: 'Restaurants',
+            title: 'Restaurants',
         }
     ];
 
@@ -155,7 +155,7 @@ export default function RestaurantManagement(navigation) {
 
         return {
             key: index,
-            restaurant_id : item.restaurant_id,
+            restaurant_id: item.restaurant_id,
             name: item.name,
             description: item.description,
             address: item.address,
@@ -193,7 +193,7 @@ export default function RestaurantManagement(navigation) {
             sorter: (a, b) => a.restaurant_type.localeCompare(b.restaurant_type),
             ...getColumnSearchProps('restaurant_type'),
             render: (type) => {
-                let tagColor = 'default'; 
+                let tagColor = 'default';
                 switch (type) {
                     case 'FAST_FOOD':
                         tagColor = 'purple';
@@ -269,11 +269,8 @@ export default function RestaurantManagement(navigation) {
             sorter: (a, b) => a.estimated_price_tier.localeCompare(b.estimated_price_tier),
             ...getColumnSearchProps('estiminated_price_tier'),
             render: (priceTier) => {
-                let tagColor = 'default'; 
+                let tagColor = 'default';
                 switch (priceTier) {
-                    case 'TIER 0':
-                        tagColor = 'grey';
-                        break;
                     case 'TIER 1':
                         tagColor = 'green';
                         break;
@@ -305,36 +302,36 @@ export default function RestaurantManagement(navigation) {
             key: 'operation',
             align: 'center',
             render: (text, record) => {
-                return <div>
-                    <CustomButton
-                        text="View Restaurant"
-                        style ={{ fontSize : 11, fontWeight: "bold"}}
-                        onClick={() => onClickOpenViewRestaurantModal(record.restaurant_id)}
-                    />
-                    <br/><br/>
-
-                    <CustomButton
-                        text="Edit Restaurant"
-                        style ={{ fontSize : 11, fontWeight: "bold"}}
-                        onClick={() => onClickOpenEditRestaurantModal(record.restaurant_id)}
-                    />
-                    <br/><br/>
-
+                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ marginBottom: '10px' }}>
+                        <Space direction="horizontal">
+                            <CustomButton
+                                text="View"
+                                style={{fontWeight: "bold" }}
+                                onClick={() => onClickOpenViewRestaurantModal(record.restaurant_id)}
+                            />
+                            <CustomButton
+                                text="Edit"
+                                style={{ fontWeight: "bold" }}
+                                onClick={() => onClickOpenEditRestaurantModal(record.restaurant_id)}
+                            />
+                        </Space>
+                    </div>
                     <CustomButton
                         text="Manage Dish(es)"
-                        style ={{ fontSize : 11, fontWeight: "bold"}}
+                        style={{ fontWeight: "bold" }}
                         onClick={() => goToDish(record.restaurant_id)}
                     />
-                    <br/><br/>
                 </div>
+
             },
-            width: 200,
+            width: 150,
         },
     ];
 
     // 
     const goToDish = (restId) => {
-        navigate('/dish', { state : {restId}})
+        navigate('/dish', { state: { restId } })
     }
 
     // view restaurant details  
@@ -371,7 +368,7 @@ export default function RestaurantManagement(navigation) {
             contact_num: values.contact_num,
             is_published: true,
             suggested_duration: values.suggested_duration,
-            restaurant_type : values.restaurant_type,
+            restaurant_type: values.restaurant_type,
             generic_location: values.generic_location,
             restaurant_image_list: values.restaurant_image_list
         }
@@ -425,7 +422,7 @@ export default function RestaurantManagement(navigation) {
     async function onClickSubmitEditRestaurant(values) {
 
         let restObj = {
-            restaurant_id : selectedRestId,
+            restaurant_id: selectedRestId,
             name: values.name,
             description: values.description,
             address: values.address,
@@ -433,7 +430,7 @@ export default function RestaurantManagement(navigation) {
             contact_num: values.contact_num,
             is_published: values.is_published,
             suggested_duration: values.suggested_duration,
-            restaurant_type : values.restaurant_type,
+            restaurant_type: values.restaurant_type,
             generic_location: values.generic_location,
             restaurant_image_list: values.restaurant_image_list
         }
@@ -447,7 +444,7 @@ export default function RestaurantManagement(navigation) {
                 return data;
             });
 
-            
+
             setData(updatedRest);
 
             setIsEditRestaurantModalOpen(false);
@@ -498,11 +495,11 @@ export default function RestaurantManagement(navigation) {
 
     return user ? (
         <Layout style={styles.layout}>
-             <CustomHeader items={restBreadCrumb}/>
-             <Content style={styles.content}>
+            <CustomHeader items={restBreadCrumb} />
+            <Content style={styles.content}>
                 <CustomButton
                     text="Add Restaurant"
-                    style={{ marginLeft: '3px', marginBottom:'10px'}}
+                    style={{ marginLeft: '3px', marginBottom: '10px' }}
                     icon={<PlusOutlined />}
                     onClick={onClickOpenCreateRestaurantModal}
                 />
@@ -541,13 +538,13 @@ export default function RestaurantManagement(navigation) {
                     restId={selectedRestId}
                 />
 
-            <ToastContainer />
-             </Content>
+                <ToastContainer />
+            </Content>
         </Layout>
-    ):
-    ( 
-        <Navigate to="/" />
-    )
+    ) :
+        (
+            <Navigate to="/" />
+        )
 }
 
 const styles = {
