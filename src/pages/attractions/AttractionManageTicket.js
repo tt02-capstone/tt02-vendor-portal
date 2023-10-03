@@ -1,5 +1,5 @@
 import { React , useEffect, useState , useRef } from 'react';
-import { Layout, Tag } from 'antd';
+import { Layout, Tag, Badge } from 'antd';
 import CustomHeader from '../../components/CustomHeader';
 import CustomButton from '../../components/CustomButton';
 import ViewTicketModal from './ViewTicketModal';
@@ -120,30 +120,19 @@ export default function AttractionManageTicket() {
     }, []);
 
     const datasource = data.map((item, index) => {
-        const publishedStatus = item.is_published ? 'Published' : 'Not Published';
         const priceList = item.price_list;
-        const ticketList = item.ticket_per_day_list;
 
-        const formatPriceList = priceList.map(item => {
-            return `${item.ticket_type}: Local $${item.local_amount}, Tourist $${item.tourist_amount}`;
+        const formatPriceList = priceList.map(priceItem => {
+            return (
+                <tr key={priceItem.ticket_type}>
+                    <td>{priceItem.ticket_type}</td>
+                    <td>${priceItem.local_amount} (Local)</td>
+                    <td>${priceItem.tourist_amount} (Tourist)</td>
+                </tr>
+            );
         });
 
-        const priceListString = formatPriceList.join('\n');
-
-        const validTicketList = ticketList.filter(item => {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0'); // format to current timezone 
-
-            const todayFormatted = `${year}-${month}-${day}`;
-
-            return item.ticket_date >= todayFormatted && item.ticket_count > 0;
-        });
-
-        const ticketListString = validTicketList.map(item => {
-            return `${item.ticket_date} - ${item.ticket_type} = ${item.ticket_count} Left`;
-        }).join('\n');
+        const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
 
         return {
             key: index,
@@ -153,9 +142,15 @@ export default function AttractionManageTicket() {
             age_group: item.age_group,
             category: item.attraction_category, 
             description: item.description,
-            status: publishedStatus,
-            price_list: priceListString,
-            ticket_list: ticketListString
+            status: item.is_published, // sync with other screens 
+            estimated_price_tier: formattedPriceTier, 
+            price_list: (
+                <table>
+                    <tbody>
+                        {formatPriceList}
+                    </tbody>
+                </table>
+            ),
         };
     });
 
@@ -315,43 +310,57 @@ export default function AttractionManageTicket() {
             }
         },
         {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description', 
-            sorter: (a, b) => a.description.localeCompare(b.description),
-            ...getColumnSearchProps('description')
-        },
-        {
-            title: 'Visibility',
+            title: 'Published',
             dataIndex: 'status',
             key: 'status',
             sorter: (a, b) => a.status.localeCompare(b.status),
             ...getColumnSearchProps('status'),
             render: (text) => {
+                if (text === true) {
+                    return <Badge status="success" text="Yes" />
+                } else {
+                    return <Badge status="error" text="No" />
+                }
+            },
+            width: 150,
+        },
+        {
+            title: 'Price Tier',
+            dataIndex: 'estimated_price_tier',
+            key: 'estimated_price_tier',
+            sorter: (a, b) => a.estimated_price_tier.localeCompare(b.estimated_price_tier),
+            ...getColumnSearchProps('estiminated_price_tier'),
+            render: (priceTier) => {
                 let tagColor = 'default'; 
-                switch (text) {
-                    case 'Published':
+                switch (priceTier) {
+                    case 'TIER 1':
+                        tagColor = 'green';
+                        break;
+                    case 'TIER 2':
+                        tagColor = 'orange';
+                        break;
+                    case 'TIER 3':
+                        tagColor = 'red';
+                        break;
+                    case 'TIER 4':
                         tagColor = 'blue';
                         break;
-                    case 'Not Published':
-                        tagColor = 'red';
+                    case 'TIER 5':
+                        tagColor = 'yellow';
                         break;
                     default:
                         break;
                 }
-
                 return (
-                    <Tag color={tagColor}>{text}</Tag>
+                    <Tag color={tagColor}>{priceTier}</Tag>
                 );
-            }
+            },
+            width: 100,
         },
         {
             title: 'Price List',
             dataIndex: 'price_list',
-            key: 'price_list', 
-            width: 300,
-            sorter: (a, b) => a.price_list.localeCompare(b.price_list),
-            ...getColumnSearchProps('price_list'),
+            key: 'price_list',
         },
         {
             title: 'Action(s)',
