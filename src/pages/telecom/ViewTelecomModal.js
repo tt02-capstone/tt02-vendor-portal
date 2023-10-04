@@ -86,29 +86,29 @@ export default function ViewTelecomModal(props) {
 
     function formatDurationCategory(text) {
         if (text === 'ONE_DAY') {
-            return '1 day';
+            return '1 DAY';
         } else if (text === 'THREE_DAY') {
-            return 'Bet 2 and 3 days';
+            return 'BET 2 AND 3 DAYS';
         } else if (text === 'SEVEN_DAY') {
-            return 'Bet 4 and 7 days';
+            return 'BET 4 AND 7 DAYS';
         } else if (text === 'FOURTEEN_DAY') {
-            return 'Bet 8 and 14 days';
+            return 'BET 8 AND 14 DAYS';
         } else {
-            return 'More than 14 days';
+            return 'MORE THAN 14 DAYS';
         }
     }
 
     function formatDataLimitText(text) {
         if (text === 'VALUE_10') {
-            return '10GB and less';
+            return '10GB AND LESS';
         } else if (text === 'VALUE_30') {
-            return 'Bet 10GB and 30GB';
+            return 'BET 10GB AND 30GB';
         } else if (text === 'VALUE_50') {
-            return 'Bet 30GB and 50GB';
+            return 'BET 30GB AND 50GB';
         } else if (text === 'VALUE_100') {
-            return 'Bet 50GB and 100GB';
+            return 'BET 50GB AND 100GB';
         } else {
-            return 'Beyond 100GB';
+            return 'BEYOND 100GB';
         }
     }
 
