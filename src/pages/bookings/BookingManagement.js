@@ -151,9 +151,9 @@ export default function BookingManagement() {
             onFilter: (value, record) => record.booked_user === value,
             render: (text, record) => {
               if (text === 'LOCAL') {
-                return <Tag color='success'>Local</Tag>;
+                return <Tag color='success'>LOCAL</Tag>;
               } else if (text === 'TOURIST') {
-                return <Tag color='error'>Tourist</Tag>;
+                return <Tag color='error'>TOURIST</Tag>;
               } else {
                 return 'Bug';
               }
@@ -188,19 +188,19 @@ export default function BookingManagement() {
                 switch (text) {
                     case 'ACCOMMODATION':
                         color = 'processing';
-                        value = 'Accommodation';
+                        value = 'ACCOMMODATION';
                         break;
                     case 'TELECOM':
                         color = 'warning';
-                        value = 'Telecom';
+                        value = 'TELECOM';
                         break;
                     case 'ATTRACTION':
                         color = 'success';
-                        value = 'Attraction';
+                        value = 'ATTRACTION';
                         break;
                     case 'TOUR':
                         color = 'error';
-                        value = 'Tour';
+                        value = 'TOUR';
                         break;
                 }
 
@@ -257,20 +257,20 @@ export default function BookingManagement() {
             sorter: (a, b) => new Date(a.last_update) > new Date(b.last_update),
             ...getColumnSearchProps('last_update'),
         },
-        {
-            title: 'Start Date',
-            dataIndex: 'start_datetime',
-            key: 'start_datetime',
-            sorter: (a, b) => new Date(a.start_datetime) > new Date(b.start_datetime),
-            ...getColumnSearchProps('start_datetime'),
-        },
-        {
-            title: 'End Date',
-            dataIndex: 'end_datetime',
-            key: 'end_datetime',
-            sorter: (a, b) => new Date(a.end_datetime) > new Date(b.end_datetime),
-            ...getColumnSearchProps('end_datetime'),
-        },
+        // {
+        //     title: 'Start Date',
+        //     dataIndex: 'start_datetime',
+        //     key: 'start_datetime',
+        //     sorter: (a, b) => new Date(a.start_datetime) > new Date(b.start_datetime),
+        //     ...getColumnSearchProps('start_datetime'),
+        // },
+        // {
+        //     title: 'End Date',
+        //     dataIndex: 'end_datetime',
+        //     key: 'end_datetime',
+        //     sorter: (a, b) => new Date(a.end_datetime) > new Date(b.end_datetime),
+        //     ...getColumnSearchProps('end_datetime'),
+        // },
         {
             title: 'Payment Status',
             dataIndex: 'payment',
@@ -294,7 +294,7 @@ export default function BookingManagement() {
                     color = 'red';
                 }
 
-                return <Tag color={color}>{payment ? (payment.is_paid ? 'Paid' : 'Unpaid') : 'N/A'}</Tag>;
+                return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
             },
         },
         {
@@ -308,11 +308,13 @@ export default function BookingManagement() {
             title: 'Action(s)',
             dataIndex: 'type',
             key: 'type',
+            align: 'center',
             render: (text, record) => {
                 if (text === 'ATTRACTION') {
                     return <Space>
                             <CustomButton
                                 text="View"
+                                style={{fontWeight: "bold"}}
                                 onClick={() => onClickOpenViewAttractionBookingModal(record.booking_id)}
                             />
                         </Space>
@@ -320,6 +322,7 @@ export default function BookingManagement() {
                     return <Space>
                             <CustomButton
                                 text="View"
+                                style={{fontWeight: "bold"}}
                                 onClick={() => onClickOpenViewTelecomBookingModal(record.booking_id)}
                             />
                         </Space>
@@ -327,6 +330,7 @@ export default function BookingManagement() {
                     return <Space>
                             <CustomButton
                                 text="View"
+                                style={{fontWeight: "bold"}}
                                 onClick={() => onClickOpenViewRoomBookingModal(record.booking_id)}
                             />
                         </Space>
@@ -433,7 +437,7 @@ export default function BookingManagement() {
 
                         <ViewRoomBookingModal
                             openViewModal={isViewRoomBookingModalOpen}
-                            onClickCancelViewTelecomBookingModal={onClickCancelViewRoomBookingModal}
+                            onClickCancelViewRoomBookingModal={onClickCancelViewRoomBookingModal}
                             id={selectedBookingId}
                         />
                     </Content>
