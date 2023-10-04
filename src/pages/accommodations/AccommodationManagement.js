@@ -30,6 +30,7 @@ export default function AccommodationManagement() {
     const [selectedAccommodation, setSelectedAccommodation] = useState([]);
     const [roomList, setRoomList] = useState([]);
     const [accommodationImages, setAccommodationImages] = useState({});
+    const searchInputRef = useRef(null);
 
     const viewAccommodationBreadCrumb = [
         {
@@ -88,19 +89,6 @@ export default function AccommodationManagement() {
                         }}
                     >
                         Reset
-                    </Button>
-                    <Button
-                        type="link"
-                        size="small"
-                        onClick={() => {
-                            confirm({
-                                closeDropdown: false,
-                            });
-                            setSearchText(selectedKeys[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
                     </Button>
                     <Button
                         type="link"
@@ -177,7 +165,6 @@ export default function AccommodationManagement() {
             dataIndex: 'type',
             key: 'type',
             sorter: (a, b) => a.type.localeCompare(b.type),
-            ...getColumnSearchProps('type'),
             render: (type) => {
                 let tagColor = 'default';
                 switch (type) {
@@ -194,14 +181,38 @@ export default function AccommodationManagement() {
                 return (
                     <Tag color={tagColor}>{type}</Tag>
                 );
-            }
+            },
+            filters: [
+                {
+                    text: 'Hotel',
+                    value: 'HOTEL',
+                },
+                {
+                    text: 'Airbnb',
+                    value: 'AIRBNB',
+                },
+            ],
+            onFilter: (value, record) => record.type.indexOf(value) === 0,
         },
         {
             title: 'Area',
             dataIndex: 'generic_location',
             key: 'generic_location',
             sorter: (a, b) => a.generic_location.localeCompare(b.generic_location),
-            ...getColumnSearchProps('generic_location'),
+            filters: [
+                { text: 'Marina Bay', value: 'Marina Bay' },
+                { text: 'Raffles Place', value: 'Raffles Place' },
+                { text: 'Shenton Way', value: 'Shenton Way' },
+                { text: 'Tanjong Pagar', value: 'Tanjong Pagar' },
+                { text: 'Orchard', value: 'Orchard' },
+                { text: 'Newton', value: 'Newton' },
+                { text: 'Dhoby Ghaut', value: 'Dhoby Ghaut' },
+                { text: 'Chinatown', value: 'Chinatown' },
+                { text: 'Bugis', value: 'Bugis' },
+                { text: 'Clarke Quay', value: 'Clarke Quay' },
+                { text: 'Sentosa', value: 'Sentosa' },
+            ],
+            onFilter: (value, record) => record.generic_location.indexOf(value) === 0,
         },
         {
             title: 'Address',
@@ -230,6 +241,17 @@ export default function AccommodationManagement() {
                 }
             },
             width: 100,
+            filters: [
+                {
+                    text: 'Published',
+                    value: true,
+                },
+                {
+                    text: 'Hidden',
+                    value: false,
+                },
+            ],
+            onFilter: (value, record) => record.is_published === value,
         },
         // total rooms
         {
@@ -258,41 +280,47 @@ export default function AccommodationManagement() {
                         break;
                 }
 
-                return (
-                    <Tag color={tagColor}>{priceTier}</Tag>
-                );
+                return <Tag color={tagColor}>{priceTier}</Tag>;
             },
             sorter: (a, b) => {
                 const tierA = a.estimated_price_tier || '';
                 const tierB = b.estimated_price_tier || '';
-            
+
                 return tierA.localeCompare(tierB);
-              },
+            },
             width: 100,
+            filters: [
+                { text: 'Tier 1', value: 'TIER 1' },
+                { text: 'Tier 2', value: 'TIER 2' },
+                { text: 'Tier 3', value: 'TIER 3' },
+                { text: 'Tier 4', value: 'TIER 4' },
+                { text: 'Tier 5', value: 'TIER 5' },
+            ],
+            onFilter: (value, record) => record.estimated_price_tier.indexOf(value) === 0,
         },
         {
             title: 'Action(s)',
             dataIndex: 'operation',
             key: 'operation',
             render: (text, record) => {
-                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ marginBottom: '10px' }}>
                         <Space direction="horizontal">
                             <CustomButton
                                 text="View"
-                                style={{fontWeight:"bold"}}
+                                style={{ fontWeight: "bold" }}
                                 onClick={() => onClickOpenViewAccommodationModal(record.accommodation_id)}
                             />
                             <CustomButton
                                 text="Edit"
-                                style={{fontWeight:"bold"}}
+                                style={{ fontWeight: "bold" }}
                                 onClick={() => onClickOpenEditAccommodationModal(record.accommodation_id)}
                             />
                         </Space>
                     </div>
                     <CustomButton
                         text="Rooms"
-                        style={{fontWeight:"bold"}}
+                        style={{ fontWeight: "bold" }}
                         onClick={() => onClickNavigateToRoomManagement(record.accommodation_id)}
                     />
                 </div>
@@ -308,7 +336,7 @@ export default function AccommodationManagement() {
             const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
             const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
-      
+
             return {
                 accommodation_id: item.accommodation_id,
                 name: item.name,
@@ -468,8 +496,8 @@ export default function AccommodationManagement() {
 
         console.log('values.check_in_time:', values.check_in_time);
         console.log('values.check_out_time:', values.check_out_time);
-        
-        if(moment.isMoment(values.check_in_time)) {
+
+        if (moment.isMoment(values.check_in_time)) {
             const checkInMomentObject = values.check_in_time;
             checkInHours = checkInMomentObject.hours();
             console.log('MomentObject checkInHours:', checkInHours);
@@ -483,7 +511,7 @@ export default function AccommodationManagement() {
             console.log('New checkInMinutes:', checkInMinutes);
         }
 
-        if(moment.isMoment(values.check_out_time)) {
+        if (moment.isMoment(values.check_out_time)) {
             const checkOutMomentObject = values.check_out_time;
             checkOutHours = checkOutMomentObject.hours();
             console.log('MomentObject checkOutHours:', checkOutHours);

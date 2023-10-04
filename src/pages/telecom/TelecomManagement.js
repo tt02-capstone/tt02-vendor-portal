@@ -182,9 +182,9 @@ export default function TelecomManagement() {
             onFilter: (value, record) => record.type.indexOf(value) === 0,
             render: (text, record) => {
                 if (text === 'ESIM') {
-                    return <Tag color="magenta">E-Sim</Tag>
+                    return <Tag color="magenta">{text}</Tag>
                 } else if (text === 'PHYSICALSIM') {
-                    return <Tag color="cyan">Physical SIM</Tag>
+                    return <Tag color="cyan">{text}</Tag>
                 } else {
                     return <p>Bug</p>
                 }
@@ -262,15 +262,15 @@ export default function TelecomManagement() {
             onFilter: (value, record) => record.plan_duration_category.indexOf(value) === 0,
             render: (text, record) => {
                 if (text === 'ONE_DAY') {
-                    return <Tag color="green">1 day</Tag>
+                    return <Tag color="green">1 DAY</Tag>
                 } else if (text === 'THREE_DAY') {
-                    return <Tag color="cyan">Bet 2 and 3 days</Tag>
+                    return <Tag color="cyan">BET 2 AND 3 DAYS</Tag>
                 } else if (text === 'SEVEN_DAY') {
-                    return <Tag color="blue">Bet 4 and 7 days</Tag>
+                    return <Tag color="blue">BET 4 AND 7 DAYS</Tag>
                 } else if (text === 'FOURTEEN_DAY') {
-                    return <Tag color="geekblue">Bet 8 and 14 days</Tag>
+                    return <Tag color="geekblue">BET 8 AND 14 DAYS</Tag>
                 } else if (text === 'MORE_THAN_FOURTEEN_DAYS') {
-                    return <Tag color="purple">More than 14 days</Tag>
+                    return <Tag color="purple">MORE THAN 14 DAYS</Tag>
                 } else {
                     return <p>Bug</p>
                 }
@@ -305,15 +305,15 @@ export default function TelecomManagement() {
             onFilter: (value, record) => record.data_limit_category.indexOf(value) === 0,
             render: (text, record) => {
                 if (text === 'VALUE_10') {
-                    return <Tag color="magenta">10GB and less</Tag>
+                    return <Tag color="magenta">10GB AND LESS</Tag>
                 } else if (text === 'VALUE_30') {
-                    return <Tag color="red">Bet 11 and 30GB</Tag>
+                    return <Tag color="red">BET 11 AND 30GB</Tag>
                 } else if (text === 'VALUE_50') {
-                    return <Tag color="volcano">Bet 31 and 50GB</Tag>
+                    return <Tag color="volcano">BET 31 AND 50GB</Tag>
                 } else if (text === 'VALUE_100') {
-                    return <Tag color="orange">Bet 51 and 100GB</Tag>
+                    return <Tag color="orange">BET 51 AND 100GB</Tag>
                 } else if (text === 'UNLIMITED') {
-                    return <Tag color="gold">Beyond 100GB</Tag>
+                    return <Tag color="gold">BEYOND 100GB</Tag>
                 } else {
                     return <p>Bug</p>
                 }
