@@ -88,7 +88,7 @@ export default function ViewRoomBookingModal(props) {
         
         // Create an array of formatted ticket descriptions
         const ticketDescriptions = bookingItems.map((bookingItem) => {
-          return `${bookingItem?.activity_selection} (${bookingItem?.quantity} pax)`;
+          return `${bookingItem?.activity_selection} (${bookingItem?.quantity} room)`;
         });
         
         const tickets = ticketDescriptions.join(', ');
@@ -102,6 +102,7 @@ export default function ViewRoomBookingModal(props) {
     }
 
     function formatStartEndDate(date) {
+        console.log("date", date);
         if (!date) return '';
         return new Date(date).toLocaleDateString();
     }
