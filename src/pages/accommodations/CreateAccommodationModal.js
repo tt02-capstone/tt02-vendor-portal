@@ -280,7 +280,7 @@ export default function CreateAccommodationModal(props) {
 
                     {/* once they create shld direct them to create rooms */}
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
                         <Button type="primary" htmlType="submit">
                             Create
                         </Button>
