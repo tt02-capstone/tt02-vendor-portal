@@ -95,11 +95,25 @@ export default function ViewTelecomBookingModal(props) {
       
         return (
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <div style={{ fontWeight: 'bold', minWidth: '200px' }}>Booking:</div>
+            <div style={{ fontWeight: 'bold', minWidth: '200px' }}>Booking Items:</div>
             <div>{tickets}</div>
           </div>
         );
     }
+
+    function formatStartEndDate(date) {
+        if (!date) return '';
+        return new Date(date).toLocaleDateString();
+    }
+
+    function formatDate(dateTime) {
+        if (!dateTime) return '';
+        const dateObj = new Date(dateTime);
+        const formattedDate = dateObj.toLocaleDateString(); 
+        const formattedTime = dateObj.toLocaleTimeString(); 
+        return `${formattedDate} ${formattedTime}`;
+    }
+
 
     return (
         <div>
@@ -116,9 +130,9 @@ export default function ViewTelecomBookingModal(props) {
                     {renderProperty('Customer Type', selectedBooking.booked_user, getCustomerType(selectedBooking.booked_user))}
                     {renderProperty('Customer Contact', selectedBooking.contact)}
                     {renderProperty('Booking Status', selectedBooking.status, getBookingStatusColor(selectedBooking.status))}
-                    {renderProperty('Last Updated', selectedBooking.last_update)}
-                    {renderProperty('Start Date', selectedBooking.start_datetime)}
-                    {renderProperty('End Date', selectedBooking.end_datetime)}
+                    {renderProperty('Last Updated', formatDate(selectedBooking.last_update))}
+                    {renderProperty('Start Date', formatStartEndDate(selectedBooking.start_datetime))}
+                    {renderProperty('End Date', formatStartEndDate(selectedBooking.end_datetime))}
                     {renderBookingItems()}
                     {renderProperty('Payment Status', selectedBooking.payment.is_paid ? "PAID" : "UNPAID", getPaymentStatusColor(selectedBooking.payment.is_paid))}
                     {renderProperty('Amount Earned', selectedBooking.payment_amount)}

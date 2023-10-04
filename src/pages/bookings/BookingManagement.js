@@ -187,19 +187,19 @@ export default function BookingManagement() {
                 let value = '';
                 switch (text) {
                     case 'ACCOMMODATION':
-                        color = 'processing';
+                        color = 'purple';
                         value = 'ACCOMMODATION';
                         break;
                     case 'TELECOM':
-                        color = 'warning';
+                        color = 'magenta';
                         value = 'TELECOM';
                         break;
                     case 'ATTRACTION':
-                        color = 'success';
+                        color = 'volcano';
                         value = 'ATTRACTION';
                         break;
                     case 'TOUR':
-                        color = 'error';
+                        color = 'geekblue';
                         value = 'TOUR';
                         break;
                 }
@@ -341,6 +341,14 @@ export default function BookingManagement() {
         },
     ];
 
+    function formatDate(dateTime) {
+        if (!dateTime) return '';
+        const dateObj = new Date(dateTime);
+        const formattedDate = dateObj.toLocaleDateString(); 
+        const formattedTime = dateObj.toLocaleTimeString(); 
+        return `${formattedDate} ${formattedTime}`;
+    }
+
     useEffect(() => {
         if (getBookingsData) {
             const fetchData = async () => {
@@ -354,6 +362,7 @@ export default function BookingManagement() {
                         start_datetime: moment(val.start_datetime).format('ll'),
                         end_datetime: moment(val.end_datetime).format('ll'),
                         payment_amount: `$${(val.payment.payment_amount * (1 - val.payment.comission_percentage)).toFixed(2)}`,
+                        last_update: formatDate(val.last_update),
                         key: val.user_id,
                     }));
                     setBookingsData(tempData);
