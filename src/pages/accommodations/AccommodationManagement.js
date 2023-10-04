@@ -165,7 +165,6 @@ export default function AccommodationManagement() {
             dataIndex: 'type',
             key: 'type',
             sorter: (a, b) => a.type.localeCompare(b.type),
-            ...getColumnSearchProps('type'),
             render: (type) => {
                 let tagColor = 'default';
                 switch (type) {
@@ -182,14 +181,38 @@ export default function AccommodationManagement() {
                 return (
                     <Tag color={tagColor}>{type}</Tag>
                 );
-            }
+            },
+            filters: [
+                {
+                    text: 'Hotel',
+                    value: 'HOTEL',
+                },
+                {
+                    text: 'Airbnb',
+                    value: 'AIRBNB',
+                },
+            ],
+            onFilter: (value, record) => record.type.indexOf(value) === 0,
         },
         {
             title: 'Area',
             dataIndex: 'generic_location',
             key: 'generic_location',
             sorter: (a, b) => a.generic_location.localeCompare(b.generic_location),
-            ...getColumnSearchProps('generic_location'),
+            filters: [
+                { text: 'Marina Bay', value: 'Marina Bay' },
+                { text: 'Raffles Place', value: 'Raffles Place' },
+                { text: 'Shenton Way', value: 'Shenton Way' },
+                { text: 'Tanjong Pagar', value: 'Tanjong Pagar' },
+                { text: 'Orchard', value: 'Orchard' },
+                { text: 'Newton', value: 'Newton' },
+                { text: 'Dhoby Ghaut', value: 'Dhoby Ghaut' },
+                { text: 'Chinatown', value: 'Chinatown' },
+                { text: 'Bugis', value: 'Bugis' },
+                { text: 'Clarke Quay', value: 'Clarke Quay' },
+                { text: 'Sentosa', value: 'Sentosa' },
+            ],
+            onFilter: (value, record) => record.generic_location.indexOf(value) === 0,
         },
         {
             title: 'Address',
@@ -218,6 +241,17 @@ export default function AccommodationManagement() {
                 }
             },
             width: 100,
+            filters: [
+                {
+                    text: 'Published',
+                    value: true,
+                },
+                {
+                    text: 'Hidden',
+                    value: false,
+                },
+            ],
+            onFilter: (value, record) => record.is_published === value,
         },
         // total rooms
         {
@@ -255,45 +289,14 @@ export default function AccommodationManagement() {
                 return tierA.localeCompare(tierB);
             },
             width: 100,
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-                <div style={{ padding: 8 }}>
-                    <Input
-                        ref={searchInputRef}
-                        placeholder="Search Price Tier"
-                        value={selectedKeys[0]}
-                        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                        onPressEnter={() => {
-                            setSearchText(selectedKeys[0]);
-                            confirm();
-                        }}
-                        style={{ width: 188, marginBottom: 8, display: 'block' }}
-                    />
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setSearchText(selectedKeys[0]);
-                            confirm();
-                        }}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{ width: 90, marginRight: 8 }}
-                    >
-                        Search
-                    </Button>
-                    <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
-                        Reset
-                    </Button>
-                </div>
-            ),
-            onFilter: (value, record) =>
-                record.estimated_price_tier.toLowerCase().includes(value.toLowerCase()),
-            onFilterDropdownVisibleChange: (visible) => {
-                if (visible) {
-                    setTimeout(() => {
-                        searchInputRef.current.select();
-                    }, 0);
-                }
-            },
+            filters: [
+                { text: 'Tier 1', value: 'TIER 1' },
+                { text: 'Tier 2', value: 'TIER 2' },
+                { text: 'Tier 3', value: 'TIER 3' },
+                { text: 'Tier 4', value: 'TIER 4' },
+                { text: 'Tier 5', value: 'TIER 5' },
+            ],
+            onFilter: (value, record) => record.estimated_price_tier.indexOf(value) === 0,
         },
         {
             title: 'Action(s)',
