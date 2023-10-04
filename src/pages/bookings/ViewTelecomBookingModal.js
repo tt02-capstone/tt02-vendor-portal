@@ -95,7 +95,7 @@ export default function ViewTelecomBookingModal(props) {
       
         return (
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <div style={{ fontWeight: 'bold', minWidth: '200px' }}>Tickets:</div>
+            <div style={{ fontWeight: 'bold', minWidth: '200px' }}>Booking:</div>
             <div>{tickets}</div>
           </div>
         );
@@ -113,14 +113,14 @@ export default function ViewTelecomBookingModal(props) {
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderProperty('Customer Name', selectedBooking.name)}
                     {renderProperty('Customer Email', selectedBooking.email)}
-                    {renderProperty('Customer Type', selectedBooking.booked_user === 'LOCAL' ? 'Local' : 'Tourist', getCustomerType(selectedBooking.booked_user))}
+                    {renderProperty('Customer Type', selectedBooking.booked_user, getCustomerType(selectedBooking.booked_user))}
                     {renderProperty('Customer Contact', selectedBooking.contact)}
                     {renderProperty('Booking Status', selectedBooking.status, getBookingStatusColor(selectedBooking.status))}
                     {renderProperty('Last Updated', selectedBooking.last_update)}
                     {renderProperty('Start Date', selectedBooking.start_datetime)}
                     {renderProperty('End Date', selectedBooking.end_datetime)}
                     {renderBookingItems()}
-                    {renderProperty('Payment Status', selectedBooking.payment.is_paid ? "Paid" : "Unpaid", getPaymentStatusColor(selectedBooking.payment.is_paid))}
+                    {renderProperty('Payment Status', selectedBooking.payment.is_paid ? "PAID" : "UNPAID", getPaymentStatusColor(selectedBooking.payment.is_paid))}
                     {renderProperty('Amount Earned', selectedBooking.payment_amount)}
                 </div>
             </Modal >}
