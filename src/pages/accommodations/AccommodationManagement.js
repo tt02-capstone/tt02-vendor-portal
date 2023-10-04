@@ -30,6 +30,7 @@ export default function AccommodationManagement() {
     const [selectedAccommodation, setSelectedAccommodation] = useState([]);
     const [roomList, setRoomList] = useState([]);
     const [accommodationImages, setAccommodationImages] = useState({});
+    const searchInputRef = useRef(null);
 
     const viewAccommodationBreadCrumb = [
         {
@@ -245,41 +246,78 @@ export default function AccommodationManagement() {
                         break;
                 }
 
-                return (
-                    <Tag color={tagColor}>{priceTier}</Tag>
-                );
+                return <Tag color={tagColor}>{priceTier}</Tag>;
             },
             sorter: (a, b) => {
                 const tierA = a.estimated_price_tier || '';
                 const tierB = b.estimated_price_tier || '';
-            
+
                 return tierA.localeCompare(tierB);
-              },
+            },
             width: 100,
+            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+                <div style={{ padding: 8 }}>
+                    <Input
+                        ref={searchInputRef}
+                        placeholder="Search Price Tier"
+                        value={selectedKeys[0]}
+                        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                        onPressEnter={() => {
+                            setSearchText(selectedKeys[0]);
+                            confirm();
+                        }}
+                        style={{ width: 188, marginBottom: 8, display: 'block' }}
+                    />
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setSearchText(selectedKeys[0]);
+                            confirm();
+                        }}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90, marginRight: 8 }}
+                    >
+                        Search
+                    </Button>
+                    <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
+                        Reset
+                    </Button>
+                </div>
+            ),
+            onFilter: (value, record) =>
+                record.estimated_price_tier.toLowerCase().includes(value.toLowerCase()),
+            onFilterDropdownVisibleChange: (visible) => {
+                if (visible) {
+                    setTimeout(() => {
+                        searchInputRef.current.select();
+                    }, 0);
+                }
+            },
         },
         {
             title: 'Action(s)',
             dataIndex: 'operation',
             key: 'operation',
             render: (text, record) => {
-                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ marginBottom: '10px' }}>
                         <Space direction="horizontal">
                             <CustomButton
                                 text="View"
-                                style={{fontWeight:"bold"}}
+                                style={{ fontWeight: "bold" }}
                                 onClick={() => onClickOpenViewAccommodationModal(record.accommodation_id)}
                             />
                             <CustomButton
                                 text="Edit"
-                                style={{fontWeight:"bold"}}
+                                style={{ fontWeight: "bold" }}
                                 onClick={() => onClickOpenEditAccommodationModal(record.accommodation_id)}
                             />
                         </Space>
                     </div>
                     <CustomButton
                         text="Rooms"
-                        style={{fontWeight:"bold"}}
+                        style={{ fontWeight: "bold" }}
                         onClick={() => onClickNavigateToRoomManagement(record.accommodation_id)}
                     />
                 </div>
@@ -295,7 +333,7 @@ export default function AccommodationManagement() {
             const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
             const formattedAvgRatingTier = item.avg_rating_tier === 0 ? 'N/A' : item.avg_rating_tier;
-      
+
             return {
                 accommodation_id: item.accommodation_id,
                 name: item.name,
@@ -455,8 +493,8 @@ export default function AccommodationManagement() {
 
         console.log('values.check_in_time:', values.check_in_time);
         console.log('values.check_out_time:', values.check_out_time);
-        
-        if(moment.isMoment(values.check_in_time)) {
+
+        if (moment.isMoment(values.check_in_time)) {
             const checkInMomentObject = values.check_in_time;
             checkInHours = checkInMomentObject.hours();
             console.log('MomentObject checkInHours:', checkInHours);
@@ -470,7 +508,7 @@ export default function AccommodationManagement() {
             console.log('New checkInMinutes:', checkInMinutes);
         }
 
-        if(moment.isMoment(values.check_out_time)) {
+        if (moment.isMoment(values.check_out_time)) {
             const checkOutMomentObject = values.check_out_time;
             checkOutHours = checkOutMomentObject.hours();
             console.log('MomentObject checkOutHours:', checkOutHours);
