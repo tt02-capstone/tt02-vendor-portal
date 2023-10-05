@@ -366,7 +366,6 @@ export default function AttractionManageTicket() {
             title: 'Action(s)',
             key: 'add_edit',
             dataIndex: 'add_edit',
-            width: 160,
             align: 'center',
             render: (text, record) => (
                 <div>
