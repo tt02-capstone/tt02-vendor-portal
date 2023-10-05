@@ -209,8 +209,14 @@ export default function TourTypes() {
             dataIndex: 'special_note',
             key: 'special_note',
             width: 60,
-            sorter: (a, b) => a.special_note - b.special_note,
+            sorter: (a, b) => a.special_note.localeCompare(b.special_note),
             ...getColumnSearchProps('special_note'),
+            render: (text) => {
+                if (text === null) {
+                    return "-";
+                }
+                return text;
+            },
         },
         {
             title: 'Published',
@@ -223,7 +229,18 @@ export default function TourTypes() {
                     return <Badge status="error" text="No" />
                 }
             },
-            width: 40
+            width: 40,
+            filters: [
+                {
+                    text: 'Published',
+                    value: true,
+                },
+                {
+                    text: 'Hidden',
+                    value: false,
+                },
+            ],
+            onFilter: (value, record) => record.is_published === value,
         },
         {
             title: 'Action(s)',
@@ -278,7 +295,7 @@ export default function TourTypes() {
             description: values.description,
             price: values.price,
             recommended_pax: values.recommended_pax,
-            special_note: values.special_note,
+            special_note: values.special_note ? values.special_note : '-',
             estimated_duration: values.estimated_duration,
             tour_image_list: values.tour_image_list,
             is_published: true
