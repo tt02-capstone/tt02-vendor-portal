@@ -163,11 +163,12 @@ export default function DealManagement() {
             ...getColumnSearchProps('promo_code'),
         },
         {
-            title: 'Discount %',
+            title: 'Discount',
             dataIndex: 'discount_percent',
             key: 'discount_percent',
             sorter: (a, b) => a.discount_percent > b.discount_percent,
             ...getColumnSearchProps('discount_percent'),
+            render: (discount_percent) => `${discount_percent}%`,
         },
         {
             title: 'Published',

@@ -167,9 +167,9 @@ export default function CreateDealModal(props) {
                 <Form
                     name="form"
                     form={props.form}
-                    labelCol={{span: 8}}
-                    wrapperCol={{span: 16}}
-                    style={{maxWidth: 600}}
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 15 }}
+                    style={{ maxWidth: 650 }}
                     required={true}
                     requiredMark={true}
                     onFinish={onFinish}
@@ -214,14 +214,14 @@ export default function CreateDealModal(props) {
                         name="discount_percent"
                         rules={[{required: true, message: 'Please enter discount of deal!'}]}
                     >
-                        <InputNumber placeholder="10.00" prefix="%" min="0" max="100" step="0.10"/>
+                        <InputNumber placeholder="10.00" suffix="%" min="0" max="100" step="0.50"/>
                     </Form.Item>
 
                     <Form.Item
                         label="Publish"
                         labelAlign="left"
                         name="is_published"
-                        initialValue={true}
+                        initialValue={false}
                         valuePropName="checked"
                         rules={[{required: true, message: 'Please select whether to publish the deal!'}]}
                     >
@@ -232,7 +232,7 @@ export default function CreateDealModal(props) {
                         label="Government Voucher"
                         labelAlign="left"
                         name="is_govt_voucher"
-                        initialValue={true}
+                        initialValue={false}
                         valuePropName="checked"
                         rules={[{required: true, message: 'Please select whether the deal is from the Government!'}]}
                     >

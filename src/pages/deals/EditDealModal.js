@@ -211,8 +211,8 @@ export default function EditDealModal(props) {
                     name="editDeal"
                     form={props.form}
                     labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 800 }}
+                    wrapperCol={{ span: 15 }}
+                    style={{ maxWidth: 650 }}
                     required={true}
                     requiredMark={true}
                     onFinish={onFinish}
@@ -264,7 +264,7 @@ export default function EditDealModal(props) {
                         name="discount_percent"
                         rules={[{required: true, message: 'Please enter discount of deal!'}]}
                     >
-                        <InputNumber placeholder="10.00" prefix="%" min="0" max="100" step="0.10"/>
+                        <InputNumber placeholder="10.00" suffix="%" min="0" max="100" step="0.50"/>
                     </Form.Item>
 
                     <Form.Item
