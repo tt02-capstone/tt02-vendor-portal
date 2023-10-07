@@ -109,6 +109,14 @@ export default function ViewRestaurantModal(props) {
             formattedValue += ' Hours';
         }
 
+        if (label === 'Restaurant Type' && value !== undefined) {
+            formattedValue = formattedValue.replace(/_/g, ' ');
+        }
+
+        if (label === 'Price Tier' && value !== undefined) {
+            formattedValue = formattedValue.replace(/_/g, ' ');
+        }
+
         return (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 'bold', minWidth: '160px' }}>{label}:</div>
