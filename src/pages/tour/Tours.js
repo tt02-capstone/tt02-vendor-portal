@@ -75,6 +75,20 @@ export default function Tours() {
         }
     }, [getToursData]);
 
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+
     const toursColumns = [
         {
             title: 'Date',
@@ -94,6 +108,40 @@ export default function Tours() {
                 }
                 return 0;
             },
+            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+                <div style={{ padding: 8 }}>
+                    <Input
+                        id="custom-search-input"
+                        placeholder="Search Date"
+                        value={selectedKeys[0]}
+                        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                        onPressEnter={() => handleSearch(selectedKeys, confirm, 'date')}
+                        style={{ width: 188, marginBottom: 8, display: 'block' }}
+                    />
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys, confirm, 'date')}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90, marginRight: 8 }}
+                    >
+                        Search
+                    </Button>
+                    <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                        Reset
+                    </Button>
+                </div>
+            ),
+            onFilter: (value, record) => {
+                const date = moment(record.date);
+                const dayMatch = date.format('DD') === value;
+                const monthMatch = date.format('MMM').toLowerCase() === value.toLowerCase();
+                const yearMatch = date.format('YYYY') === value;
+                return dayMatch || monthMatch || yearMatch;
+            },
+            filterIcon: (filtered) => (
+                <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+            ),
         },
         {
             title: 'Start Time',
