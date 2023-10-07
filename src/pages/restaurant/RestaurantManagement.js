@@ -152,6 +152,7 @@ export default function RestaurantManagement(navigation) {
         const formattedContactNum = item.contact_num.replace(/(\d{4})(\d{4})/, '$1 $2');
         const formattedGenericLocation = item.generic_location.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
         const formattedPriceTier = item.estimated_price_tier.split('_').join(' ');
+        const formatType = item.restaurant_type.split('_').join(' ');
 
         return {
             key: index,
@@ -163,20 +164,40 @@ export default function RestaurantManagement(navigation) {
             contact_num: formattedContactNum,
             is_published: item.is_published,
             suggested_duration: item.suggested_duration,
-            restaurant_type: item.restaurant_type,
+            restaurant_type: formatType,
             generic_location: formattedGenericLocation,
-            estimated_price_tier: formattedPriceTier
+            estimated_price_tier: formattedPriceTier,
+            restaurant_image_list: item.restaurant_image_list
         };
     }) : [];
 
     const columns = [
+        {
+            title: 'Cover Image',
+            dataIndex: 'restaurant_image_list',
+            key: 'restaurant_image_list',
+            render: (imageList) => {
+                if (Array.isArray(imageList) && imageList.length > 0) {
+                    const firstImageUrl = imageList[0];
+                    return (
+                        <div style={styles.imageContainer}>
+                            <img
+                                src={firstImageUrl}
+                                alt="Restaurant"
+                                style={styles.image}
+                            />
+                        </div>
+                    );
+                }
+                return 'No Image';
+            },
+        },
         {
             title: 'Restaurant Name',
             dataIndex: 'name',
             key: 'name',
             sorter: (a, b) => a.name.localeCompare(b.name),
             ...getColumnSearchProps('name'),
-            width: 150
         },
         {
             title: 'Description',
@@ -184,18 +205,42 @@ export default function RestaurantManagement(navigation) {
             key: 'description',
             sorter: (a, b) => a.description.localeCompare(b.description),
             ...getColumnSearchProps('description'),
-            width: 150,
         },
         {
-            title: 'Type',
+            title: 'Restaurant Type',
             dataIndex: 'restaurant_type',
             key: 'restaurant_type',
-            sorter: (a, b) => a.restaurant_type.localeCompare(b.restaurant_type),
-            ...getColumnSearchProps('restaurant_type'),
+            filters: [
+                {
+                    text: 'Fast Food',
+                    value: 'FAST FOOD',
+                },
+                {
+                    text: 'Chinese',
+                    value: 'CHINESE',
+                },
+                {
+                    text: 'Mexican',
+                    value: 'MEXICAN',
+                },
+                {
+                    text: 'Korean',
+                    value: 'KOREAN',
+                },
+                {
+                    text: 'Western',
+                    value: 'WESTERN',
+                },
+                {
+                    text: 'Japanese',
+                    value: 'JAPANESE',
+                }
+            ],
+            onFilter: (value, record) => record.restaurant_type.indexOf(value) === 0,
             render: (type) => {
                 let tagColor = 'default';
                 switch (type) {
-                    case 'FAST_FOOD':
+                    case 'FAST FOOD':
                         tagColor = 'purple';
                         break;
                     case 'CHINESE':
@@ -221,7 +266,6 @@ export default function RestaurantManagement(navigation) {
                     <Tag color={tagColor}>{type}</Tag>
                 );
             },
-            width: 150
         },
         {
             title: 'Address',
@@ -229,7 +273,6 @@ export default function RestaurantManagement(navigation) {
             key: 'address',
             sorter: (a, b) => a.address.localeCompare(b.address),
             ...getColumnSearchProps('address'),
-            width: 150,
         },
         {
             title: 'Opening Hours',
@@ -237,7 +280,6 @@ export default function RestaurantManagement(navigation) {
             key: 'opening_hours',
             sorter: (a, b) => a.opening_hours.localeCompare(b.opening_hours),
             ...getColumnSearchProps('opening_hours'),
-            width: 150,
         },
         {
             title: 'Contact No.',
@@ -246,7 +288,6 @@ export default function RestaurantManagement(navigation) {
             width: 120,
             sorter: (a, b) => a.contact_num.localeCompare(b.contact_num),
             ...getColumnSearchProps('contact_num'),
-            width: 150,
         },
         {
             title: 'Published',
@@ -267,7 +308,6 @@ export default function RestaurantManagement(navigation) {
             dataIndex: 'estimated_price_tier',
             key: 'estimated_price_tier',
             sorter: (a, b) => a.estimated_price_tier.localeCompare(b.estimated_price_tier),
-            ...getColumnSearchProps('estiminated_price_tier'),
             render: (priceTier) => {
                 let tagColor = 'default';
                 switch (priceTier) {
@@ -318,14 +358,14 @@ export default function RestaurantManagement(navigation) {
                         </Space>
                     </div>
                     <CustomButton
-                        text="Manage Dish(es)"
+                        text="Manage Menu"
                         style={{ fontWeight: "bold" }}
                         onClick={() => goToDish(record.restaurant_id)}
                     />
                 </div>
 
             },
-            width: 150,
+            width: 200,
         },
     ];
 
@@ -561,5 +601,14 @@ const styles = {
     button: {
         fontSize: 13,
         fontWeight: "bold"
-    }
+    },
+    imageContainer: {
+        maxWidth: '180px',
+        maxHeight: '100px',
+        overflow: 'hidden',
+    },
+    image: {
+        width: '100%',
+        height: 'auto',
+    },
 }

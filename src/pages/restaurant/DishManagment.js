@@ -25,7 +25,7 @@ export default function DishManagement() {
           title: 'Restaurants',
         },
         {
-            title: 'Manage Dish(es)',
+            title: 'Manage Menu',
         },
     ];
  
@@ -171,7 +171,7 @@ export default function DishManagement() {
 
     const columns = [
         {
-            title: 'Dish Name',
+            title: 'Menu Name',
             dataIndex: 'name',
             key: 'name',
             sorter: (a, b) => a.name.localeCompare(b.name),
@@ -215,11 +215,28 @@ export default function DishManagement() {
             width: 100
         },
         {
-            title: 'Type',
+            title: 'Menu Type',
             dataIndex: 'dish_type',
             key: 'dish_type',
-            sorter: (a, b) => a.dish_type.localeCompare(b.dish_type),
-            ...getColumnSearchProps('dish_type'),
+            filters: [
+                {
+                    text: 'Mains',
+                    value: 'MAINS',
+                },
+                {
+                    text: 'Beverage',
+                    value: 'BEVERAGE',
+                },
+                {
+                    text: 'Sides',
+                    value: 'SIDES',
+                },
+                {
+                    text: 'Dessert',
+                    value: 'DESSERT',
+                }
+            ],
+            onFilter: (value, record) => record.dish_type.indexOf(value) === 0,
             render: (type) => {
                 let tagColor = 'default'; 
                 switch (type) {
@@ -344,7 +361,7 @@ export default function DishManagement() {
              <Content style={styles.content}>
                 <CustomButton
                     text="Add Dish"
-                    style={{ marginLeft: '3px', fontWeight:'bold'}}
+                    style={{ marginLeft: '3px'}}
                     icon={<PlusOutlined />}
                     onClick={showAddModal}
                 />
