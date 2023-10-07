@@ -42,22 +42,6 @@ export default function ViewTourModal(props) {
         );
     }
 
-    const calculateDuration = (start, end) => {
-        const startTime = new Date(Date.parse(start));
-        const endTime = new Date(Date.parse(end));
-        const timeDifference = Math.abs(endTime - startTime);
-        const hours = Math.floor(timeDifference / 3600000); 
-        const minutes = Math.floor((timeDifference % 3600000) / 60000); 
-        
-        if (hours < 1) {
-            return `${minutes} minutes`;
-        } else if (hours == 1) {
-            return `${hours} hour ${minutes} minutes`;
-        } else {
-            return `${hours} hours ${minutes} minutes`;
-        }
-    };
-
     return (
         <div>
             <Modal
@@ -70,7 +54,6 @@ export default function ViewTourModal(props) {
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderProperty('Start Time', selectedTour.start_time)}
                     {renderProperty('End Time', selectedTour.end_time)}
-                    {renderProperty('Duration', calculateDuration(selectedTour.start_time, selectedTour.end_time))}
                 </div>
             </Modal>
         </div>

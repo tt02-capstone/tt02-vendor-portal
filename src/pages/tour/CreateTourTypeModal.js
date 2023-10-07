@@ -257,7 +257,7 @@ export default function CreateTourTypeModal(props) {
                             },
                         ]}
                     >
-                        <InputNumber style={{ width: '110px' }} suffix="Hours" min={1} />
+                        <InputNumber style={{ width: '110px' }} suffix="Hours" min={1} step={1} parser={value => parseInt(value, 10)} />
                     </Form.Item>
 
                     <Form.Item
