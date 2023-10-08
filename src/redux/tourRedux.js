@@ -114,3 +114,23 @@ export async function updateTour(tour) {
         return { status: false, data: error.message };
     }
 }
+
+export async function getAllBookingsByLocal(userId) {
+    try {
+        const response = await tourApi.get(`${tourURL}/getAllBookingsByLocal/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux getAllBookingsByLocal Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
+
+export async function getBookingByBookingId(bookingId) {
+    try {
+        const response = await tourApi.get(`${tourURL}/getBookingByBookingId/${bookingId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("tourRedux getBookingByBookingId Error : ", error);
+        return { status: false, data: error.message };
+    }
+}

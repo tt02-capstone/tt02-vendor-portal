@@ -37,6 +37,7 @@ import RestaurantManagement from "./pages/restaurant/RestaurantManagement";
 import DishManagement from "./pages/restaurant/DishManagment";
 import TourTypes from "./pages/tour/TourTypes";
 import Tours from "./pages/tour/Tours";
+import TourBookings from "./pages/tour/TourBookings";
 
 function AppLayout() {
 
@@ -62,6 +63,7 @@ function AppLayout() {
     const localMenuItems = [
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/tourtypes', label: 'Tour Types', icon: <ScheduleOutlined/>},
+        {key: '/tourbookings', label: 'Tour Bookings', icon: <CalendarOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -103,6 +105,7 @@ function AppLayout() {
                         <Route path="/tourtypes" element={<TourTypes />}/>
                         <Route path="/tours/:tourTypeId" element={<Tours />}/>
                         <Route path="/deal" element={<DealManagement/>}/>
+                        <Route path="/tourbookings" element={<TourBookings/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
