@@ -31,7 +31,7 @@ export default function Tours() {
 
     const viewToursBreadCrumb = [
         {
-            title: 'Tour Types',
+            title: 'Tours',
         },
         {
             title: 'Tour Timings',
