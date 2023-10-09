@@ -34,7 +34,7 @@ export default function Tours() {
             title: 'Tour Types',
         },
         {
-            title: 'Tours',
+            title: 'Tour Timings',
         },
     ];
 
@@ -352,7 +352,7 @@ export default function Tours() {
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
                         <CustomButton
-                            text="Create Tour"
+                            text="Create Tour Timing"
                             style={{ marginLeft: '3px', marginBottom: '20px' }}
                             icon={<PlusOutlined />}
                             onClick={onClickOpenCreateTourModal}
@@ -396,7 +396,7 @@ export default function Tours() {
                             onOk={() => onDeleteConfirmed()}
                             onCancel={closeDeleteConfirmation}
                         >
-                            <p>Are you sure you want to delete this tour?</p>
+                            <p>Are you sure you want to delete this tour timing?</p>
                         </Modal>
                     </Content>
                 </Layout>

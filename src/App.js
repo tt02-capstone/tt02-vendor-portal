@@ -62,7 +62,7 @@ function AppLayout() {
 
     const localMenuItems = [
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
-        {key: '/tourtypes', label: 'Tour Types', icon: <ScheduleOutlined/>},
+        {key: '/tourtypes', label: 'Tours', icon: <ScheduleOutlined/>},
         {key: '/tourbookings', label: 'Tour Bookings', icon: <CalendarOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];

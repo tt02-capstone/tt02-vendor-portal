@@ -211,7 +211,7 @@ export default function EditTourTypeModal(props) {
     return (
         <div>
             <Modal
-                title="Edit Tour Type"
+                title="Edit Tour"
                 centered
                 open={props.isEditTourTypeModalOpen}
                 onCancel={props.onClickCancelEditTourTypeModal}

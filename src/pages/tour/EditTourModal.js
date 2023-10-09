@@ -84,7 +84,7 @@ export default function EditTourModal(props) {
     return (
         <div>
             <Modal
-                title="Edit Tour"
+                title="Edit Tour Timing"
                 centered
                 open={props.isEditTourModalOpen}
                 onCancel={() => {

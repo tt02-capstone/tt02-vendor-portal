@@ -31,7 +31,7 @@ export default function TourTypes() {
 
     const viewTourTypesBreadCrumb = [
         {
-            title: 'Tour Types',
+            title: 'Tours',
         }
     ];
 
@@ -265,7 +265,7 @@ export default function TourTypes() {
                     <br /><br />
                     <Space>
                         <CustomButton
-                            text="Tours"
+                            text="Tour Timings"
                             style={{fontWeight:"bold"}}
                             onClick={() => redirectToTours(record.tour_type_id)}
                         />
@@ -436,7 +436,7 @@ export default function TourTypes() {
                 <Layout style={{ padding: '0 24px 24px' }}>
                     <Content style={styles.content}>
                         <CustomButton
-                            text="Create Tour Type"
+                            text="Create Tour"
                             style={{ marginLeft: '3px', marginBottom: '20px' }}
                             icon={<PlusOutlined />}
                             onClick={onClickOpenCreateTourTypeModal}

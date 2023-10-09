@@ -39,7 +39,7 @@ export default function CreateTourModal(props) {
     return (
         <div>
             <Modal
-                title="Create New Tour"
+                title="Create New Tour Timing"
                 centered
                 open={props.isCreateTourModalOpen}
                 onCancel={props.onClickCancelCreateTourModal}
