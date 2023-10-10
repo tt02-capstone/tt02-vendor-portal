@@ -30,6 +30,7 @@ export default function AttractionManageTicket() {
     const viewTicketBreadCrumb = [
         {
           title: 'Attractions',
+          to : '/attraction'
         },
         {
           title: 'View Tickets',
@@ -443,13 +444,15 @@ export default function AttractionManageTicket() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '90vw'
+        minWidth: '90vw',
+        backgroundColor: 'white'
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
         alignSelf: 'center',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop:'-5px'
     },
     button: {
         fontSize: 12,

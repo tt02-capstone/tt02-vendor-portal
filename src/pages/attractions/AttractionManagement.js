@@ -629,7 +629,7 @@ export default function AttractionManagement() {
             <Layout style={styles.layout}>
                 {/* <CustomHeader text={"Header"} /> */}
                 <CustomHeader items={viewAttractionBreadCrumb}/>
-                <Layout style={{ padding: '0 24px 24px' }}>
+                <Layout style={{ padding: '0 24px 24px', backgroundColor:'white' }}>
                     <Content style={styles.content}>
 
                         <CustomButton
@@ -702,14 +702,16 @@ export default function AttractionManagement() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '91.5vw'
+        minWidth: '91.5vw',
+        backgroundColor: 'white'
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        width: "98%"
+        width: "98%",
+        marginTop:'-5px'
     },
     customRow: {
         height: '280px',
