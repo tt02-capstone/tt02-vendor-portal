@@ -328,7 +328,7 @@ export default function VendorStaff() {
         <div>
             <Layout style={styles.layout}>
                     <CustomHeader items={breadcrumbItems}/>
-                    <Layout style={{ padding: '0 24px 24px' }}>
+                    <Layout style={{ padding: '0 24px 24px', backgroundColor: 'white' }}>
                         <Content style={styles.content}>
                             <CustomButton 
                                 text="Create"
@@ -369,13 +369,15 @@ export default function VendorStaff() {
 const styles = {
     layout: {
         minHeight: '100vh',
-        minWidth: '90vw'
+        minWidth: '90vw',
+        backgroundColor: 'white'
     },
     content: {
         margin: '24px 16px 0',
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: '-5px'
     },
     table: {
         

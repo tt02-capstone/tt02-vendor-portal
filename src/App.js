@@ -25,7 +25,8 @@ import {
     BankOutlined,
     MoneyCollectOutlined,
     PhoneOutlined,
-    ScheduleOutlined
+    ScheduleOutlined,
+    FormOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
@@ -38,6 +39,10 @@ import DishManagement from "./pages/restaurant/DishManagment";
 import TourTypes from "./pages/tour/TourTypes";
 import Tours from "./pages/tour/Tours";
 import TourBookings from "./pages/tour/TourBookings";
+import ForumCategory from "./pages/forum/forumCategory";
+import ForumCategoryItems from "./pages/forum/categoryItems";
+import Post from "./pages/forum/post";
+import PostItems from "./pages/forum/postItem";
 
 function AppLayout() {
 
@@ -51,6 +56,7 @@ function AppLayout() {
     const vendorStaffMenuItems = [
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
+        {key: '/forum', label: 'Forum', icon: <FormOutlined />,},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
         {key: '/accommodation', label: 'Accommodations', icon: <BankOutlined/>,},
         {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
@@ -106,6 +112,10 @@ function AppLayout() {
                         <Route path="/tours/:tourTypeId" element={<Tours />}/>
                         <Route path="/deal" element={<DealManagement/>}/>
                         <Route path="/tourbookings" element={<TourBookings/>}/>
+                        <Route path="/forum" element={<ForumCategory />}/>
+                        <Route path="/forum/:category_id/:category_name" element={<ForumCategoryItems />}/>
+                        <Route path="/forum/post/:category_id/:category_name/:category_item_id/:category_item_name" element={< Post/>}/>
+                        <Route path="/forum/post/:category_id/:category_name/:category_item_id/:category_item_name/:post_id/:post_title" element={< PostItems/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
