@@ -115,7 +115,8 @@ export default function Post() {
     async function onClickSubmitPostCreate(values) {
         const postObj = {
             title: values.title,
-            content: values.content
+            content: values.content,
+            post_image_list: values.post_image
         };
 
         console.log("postObj", postObj);
@@ -161,7 +162,8 @@ export default function Post() {
         const postObj = {
             post_id: selectedPostId,
             title: values.title,
-            content: values.content
+            content: values.content,
+            post_image_list: values.post_image
         };
 
         console.log("postObj", postObj);
@@ -246,6 +248,8 @@ export default function Post() {
                         isCreatePostModalOpen={isCreatePostModalOpen}
                         onClickCancelCreatePostModal={onClickCancelCreatePostModal}
                         onClickSubmitPostCreate={onClickSubmitPostCreate}
+                        user_id={user.user_id}
+                        category_item_id={category_item_id}
                     />
                 </div>
 
