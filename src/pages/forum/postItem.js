@@ -1,5 +1,5 @@
-import  { Layout, Card, Button , List, Avatar} from 'antd';
-import { React , useEffect, useState , useRef } from 'react';
+import { Layout, Card, Button, List, Avatar, Modal } from 'antd';
+import { React, useEffect, useState, useRef } from 'react';
 import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import { Content } from "antd/es/layout/layout";
@@ -16,25 +16,30 @@ export default function PostItems() {
     let { post_id } = useParams();
 
     const user = JSON.parse(localStorage.getItem("user"));
-    const [post, setPost] = useState(); 
+    const [post, setPost] = useState();
     const { Meta } = Card;
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const handleModalVisible = () => {
+        setModalVisible(!modalVisible);
+    };
 
     const forumBreadCrumb = [
         {
             title: 'Forum',
-            to:'/forum'
-        }, 
+            to: '/forum'
+        },
         {
             title: category_name,
-            to:'/forum/' + category_id + '/' + category_name
+            to: '/forum/' + category_id + '/' + category_name
         },
         {
             title: category_item_name,
-            to:'/forum/post/' + category_id + '/' + category_name + '/' + category_item_id + '/' + category_item_name
-        }, 
+            to: '/forum/post/' + category_id + '/' + category_name + '/' + category_item_id + '/' + category_item_name
+        },
         {
             title: post_title
-        }, 
+        },
     ];
 
     useEffect(() => {
@@ -46,11 +51,12 @@ export default function PostItems() {
 
                 const formatItem = {
                     post_id: item.post_id,
-                    title : item.title,
-                    content : item.content, 
-                    postUser : user,
-                    publish_time : item.publish_time,
-                    updated_time : item.updated_time
+                    title: item.title,
+                    content: item.content,
+                    postUser: user,
+                    publish_time: item.publish_time,
+                    updated_time: item.updated_time,
+                    post_image: item.post_image_list[0]
                 }
 
                 setPost(formatItem)
@@ -66,15 +72,15 @@ export default function PostItems() {
 
     return user ? (
         <Layout style={styles.layout}>
-             <CustomHeader items={forumBreadCrumb} />
-             <Content style={styles.content}>
+            <CustomHeader items={forumBreadCrumb} />
+            <Content style={styles.content}>
                 <Card
                     style={{
                         width: '100%',
                         height: 300,
                         marginLeft: '-5px',
-                        marginRight: '50px', 
-                        fontSize: 20
+                        marginRight: '50px',
+                        fontSize: 20,
                     }}
                     bordered={false}
                 >
@@ -88,18 +94,38 @@ export default function PostItems() {
 
                                 </div>
                             }
-                            description= {post.content}
+                            description={post.content}
                         />
                     )}
-                    
+                    {post && post.post_image && (
+                        <div>
+                            <img
+                                src={post.post_image}
+                                alt="Post Image"
+                                style={{ marginTop: '20px', marginLeft: '50px', width: '25%', cursor: 'pointer' }}
+                                onClick={handleModalVisible}
+                            />
+                            <Modal
+                                visible={modalVisible}
+                                onCancel={handleModalVisible}
+                                footer={null}
+                            >
+                                <img
+                                    src={post.post_image}
+                                    alt="Post Image"
+                                    style={{ width: '100%' }}
+                                />
+                            </Modal>
+                        </div>
+                    )}
                 </Card>
 
-             </Content>
+            </Content>
         </Layout>
-    ):
-    ( 
-        <Navigate to="/" />
-    ) 
+    ) :
+        (
+            <Navigate to="/" />
+        )
 }
 
 const styles = {
@@ -110,8 +136,8 @@ const styles = {
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
-        marginTop: -10, 
-        justifyContent: 'center', 
+        marginTop: -10,
+        justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 60,
     },
