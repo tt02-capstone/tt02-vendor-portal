@@ -26,7 +26,8 @@ import {
     MoneyCollectOutlined,
     PhoneOutlined,
     ScheduleOutlined,
-    FormOutlined
+    FormOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
@@ -43,7 +44,9 @@ import ForumCategory from "./pages/forum/forumCategory";
 import ForumCategoryItems from "./pages/forum/categoryItems";
 import Post from "./pages/forum/post";
 import PostItems from "./pages/forum/postItem";
-
+import UserSupportTicketManagement from "./pages/supportticket/UserSupportTicketManagement/UserSupportTicketManagement";
+import AdminSupportTicketManagement
+    from "./pages/supportticket/UserSupportTicketManagement/Admin/AdminSupportTicketManagement";
 function AppLayout() {
 
     const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');
@@ -63,6 +66,8 @@ function AppLayout() {
         {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
+        {key: '/usersupportticket', label: 'User Support Ticket Management', icon: <ExclamationCircleOutlined/>,},
+        {key: '/adminsupportticket', label: 'Admin Support Ticket Management', icon: <ExclamationCircleOutlined/>,},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -112,6 +117,8 @@ function AppLayout() {
                         <Route path="/tours/:tourTypeId" element={<Tours />}/>
                         <Route path="/deal" element={<DealManagement/>}/>
                         <Route path="/tourbookings" element={<TourBookings/>}/>
+                        <Route path="/usersupportticket" element={<UserSupportTicketManagement/>}/>
+                        <Route path="/adminsupportticket" element={<AdminSupportTicketManagement/>}/>
                         <Route path="/forum" element={<ForumCategory />}/>
                         <Route path="/forum/:category_id/:category_name" element={<ForumCategoryItems />}/>
                         <Route path="/forum/post/:category_id/:category_name/:category_item_id/:category_item_name" element={< Post/>}/>
