@@ -11,6 +11,17 @@ export async function getAllSupportTicketsByUser(userId) {
     }
 }
 
+
+export async function getAllSupportTicketsByVendorStaff(userId) {
+    try {
+        const response = await supportApi.get(`/getAllSupportTicketsByVendorStaff/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("supportRedux getAllSupportTicketsByUser Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
 export async function getSupportTicket(supportTicketId) {
     try {
         const response = await supportApi.get(`/getSupportTicket/${supportTicketId}`);
