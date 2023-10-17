@@ -248,7 +248,9 @@ export default function AdminSupportTicketManagement() {
                     {SupportTicket()}
                     <br /><br />
 
-                    <MessageBox/>
+                    {viewReplySection?
+                        <MessageBox supportTicketId={currSupportTicket}/>: null
+                    }
                 </Content>
             </Layout>
             <ToastContainer />
