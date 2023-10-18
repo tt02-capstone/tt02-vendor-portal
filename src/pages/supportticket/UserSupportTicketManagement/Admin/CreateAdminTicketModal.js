@@ -103,9 +103,10 @@ export default function CreateAdminTicketModal(props) {
                         rules={[{required: true, message: 'Please select the Ticket type!'}]}
                         // onChange={onTypeChange}
                     >
-                        <Select placeholder="Wallet">
-                            <Option value='MASTER_ACCOUNT_CREATION'>Master Account </Option>
-                            <Option value='WALLET'>Wallet</Option>
+                        <Select placeholder="Finance Related">
+                            <Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>
+                            <Option value='WALLET'>Finance Related</Option>
+                            <Option value='GENERAL_ENQUIRY'>General Inquiries</Option>
                         </Select>
                     </Form.Item>
 

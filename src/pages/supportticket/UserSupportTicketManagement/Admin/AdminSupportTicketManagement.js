@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar} from 'antd';
+import {Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar, Select} from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import CustomHeader from "../../../../components/CustomHeader";
@@ -17,7 +17,6 @@ import MessageBox from "./MessageBox";
 const Search = Input.Search;
 
 export default function AdminSupportTicketManagement() {
-
     const navigate = useNavigate();
     const {Content} = Layout;
     const vendorstaff = JSON.parse(localStorage.getItem("user"));
@@ -34,9 +33,10 @@ export default function AdminSupportTicketManagement() {
     const [viewReplySection, setViewReplySection] = useState(false);
     const [currSupportTicket, setCurrSupportTicket] = useState('');
     const handleSendMessage = (item) => {
-        console.log(item)
-        setViewReplySection(true)
-        setCurrSupportTicket(item.key)
+        console.log("Curr item ", item.key)
+        setViewReplySection(!viewReplySection)
+        // setCurrSupportTicket(item.key)
+        setCurrSupportTicket((prevTicket) => item.key);
     };
 
 
@@ -78,6 +78,9 @@ export default function AdminSupportTicketManagement() {
         }
     }, [vendorstaff, fetchAdminTicketList]);
 
+    const toggleFetchAdminList = () => {
+        setFetchAdminTicketList(true)
+    }
     function onCancelCreateModal() {
         form.resetFields();
         setOpenCreateAdminTickerModal(false)
@@ -159,8 +162,8 @@ export default function AdminSupportTicketManagement() {
                 <List.Item
                     key={item.title}
                     actions={[
-                        <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-                        <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
+                        // <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
+                        // <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
                         <Button
                             type="primary"
                             icon={<MessageOutlined />}
@@ -182,16 +185,17 @@ export default function AdminSupportTicketManagement() {
     )
 
 
-    // const TitleSearch = ({ onSearch, ...props }) => (
-    //     <div {...props}>
-    //         <Search
-    //             placeholder="Enter Title"
-    //             onSearch={onSearch}
-    //             style={{ width: 200 }}
-    //         />
-    //     </div>
-    // );
-    //
+    const TitleSearch = ({ onSearch, ...props }) => (
+        <div {...props}>
+            <Search
+                allowClear
+                placeholder="Search description"
+                onSearch={onSearch}
+                style={{ width: 200 }}
+            />
+        </div>
+    );
+
     // const handleFilter = (key) => {
     //     const selected = parseInt(key);
     //     if (selected === 3) {
@@ -215,16 +219,16 @@ export default function AdminSupportTicketManagement() {
     //     });
     // };
     //
-    // const handleSearch = (searchText) => {
-    //     const filteredEvents = eventsData.filter(({ title }) => {
-    //         title = title.toLowerCase();
-    //         return title.includes(searchText);
-    //     });
-    //
-    //     this.setState({
-    //         eventsData: filteredEvents
-    //     });
-    // };
+    const handleSearch = (searchText, event) => {
+        event.preventDefault();
+        const filteredEvents = adminTicketList.filter(({ description }) => {
+            console.log(description)
+            description = description.toLowerCase();
+            return description.includes(searchText);
+        });
+
+        setAdminTicketList(filteredEvents)
+    };
 
     return (
         <Layout style={styles.layout}>
@@ -234,11 +238,14 @@ export default function AdminSupportTicketManagement() {
                 <Content style={styles.content}>
                     <CustomButton text="Create Admin Ticket" icon={<PlusOutlined />} onClick={() => setOpenCreateAdminTickerModal(true)} />
                     <br /><br />
+
+                    <TitleSearch onSearch={handleSearch} />
+
+                    <br /><br />
                     {/*<AdminTicketFilter*/}
                     {/*    filterBy={this.handleFilter}*/}
                     {/*    className={styles.action}*/}
                     {/*/>*/}
-                    {/*<TitleSearch onSearch={handleSearch} className={styles.action} />*/}
                     <CreateAdminTicketModal
                         form={form}
                         openCreateAdminTickerModal={openCreateAdminTickerModal}
@@ -249,7 +256,10 @@ export default function AdminSupportTicketManagement() {
                     <br /><br />
 
                     {viewReplySection?
-                        <MessageBox supportTicketId={currSupportTicket}/>: null
+                        <MessageBox
+                            supportTicketId={currSupportTicket}
+                            toggleFetchAdminList = {toggleFetchAdminList}
+                        />: null
                     }
                 </Content>
             </Layout>
