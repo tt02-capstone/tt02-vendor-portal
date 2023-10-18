@@ -46,7 +46,7 @@ import Post from "./pages/forum/post";
 import PostItems from "./pages/forum/postItem";
 import UserSupportTicketManagement from "./pages/supportticket/UserSupportTicketManagement/UserSupportTicketManagement";
 import AdminSupportTicketManagement
-    from "./pages/supportticket/UserSupportTicketManagement/Admin/AdminSupportTicketManagement";
+    from "./pages/supportticket/AdminSupportTicketManagement/AdminSupportTicketManagement";
 function AppLayout() {
 
     const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');

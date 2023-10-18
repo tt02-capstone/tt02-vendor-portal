@@ -3,12 +3,18 @@ import {Layout, Input, Button, List, Avatar, Descriptions, Switch, Select} from 
 import {SendOutlined, UserOutlined} from '@ant-design/icons';
 import {
   createReply, getAllRepliesBySupportTicket,
-  getAllSupportTicketsByVendorStaff,
   getSupportTicket, updateSupportTicket,
   updateSupportTicketStatus
-} from "../../../../redux/supportticketRedux";
+} from "../../redux/supportticketRedux";
 import moment from "moment/moment";
 import {toast} from "react-toastify";
+import ViewAttractionModal from "../attractions/ViewAttractionModal";
+import CustomButton from "../../components/CustomButton";
+import ViewTelecomModal from "../telecom/ViewTelecomModal";
+import ViewDealModal from "../deals/ViewDealModal";
+import ViewAccommodationModal from "../accommodations/ViewAccommodationModal";
+import ViewRestaurantModal from "../restaurant/ViewRestaurantModal";
+import ViewTourModal from "../tour/ViewTourModal";
 
 const { Content } = Layout;
 const {Option} = Select;
@@ -20,16 +26,22 @@ export default function MessageBox(props) {
   const [supportTicket, setSupportTicket] = useState('');
   const [replyList, setReplyList] = useState([]);
   const [inputText, setInputText] = useState('');
-  const [descriptionText, setDescriptionText] = useState('');
-  const [isResolved, setIsResolved] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('Finance Related');
   const vendorstaff = JSON.parse(localStorage.getItem("user"));
   const [values, setValues] = useState({
     description: '',
     ticket_category: '',
     is_resolved: false
   });
+
+  // VIEW ATTRACTION
+  const [isViewAttractionModalOpen, setIsViewAttractionModalOpen] = useState(false);
+  const [isViewDealModal, setIsViewDealModal] = useState(false);
+  const [isViewTelecomModal, setIsViewTelecomModal] = useState(false);
+  const [isViewAccommodationModal, setIsViewAccommodationModal] = useState(false);
+  const [isViewBookingModal, setIsViewBookingModal] = useState(false);
+  const [isViewRestaurantModal, setIsViewRestaurantModal] = useState(false);
+  const [isViewTourModal, setIsViewTourModal] = useState(false);
 
   useEffect(() => {
     if (vendorstaff && vendorstaff.user_type === 'VENDOR_STAFF' && fetchSupportTicket) {
@@ -201,9 +213,154 @@ export default function MessageBox(props) {
     // Perform the update logic here
   };
 
+  const getReplyUserType = (item) => {
+    if (item.tourist_user != null) {
+      return 'Tourist';
+    } else if (item.local_user != null) {
+      return 'Local';
+    } else if (item.vendor_staff_user != null) {
+      if (supportTicket.attraction != null) {
+        return 'Vendor' + ' - ' + supportTicket.attraction.name;
+      } else if (supportTicket.accommodation != null) {
+        return 'Vendor' + ' - ' + supportTicket.accommodation.name;
+      } else if (supportTicket.tour != null) {
+        return 'Vendor' + ' - ' + supportTicket.tour.name;
+      } else if (supportTicket.telecom != null) {
+        return 'Vendor' + ' - ' + supportTicket.telecom.name;
+      } else if (supportTicket.restaurant != null) {
+        return 'Vendor' + ' - ' + supportTicket.restaurant.name;
+      } else if (supportTicket.deal != null) {
+        return 'Vendor' + ' - ' + supportTicket.deal.name;
+      } else {
+        return 'Vendor';
+      }
+    } else if (item.internal_staff_user != null) {
+      return 'Admin';
+    } else {
+      return 'Error';
+    }
+  }
+  const getReplyUser = (item) => {
+    if (item.tourist_user != null) {
+      return item.tourist_user.name;
+    } else if (item.local_user != null) {
+      return item.local_user.name;
+    } else if (item.vendor_staff_user != null) {
+      return item.vendor_staff_user.name;
+    } else if (item.internal_staff_user != null) {
+      return item.internal_staff_user.name;
+    } else {
+      return 'Error';
+    }
+  }
   return (
     <Layout style={styles.layout}>
       <Content style={{ padding: '16px' }}>
+
+        {supportTicket.attraction ? (
+            <div>
+              <CustomButton
+                  text="View Attraction"
+                  style={{ fontWeight: "bold" }}
+                  onClick={() => { setIsViewAttractionModalOpen(true);}}
+              />
+              {supportTicket.attraction.attraction_id ? (
+                  <ViewAttractionModal
+                      isViewAttractionModalOpen={isViewAttractionModalOpen}
+                      onClickCancelViewAttractionModal={() => { setIsViewAttractionModalOpen(false);}}
+                      attractionId={supportTicket.attraction.attraction_id}
+                  />
+              ) : null}
+            </div>
+        ) : null}
+
+        {supportTicket.telecom ? (
+            <div>
+              <CustomButton
+                  text="View Telecom"
+                  style={{ fontWeight: "bold" }}
+                  onClick={() => { setIsViewTelecomModal(true);}}
+              />
+              {supportTicket.telecom.telecom_id ? (
+                      <ViewTelecomModal
+                          selectedTelecomId={supportTicket.telecom.telecom_id }
+                          viewTelecomModal={isViewTelecomModal}
+                          onCancelViewModal={() => { setIsViewTelecomModal(false);}}
+                      />
+              ) : null}
+            </div>
+        ) : null}
+
+
+        {supportTicket.deal ? (
+            <div>
+              <CustomButton
+                  text="View Deal"
+                  style={{ fontWeight: "bold" }}
+                  onClick={() => { setIsViewDealModal(true);}}
+              />
+              {supportTicket.deal.deal_id ? (
+                  <ViewDealModal
+                      selectedDealId={supportTicket.deal.deal_id }
+                      viewDealModal={isViewDealModal}
+                      onCancelViewModal={() => { setIsViewDealModal(false);}}
+                  />
+              ) : null}
+            </div>
+        ) : null}
+
+
+        {supportTicket.accommodation ? (
+            <div>
+              <CustomButton
+                  text="View Accommodation"
+                  style={{ fontWeight: "bold" }}
+                  onClick={() => { setIsViewAccommodationModal(true);}}
+              />
+              {supportTicket.accommodation.accommodation_id ? (
+                  <ViewAccommodationModal
+                      isViewAccommodationModalOpen={isViewAccommodationModal}
+                      onClickCancelViewAccommodationModal={() => { setIsViewAccommodationModal(false);}}
+                      accommodationId={supportTicket.accommodation.accommodation_id}
+                  />
+              ) : null}
+            </div>
+        ) : null}
+
+        {supportTicket.restaurant ? (
+            <div>
+              <CustomButton
+                  text="View Telecom"
+                  style={{ fontWeight: "bold" }}
+                  onClick={() => { setIsViewRestaurantModal(true);}}
+              />
+              {supportTicket.restaurant.restaurant_id ? (
+                  <ViewRestaurantModal
+                      isViewRestaurantModalOpen={isViewRestaurantModal}
+                      onClickCancelViewRestaurantModal={() => { setIsViewRestaurantModal(false);}}
+                      restId={supportTicket.restaurant.restaurant_id}
+                  />
+              ) : null}
+            </div>
+        ) : null}
+
+        {supportTicket.tour ? (
+            <div>
+              <CustomButton
+                  text="View Telecom"
+                  style={{ fontWeight: "bold" }}
+                  onClick={() => { setIsViewTourModal(true);}}
+              />
+              {supportTicket.tour.tour_id ? (
+                  <ViewTourModal
+                      isViewTourModalOpen={isViewTourModal}
+                      onClickCancelViewTourModal={() => { setIsViewTourModal(false);}}
+                      tourId={supportTicket.tour.tour_id }
+                  />
+              ) : null}
+            </div>
+        ) : null}
+
         <Descriptions
             title="Support Ticket Info"
             bordered
@@ -211,9 +368,13 @@ export default function MessageBox(props) {
             extra={isEditing? <Button type="primary" onClick={handleEdit}>Save</Button>: <Button type="primary" onClick={handleUpdate}>Edit</Button>}
             column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4 }}>
           {getDescriptions().map((item, index) => (
-              <Descriptions.Item key={index} label={item.label} style={styles.item}>
-                {item.content}
-              </Descriptions.Item>
+              <>
+                <Descriptions.Item key={index} label={item.label} style={styles.item}>
+                  {item.content}
+                </Descriptions.Item>
+                {/* Modal to view attraction */}
+              </>
+
           ))}
         </Descriptions>
 
@@ -229,7 +390,7 @@ export default function MessageBox(props) {
                   <List.Item>
                     <List.Item.Meta
                         avatar={<Avatar icon={reply.internal_staff_user ? null : <UserOutlined />} style={{ backgroundColor: reply.internal_staff_user ? '#1890ff' : '#52c41a' }} />}
-                        title={reply.internal_staff_user ? 'Admin' : 'You'}
+                        title={getReplyUser(reply)}
                         description={reply.message}
                         // style={{
                         //   textAlign: reply.internal_staff_user ? 'left' : 'right',

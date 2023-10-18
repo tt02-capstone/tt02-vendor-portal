@@ -2,17 +2,21 @@ import React, { useState, useEffect, useRef } from "react";
 import {Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar, Select} from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import CustomHeader from "../../../../components/CustomHeader";
+import CustomHeader from "../../../components/CustomHeader";
 import {toast, ToastContainer} from "react-toastify";
 import CreateAdminTicketModal from "./CreateAdminTicketModal";
-import CustomButton from "../../../../components/CustomButton";
+import CustomButton from "../../../components/CustomButton";
 import {PlusOutlined} from "@ant-design/icons";
-import {createSupportTicketToAdmin, getAllSupportTicketsByVendorStaff} from "../../../../redux/supportticketRedux";
+import {
+    createSupportTicketToAdmin,
+    getAllOutgoingSupportTicketsByVendorStaff,
+    getAllSupportTicketsByVendorStaff
+} from "../../../redux/supportticketRedux";
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import {AdminTicketFilter} from "./AdminTicketFilter";
-import {getAssociatedTelecomList} from "../../../../redux/telecomRedux";
+import {getAssociatedTelecomList} from "../../../redux/telecomRedux";
 import moment from "moment";
-import MessageBox from "./MessageBox";
+import MessageBox from "../MessageBox";
 
 const Search = Input.Search;
 
@@ -44,7 +48,7 @@ export default function AdminSupportTicketManagement() {
         if (vendorstaff && vendorstaff.user_type === 'VENDOR_STAFF' && fetchAdminTicketList) {
             const fetchData = async () => {
                 console.log(vendorstaff.user_id)
-                const response = await getAllSupportTicketsByVendorStaff(vendorstaff.user_id);
+                const response = await getAllOutgoingSupportTicketsByVendorStaff(vendorstaff.user_id);
                 console.log(response)
                 if (response.status) {
                     var tempData = response.data.map((val) => ({
