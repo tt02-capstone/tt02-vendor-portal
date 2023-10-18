@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import CustomHeader from "../../../components/CustomHeader";
 import {toast, ToastContainer} from "react-toastify";
 import CustomButton from "../../../components/CustomButton";
-import {PlusOutlined} from "@ant-design/icons";
+import {CalendarOutlined, PlusOutlined} from "@ant-design/icons";
 import {
     getAllIncomingSupportTicketsByVendorStaff,
 } from "../../../redux/supportticketRedux";
@@ -52,18 +52,26 @@ export default function UserSupportTicketManagement() {
                         is_resolved: val.is_resolved,
                         ticket_category: val.ticket_category,
                         ticket_type: val.ticket_type,
-                        start_datetime: moment(val.created_time).format('ll'),
+                        start_datetime: moment(val.created_time).format('llll'),
                         description: val.description,
                         key: val.support_ticket_id,
                         title: getNameForSupportTicket(val),
                         avatar: `https://xsgames.co/randomusers/avatar.php?g=pixel&key=${val.support_ticket_id}`
                     }));
-                    // tempData.sort((a, b) => {
-                    //     const dateA = new Date(a.date);
-                    //     const dateB = new Date(b.date);
-                    //
-                    //     return dateA - dateB;
-                    // });
+
+                    tempData.sort((a, b) => {
+                        const momentA = moment(a.start_datetime);
+                        const momentB = moment(b.start_datetime);
+
+                        if (momentA.isBefore(momentB)) {
+                            return 1; // If momentA is earlier, put it after momentB
+                        } else if (momentA.isAfter(momentB)) {
+                            return -1; // If momentA is later, put it before momentB
+                        } else {
+                            // If the moments are the same, compare by created_time (time component)
+                            return moment(b.created_time).diff(moment(a.created_time));
+                        }
+                    });
 
                     console.log(tempData)
                     setUserTicketList(tempData);
@@ -121,7 +129,7 @@ export default function UserSupportTicketManagement() {
                     key={item.title}
                     actions={[
                         // <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-                        // <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
+                        <IconText icon={CalendarOutlined} text={item.start_datetime}/>,
                         <Button
                             type="primary"
                             icon={<MessageOutlined />}
