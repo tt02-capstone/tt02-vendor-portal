@@ -15,9 +15,9 @@ export default function ViewTourBookingModal(props) {
                     console.log(response.data);
                     let obj = {
                         ...response.data,
-                        name: response.data.booked_user === 'LOCAL' ? response.data.local_user.name : response.data.tourist_user.name,
-                        email: response.data.booked_user === 'LOCAL' ? response.data.local_user.email : response.data.tourist_user.email,
-                        contact: response.data.booked_user === 'LOCAL' ? response.data.local_user.country_code + " " + response.data.local_user.mobile_num 
+                        name: response.data.local_user != null ? response.data.local_user.name : response.data.tourist_user.name,
+                        email: response.data.local_user != null ? response.data.local_user.email : response.data.tourist_user.email,
+                        contact: response.data.local_user != null ? response.data.local_user.country_code + " " + response.data.local_user.mobile_num 
                         :  response.data.tourist_user.country_code + " " + response.data.tourist_user.mobile_num,
                         last_update: moment(response.data.last_update).format('llll'),
                         start_datetime: moment(response.data.start_datetime).format('ll'),
@@ -58,14 +58,12 @@ export default function ViewTourBookingModal(props) {
         }
     }
 
-    function getCustomerType(text) {
-        if (text === 'LOCAL') {
-            return 'success';
-        } else if (text === 'TOURIST') {
-            return 'error';
+    function getCustomerType(text, localUser) {
+        if (localUser) {
+            return <Tag color="success">LOCAL</Tag>;
         } else {
-            return '';
-        }
+            return <Tag color="error">TOURIST</Tag>;
+        } 
     }
 
     function renderProperty(label, value, color) {
@@ -112,7 +110,7 @@ export default function ViewTourBookingModal(props) {
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
                     {renderProperty('Customer Name', selectedBooking.name)}
                     {renderProperty('Customer Email', selectedBooking.email)}
-                    {renderProperty('Customer Type', selectedBooking.booked_user, getCustomerType(selectedBooking.booked_user))}
+                    {renderProperty('Customer Type', getCustomerType(selectedBooking.booked_user, selectedBooking.local_user))}
                     {renderProperty('Customer Contact', selectedBooking.contact)}
                     {renderProperty('Booking Status', selectedBooking.status, getBookingStatusColor(selectedBooking.status))}
                     {renderProperty('Last Updated', formatDate(selectedBooking.last_update))}

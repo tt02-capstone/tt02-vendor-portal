@@ -147,9 +147,9 @@ export default function TourBookings() {
             ],
             onFilter: (value, record) => record.booked_user === value,
             render: (text, record) => {
-                if (text === 'LOCAL') {
+                if (record.local_user != null) {
                     return <Tag color='success'>LOCAL</Tag>;
-                } else if (text === 'TOURIST') {
+                } else if (record.tourist_user != null) {
                     return <Tag color='error'>TOURIST</Tag>;
                 } else {
                     return 'Bug';
@@ -272,7 +272,7 @@ export default function TourBookings() {
                     console.log(response.data);
                     var tempData = response.data.map((val) => ({
                         ...val,
-                        name: val.booked_user === 'LOCAL' ? val.local_user.name : val.tourist_user.name,
+                        name: val.local_user != null ? val.local_user.name : val.tourist_user.name,
                         start_datetime: moment(val.start_datetime).format('ll'),
                         end_datetime: moment(val.end_datetime).format('ll'),
                         payment_amount: `$${(val.payment.payment_amount * (1 - val.payment.comission_percentage)).toFixed(2)}`,
