@@ -114,7 +114,7 @@ export default function CreatePostModal(props) {
                 <Form
                     name="basic"
                     form={props.form}
-                    labelCol={{ span: 8 }}
+                    labelCol={{ span: 6 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 600 }}
                     required={true}
@@ -158,7 +158,7 @@ export default function CreatePostModal(props) {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" style={{fontWeight:"bold", width:120}}>
                             Create
                         </Button>
                     </Form.Item>

@@ -127,7 +127,7 @@ export default function UpdatePostModal(props) {
                 <Form
                     name="basic"
                     form={form}
-                    labelCol={{ span: 8 }}
+                    labelCol={{ span: 6 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 600 }}
                     required={true}
@@ -171,8 +171,8 @@ export default function UpdatePostModal(props) {
                         </Upload>
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                    <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
+                        <Button type="primary" htmlType="submit" style={{fontWeight:"bold", width:100}}>
                             Update
                         </Button>
                     </Form.Item>

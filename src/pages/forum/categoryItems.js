@@ -1,11 +1,9 @@
-import  { Layout, Card, Button } from 'antd';
-import { React , useEffect, useState , useRef } from 'react';
+import  { Layout, Card } from 'antd';
+import { React , useEffect, useState } from 'react';
 import CustomHeader from "../../components/CustomHeader";
-import CustomButton from "../../components/CustomButton";
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link, useParams } from 'react-router-dom';
 import { getAllByCategoryItems } from '../../redux/forumRedux';
-import { DeleteOutlined, EditOutlined , PlusOutlined, EyeOutlined} from "@ant-design/icons";
 
 export default function ForumCategoryItems() {
     let { category_id } = useParams();
@@ -37,20 +35,6 @@ export default function ForumCategoryItems() {
         fetchData();
     }, []);
 
-    const handleUpdate = (item_id) => {
-        console.log('update');
-        console.log(item_id);
-    }
-
-    const handleDelete = (item_id) => {
-        console.log('delete');
-        console.log(item_id);
-    }
-
-    const handleCreate = () => {
-        console.log('create');
-    }
-
     return user ? (
         <Layout style={styles.layout}>
              <CustomHeader items={forumBreadCrumb} />
@@ -59,40 +43,31 @@ export default function ForumCategoryItems() {
                     <div style={{ fontWeight: "bold", fontSize: 26}}> 
                         {category_name} Category Items 
                     </div> 
-
-                    <CustomButton
-                            text="Add Category Item"
-                            style={{ marginLeft:'auto', fontWeight: "bold", marginRight: '60px'}}
-                            icon={<PlusOutlined />}
-                            onClick={() => handleCreate()}
-                    />
                 </div>
                 
                 <br/><br/>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', width: 1200}}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', width: 1800}}>
                     {categoryItems.map((item, index) => (
                         <Card
                             style={{
-                                width: 400,
-                                height: 530,
+                                width: 500,
+                                height: 630,
                                 marginLeft: '-5px',
-                                marginRight: '50px'
+                                marginRight: '50px',
+                                marginBottom: '50px'
                             }}
-                            cover={<img alt={item.name} src={item.image} style={{width:400, height:400}}/>}
+                            cover={
+                                <Link to={`/forum/post/${category_id}/${category_name}/${item.category_item_id}/${item.name}`}>
+                                    <img alt={item.name} src={item.image} style={{width:500, height:500}}/>
+                                </Link>
+                            }
                             bordered={false}
                             key={index}
                         >
                             <Meta
                                 title={item.name}
                                 description= {"Explore Posts Related to " + item.name}/>
-
-                            
-                            <div style={{ marginTop:'15px', }}>
-                                <Link type="text" onClick={() => handleUpdate(item.category_item_id)}><EditOutlined /></Link>
-                                <Link type="text" style={{ marginLeft:'20px'}} onClick={() => handleDelete(item.category_item_id)}><DeleteOutlined /></Link>
-                                <Link style={{ marginLeft:'20px'}} to={`/forum/post/${category_id}/${category_name}/${item.category_item_id}/${item.name}`}>< EyeOutlined /></Link>
-                            </div>
                         </Card>
                     ))}
                 </div>
