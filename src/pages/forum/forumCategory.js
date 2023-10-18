@@ -33,25 +33,23 @@ export default function ForumCategory() {
         <Layout style={styles.layout}>
              <CustomHeader items={forumBreadCrumb} />
              <Content style={styles.content}>
-                <div style={{ fontWeight: "bold", fontSize: 26}}> Connect with Our Fellow Users </div> <br/>
+                <div style={{ fontWeight: "bold", fontSize: 26, marginBottom: 10}}> Connect with Our Fellow Users </div> <br/>
 
                 <List
                     itemLayout="horizontal"
                     dataSource={categoryData}
                     renderItem={(item, index) => (
-                    <List.Item>
-                        <List.Item.Meta
-                            avatar={<Avatar size="large" src={`https://tt02.s3.ap-southeast-1.amazonaws.com/static/web/forum/${item.name}.png`} />}
-                            title={item.name}
-                            description= {item.name + " Discussion Thread"}
-                            style={{ fontSize: 25 , marginBottom: 10}}
-                        />
-
-                        <div style={{ marginRight: 100, fontSize: 15, fontWeight:"bold" }}>
-                            <Link to={`/forum/${item.category_id}/${item.name}`}>View More</Link>
-                        </div>
-
-                    </List.Item>
+                    <Link to={`/forum/${item.category_id}/${item.name}`}>
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={<Avatar size="large" src={`https://tt02.s3.ap-southeast-1.amazonaws.com/static/web/forum/${item.name}.png`} />}
+                                title={item.name}
+                                description= {item.name + " Discussion Thread"}
+                                style={{ fontSize: 25 ,  marginTop: -10 }}
+                            />
+                        </List.Item>
+                        <br/>
+                    </Link>
                     )}
                 />
              </Content>
