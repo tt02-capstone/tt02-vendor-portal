@@ -13,6 +13,7 @@ import Highlighter from 'react-highlight-words';
 import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
 import ViewTourBookingModal from "./ViewTourBookingModal";
+import { CSVLink } from 'react-csv';
 
 export default function TourBookings() {
 
@@ -256,6 +257,33 @@ export default function TourBookings() {
         },
     ];
 
+    const csvHeaders = [
+        { label: 'Customer Name', key: 'name' },
+        { label: 'Customer Email', key: 'email' },
+        { label: 'Customer Type', key: 'booked_user' },
+        { label: 'Customer Contact', key: 'contact' },
+        { label: 'Status', key: 'status' },
+        { label: 'Last Updated', key: 'last_update' },
+        { label: 'Start Time', key: 'start_time' },
+        { label: 'End Time', key: 'end_time' },
+        { label: 'Payment Status', key: 'payment' },
+        { label: 'Amount Earned', key: 'payment_amount' },
+    ];
+
+    const csvData = bookingsData.map(item => ({
+        name: item.name,
+        email: item.local_user ? item.local_user.email : item.tourist_user ? item.tourist_user.email : 'UNKNOWN',
+        booked_user: item.local_user ? 'LOCAL' : item.tourist_user ? 'TOURIST' : 'UNKNOWN',
+        contact: item.local_user ? item.local_user.country_code + ' ' + item.local_user.mobile_num : item.tourist_user
+            ? item.tourist_user.country_code + ' ' + item.tourist_user.mobile_num : 'UNKNOWN',
+        status: item.status,
+        last_update: item.last_update,
+        start_time: moment(item.tour.start_time).format('h.mm a'),
+        end_time: moment(item.tour.end_time).format('h.mm a'),
+        payment: item.payment.is_paid ? 'PAID' : 'UNPAID',
+        payment_amount: item.payment_amount
+    }));
+
     function formatDate(dateTime) {
         if (!dateTime) return '';
         const dateObj = new Date(dateTime);
@@ -322,6 +350,12 @@ export default function TourBookings() {
                             onClickCancelViewTourBookingModal={onClickCancelViewTourBookingModal}
                             id={selectedBookingId}
                         />
+
+                        <CSVLink data={csvData} headers={csvHeaders}>
+                            <Button type="primary">
+                                Export to Excel
+                            </Button>
+                        </CSVLink>
                     </Content>
                 </Layout>
             </Layout>
