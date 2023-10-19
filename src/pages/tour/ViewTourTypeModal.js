@@ -90,6 +90,10 @@ export default function ViewTourTypeModal(props) {
             formattedValue = '-';
         }
 
+        if (label === 'Published') {
+            console.log('gab', formattedValue);
+        }
+
         return (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 'bold', minWidth: '160px' }}>{label}:</div>
@@ -125,7 +129,12 @@ export default function ViewTourTypeModal(props) {
                     {renderProperty('No. of Pax', selectedTourType.recommended_pax)}
                     {renderProperty('Est. Duration', selectedTourType.estimated_duration)}
                     {renderProperty('Special Notes', selectedTourType.special_note)}
-                    {renderProperty('Published', selectedTourType.is_published ? "Yes" : "No")}
+                    {renderProperty('Published', selectedTourType.is_published)}
+                    {selectedTourType.publishedUpdatedBy === 'INTERNAL_STAFF' && !selectedTourType.is_published && (
+                        <div style={{ color: 'red', marginTop: '5px' }}>
+                            Your tour was unpublished by an admin staff, contact us for more information.
+                        </div>
+                    )}
                 </div>
             </Modal>
         </div>

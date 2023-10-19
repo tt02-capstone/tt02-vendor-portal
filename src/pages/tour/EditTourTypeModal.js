@@ -27,7 +27,7 @@ export default function EditTourTypeModal(props) {
         try {
             let response = await getTourTypeByTourTypeId(props.tourTypeId);
             setSelectedTourType(response.data);
-            
+
             const newExistingImageUrls = response.data.tour_image_list || [];
 
             setExistingImageUrls(newExistingImageUrls);
@@ -90,7 +90,7 @@ export default function EditTourTypeModal(props) {
     }, [selectedTourType, selectedAttraction, form]);
 
     const handleFileChange = (e) => {
-        const fileList = e.fileList; 
+        const fileList = e.fileList;
         setImageFiles(fileList);
     };
 
@@ -121,28 +121,28 @@ export default function EditTourTypeModal(props) {
 
     const onFinish = async (values) => {
         const uploadPromises = imageFiles.map(async (file) => {
-    
-        const attractionImageName = 'Tour_' + selectedTourType.tour_type_id + '_' + file.name;
 
-        console.log("existingImageUrls", existingImageUrls);
+            const attractionImageName = 'Tour_' + selectedTourType.tour_type_id + '_' + file.name;
 
-        const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/tour/Tour_${selectedTourType.tour_type_id}_${file.name}`;
+            console.log("existingImageUrls", existingImageUrls);
 
-        console.log("currentFileUrl", currentFileUrl);
+            const currentFileUrl = `http://tt02.s3-ap-southeast-1.amazonaws.com/tour/Tour_${selectedTourType.tour_type_id}_${file.name}`;
 
-        console.log(file.name, " is a new image? ", !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/tour/Tour_${selectedTourType.tour_type_id}`));
+            console.log("currentFileUrl", currentFileUrl);
+
+            console.log(file.name, " is a new image? ", !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/tour/Tour_${selectedTourType.tour_type_id}`));
 
             // Check if the file is a new image (not an existing one)
-            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/tour/Tour_${selectedTourType.tour_type_id}_${file.name}`) 
-            && !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/tour/${file.name}`)) {
-                
+            if (!existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/tour/Tour_${selectedTourType.tour_type_id}_${file.name}`)
+                && !existingImageUrls.includes(`http://tt02.s3-ap-southeast-1.amazonaws.com/tour/${file.name}`)) {
+
                 const blob = new Blob([file.originFileObj]);
                 console.log("blob", blob);
-    
+
                 if (blob) {
                     const S3_BUCKET = S3BUCKET;
                     const REGION = TT02REGION;
-    
+
                     AWS.config.update({
                         accessKeyId: ACCESS_KEY,
                         secretAccessKey: SECRET_ACCESS_KEY,
@@ -151,13 +151,13 @@ export default function EditTourTypeModal(props) {
                         params: { Bucket: S3_BUCKET },
                         region: REGION,
                     });
-    
+
                     const params = {
                         Bucket: S3_BUCKET,
                         Key: attractionImageName,
                         Body: blob,
                     };
-    
+
                     return new Promise((resolve, reject) => {
                         s3.putObject(params)
                             .on("httpUploadProgress", (evt) => {
@@ -179,13 +179,13 @@ export default function EditTourTypeModal(props) {
                 return `http://tt02.s3-ap-southeast-1.amazonaws.com/tour/${file.name}`;
             }
         });
-    
+
         try {
             const uploadedImageUrls = await Promise.all(uploadPromises);
             // Now all image URLs are collected, including both new and existing ones
-    
+
             setUploadedImageUrls(uploadedImageUrls);
-    
+
             props.onClickSubmitEditTourType({
                 ...form.getFieldsValue(),
                 tour_image_list: uploadedImageUrls, // Combined list of new and existing URLs
@@ -215,7 +215,7 @@ export default function EditTourTypeModal(props) {
                 centered
                 open={props.isEditTourTypeModalOpen}
                 onCancel={props.onClickCancelEditTourTypeModal}
-                footer={[]} 
+                footer={[]}
             >
                 <Form
                     name="editTourType"
@@ -335,7 +335,12 @@ export default function EditTourTypeModal(props) {
                         name="is_published"
                         valuePropName="checked"
                     >
-                        <Switch />
+                        <Switch disabled={selectedTourType.publishedUpdatedBy === 'INTERNAL_STAFF' && !selectedTourType.is_published} />
+                        {selectedTourType.publishedUpdatedBy === 'INTERNAL_STAFF' && !selectedTourType.is_published && (
+                            <div style={{ color: 'red', marginTop: '5px' }}>
+                                Your tour was unpublished by an admin staff, contact us for more information.
+                            </div>
+                        )}
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
