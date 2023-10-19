@@ -1,10 +1,10 @@
-import { Layout, Card, Button, List, Avatar, Form, Modal } from 'antd';
-import { React, useEffect, useState, useRef } from 'react';
+import { Layout, List, Avatar, Form, Modal } from 'antd';
+import { React, useEffect, useState } from 'react';
 import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link, useParams } from 'react-router-dom';
-import { DeleteOutlined, EditOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { getAllPostByCategoryItemId, createPost, deletePost, updatePost } from '../../redux/forumRedux';
 import { ToastContainer, toast } from 'react-toastify';
 import CreatePostModal from './CreatePostModal';
@@ -115,13 +115,14 @@ export default function Post() {
     async function onClickSubmitPostCreate(values) {
         const postObj = {
             title: values.title,
-            content: values.content
+            content: values.content,
+            post_image_list: values.post_image
         };
 
-        console.log("postObj", postObj);
+        // console.log("postObj", postObj);
 
         let response = await createPost(user.user_id, category_item_id, postObj);
-        console.log("createPost response", response);
+        // console.log("createPost response", response);
         if (response.status) {
             createPostForm.resetFields();
             setIsCreatePostModalOpen(false);
@@ -144,8 +145,6 @@ export default function Post() {
 
     // Update a post
     const handleUpdate = (post_id) => {
-        console.log('update');
-        console.log(post_id);
         setSelectedPostId(post_id);
         setSelectedPost(postList.find(item => item.post_id === post_id));
         setIsUpdatePostModalOpen(true);
@@ -161,13 +160,14 @@ export default function Post() {
         const postObj = {
             post_id: selectedPostId,
             title: values.title,
-            content: values.content
+            content: values.content,
+            post_image_list: values.post_image
         };
 
-        console.log("postObj", postObj);
+        // console.log("postObj", postObj);
 
         let response = await updatePost(postObj);
-        console.log("updatePost response", response);
+        // console.log("updatePost response", response);
         if (response.status) {
             updatePostForm.resetFields();
             setIsUpdatePostModalOpen(false);
@@ -176,13 +176,11 @@ export default function Post() {
                 autoClose: 1500
             });
 
-            console.log(response.data);
+            // console.log(response.data);
             setSelectedPostId(null);
             setSelectedPost(null);
             retrieveAllPosts();
         } else {
-            console.log("Post update failed!");
-            console.log(response.data);
             toast.error(response.data.errorMessage, {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
@@ -192,8 +190,6 @@ export default function Post() {
 
     // Delete a post
     const handleDelete = (post_id) => {
-        console.log('delete');
-        console.log(post_id);
         openDeleteConfirmation(post_id);
     }
 
@@ -230,13 +226,13 @@ export default function Post() {
             <CustomHeader items={forumBreadCrumb} />
             <Content style={styles.content}>
                 <div style={{ display: 'flex' }}>
-                    <div style={{ fontWeight: "bold", fontSize: 26 }}>
+                    <div style={{ fontWeight: "bold", fontSize: 26 , marginBottom: 10}}>
                         {category_item_name} Posts
                     </div>
 
                     <CustomButton
                         text="Create a Post"
-                        style={{ marginLeft: 'auto', fontWeight: "bold", marginRight: '60px' }}
+                        style={{ marginLeft: 'auto', fontWeight: "bold", marginRight: '55px' }}
                         icon={<PlusOutlined />}
                         onClick={() => handleCreatePost()}
                     />
@@ -246,35 +242,35 @@ export default function Post() {
                         isCreatePostModalOpen={isCreatePostModalOpen}
                         onClickCancelCreatePostModal={onClickCancelCreatePostModal}
                         onClickSubmitPostCreate={onClickSubmitPostCreate}
+                        user_id={user.user_id}
+                        category_item_id={category_item_id}
                     />
                 </div>
-
-                <br />
 
                 <List
                     itemLayout="horizontal"
                     dataSource={postList}
                     renderItem={(item, index) => (
-                        <List.Item>
-                            <List.Item.Meta
-                                avatar={<Avatar size="large" src={`${item.postUser.profile_pic}`} />}
-                                title={item.title}
-                                description={item.content}
-                                style={{ fontSize: 25, marginBottom: 10 }}
-                            />
+                        <>
+                        <List.Item style={{ fontSize: 25, marginTop: 4, marginBottom: -25 }}>
+                            <Link to={`/forum/post/${category_id}/${category_name}/${category_item_id}/${category_item_name}/${item.post_id}/${item.title}`}>
+                                <List.Item.Meta
+                                    avatar={<Avatar size="large" src={`${item.postUser.profile_pic}`} />}
+                                    title={item.title}
+                                    description={item.content}
+                                    style={{ width:'1300px' }}
+                                />
+                            </Link>
 
                             {item.postUser.user_id === user.user_id && ( // only can edit and delete ur own post 
-                                <div>
+                                <div style={{ marginRight: 75, fontSize: 18 }}>
                                     <Link type="text" onClick={() => handleUpdate(item.post_id)}><EditOutlined /></Link>
                                     <Link type="text" style={{ marginLeft: '20px' }} onClick={() => handleDelete(item.post_id)}><DeleteOutlined /></Link>
                                 </div>
                             )}
-
-                            <div style={{ marginRight: 100, marginLeft: 20 }}>
-                                <Link to={`/forum/post/${category_id}/${category_name}/${category_item_id}/${category_item_name}/${item.post_id}/${item.title}`}>< EyeOutlined /></Link>
-                            </div>
-
                         </List.Item>
+                        <br/>
+                        </>
                     )}
                 />
                 <UpdatePostModal
@@ -290,6 +286,8 @@ export default function Post() {
                     visible={isDeleteConfirmationVisible}
                     onOk={() => onDeleteConfirmed()}
                     onCancel={closeDeleteConfirmation}
+                    okButtonProps={{ style: { fontWeight:"bold" } }}
+                    cancelButtonProps={{ style: { fontWeight:"bold"} }}
                 >
                     <p>Are you sure you want to delete this post?</p>
                 </Modal>
