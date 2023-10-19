@@ -66,8 +66,12 @@ function AppLayout() {
         {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
-        {key: '/usersupportticket', label: 'User Support Ticket Management', icon: <ExclamationCircleOutlined/>,},
-        {key: '/adminsupportticket', label: 'Admin Support Ticket Management', icon: <ExclamationCircleOutlined/>,},
+        {key: '/support', label: 'Support', icon: <ExclamationCircleOutlined/>, 
+            children: [
+                {key: '/usersupportticket', label: 'User Tickets', icon: <UserOutlined/>,},
+                {key: '/adminsupportticket', label: 'Admin Tickets', icon: <UserOutlined/>,},
+            ]
+        },
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 

@@ -155,9 +155,9 @@ export default function UserSupportTicketManagement() {
         <div {...props}>
             <Search
                 allowClear
-                placeholder="Search description"
+                placeholder="Search Description"
                 onSearch={onSearch}
-                style={{ width: 200 }}
+                style={{ width: '100%'}}
             />
         </div>
     );
@@ -202,11 +202,9 @@ export default function UserSupportTicketManagement() {
             <CustomHeader items={viewUserSupportBreadCrumb}/>
             <Layout style={{ padding: '0 24px 24px', backgroundColor:'white' }}>
                 <Content style={styles.content}>
-                    <br /><br />
-
                     <TitleSearch onSearch={handleSearch} />
 
-                    <br /><br />
+                    <br />
                     {/*<UserTicketFilter*/}
                     {/*    filterBy={this.handleFilter}*/}
                     {/*    className={styles.action}*/}
@@ -239,8 +237,8 @@ const styles = {
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        width: "98%",
-        marginTop:'-5px'
+        width: "97%",
+        marginTop:'-5px', 
     },
     customRow: {
         height: '280px',

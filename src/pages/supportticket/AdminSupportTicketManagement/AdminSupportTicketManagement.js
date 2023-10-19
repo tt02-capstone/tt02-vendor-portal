@@ -201,9 +201,9 @@ export default function AdminSupportTicketManagement() {
         <div {...props}>
             <Search
                 allowClear
-                placeholder="Search description"
+                placeholder="Search Description"
                 onSearch={onSearch}
-                style={{ width: 200 }}
+                style={{ width: '100%' }}
             />
         </div>
     );
@@ -253,7 +253,7 @@ export default function AdminSupportTicketManagement() {
 
                     <TitleSearch onSearch={handleSearch} />
 
-                    <br /><br />
+                    <br />
                     {/*<AdminTicketFilter*/}
                     {/*    filterBy={this.handleFilter}*/}
                     {/*    className={styles.action}*/}
@@ -292,7 +292,7 @@ const styles = {
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        width: "98%",
+        width: "97%",
         marginTop:'-5px'
     },
     customRow: {
