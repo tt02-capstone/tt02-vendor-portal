@@ -298,7 +298,8 @@ export default function TourTypes() {
             special_note: values.special_note ? values.special_note : '-',
             estimated_duration: values.estimated_duration,
             tour_image_list: values.tour_image_list,
-            is_published: true
+            is_published: true,
+            publishedUpdatedBy: 'LOCAL'
         }
 
         let response = await createTourType(local.user_id, values.attraction, tourTypeObj);
@@ -354,7 +355,8 @@ export default function TourTypes() {
             special_note: values.special_note,
             estimated_duration: values.estimated_duration,
             tour_image_list: values.tour_image_list,
-            is_published: values.is_published
+            is_published: values.is_published,
+            publishedUpdatedBy: 'LOCAL'
         }
 
         let response = await updateTourType(tourTypeObj, values.attraction);
