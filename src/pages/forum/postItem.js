@@ -178,15 +178,16 @@ export default function PostItems() {
                             )}
 
                             <div style={{ marginLeft: 'auto', marginTop: '80px', marginRight: 30, display:'flex'}}>
-                                <Link style={{ color: (post.downvote_list && post.downvote_list.includes(user.user_id) ? "#096dd9" : "black") , fontWeight:"bold", fontSize:'20px'}} onClick={() => onDownvote(post.post_id)}>  
-                                    <ArrowDownOutlined />
-                                </Link>
-
-                                <p style={{marginLeft:10, marginRight:10, marginTop: 6, fontSize:13, fontWeight:'bold'}}> {post.upvote_list.length - post.downvote_list.length } </p>
-                                
                                 <Link style={{ color: (post.upvote_list && post.upvote_list.includes(user.user_id) ? "#096dd9" : "black") , fontWeight:"bold", fontSize:'20px'}} onClick={() => onUpvote(post.post_id)} > 
                                     <ArrowUpOutlined />
                                 </Link>
+
+                                <p style={{marginLeft:10, marginRight:10, marginTop: 6, fontSize:13, fontWeight:'bold'}}> {post.upvote_list.length } </p>
+
+                                <Link style={{ color: (post.downvote_list && post.downvote_list.includes(user.user_id) ? "#096dd9" : "black") , fontWeight:"bold", fontSize:'20px'}} onClick={() => onDownvote(post.post_id)}>  
+                                    <ArrowDownOutlined />
+                                </Link>
+                                
                             </div>
                         </div>
                     )}
