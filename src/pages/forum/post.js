@@ -258,7 +258,7 @@ export default function Post() {
                                     avatar={<Avatar size="large" src={`${item.postUser.profile_pic}`} />}
                                     title={item.title}
                                     description={item.content}
-                                    style={{ width:'1300px' }}
+                                    style={{ width:'1600px' }}
                                 />
                             </Link>
 
