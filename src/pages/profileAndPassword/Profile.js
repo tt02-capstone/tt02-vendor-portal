@@ -735,8 +735,11 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                           <Divider orientation="left" style={{fontSize: '150%' }} >Bank Account, Credit Card and Wallet</Divider>
                           <Row style={{ marginBottom: '20px' }}>
   <Col span={6} style={{ fontSize: '150%' }}>Wallet balance: ${commaWith2DP(user.wallet_balance)}</Col>
-  <Col span={8}>
+  <Col span={2}>
     <Button type="primary" icon={<DollarOutlined />} onClick={onClickWithdrawButton}>Withdraw</Button>
+  </Col>
+  <Col >
+  <Button type="primary" icon={<DollarOutlined />} onClick={onClickOpenTransactionsModal}>View Transactions</Button>
   </Col>
 </Row>
 
