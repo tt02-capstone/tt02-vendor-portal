@@ -25,6 +25,7 @@ import WalletModal from "./WalletModal";
 import {AuthContext, TOKEN_KEY} from "../../redux/AuthContext";
 import axios from 'axios';
 import {disabledDateChecker} from "../../helper/dateFormat";
+import TransactionsModal from "./TransactionsModal";
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -68,6 +69,26 @@ export default function Profile() {
     const [bankAccounts, setBankAccounts] = useState([]); // bank accounts
     const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [isTransactionsModalOpen, setIsTransactionsModalOpen] = useState(false);
+    const [currentId, setCurrentId] = useState(null);
+    const [currentType, setCurrentType] = useState(null);
+
+    function onClickOpenTransactionsModal() {
+
+      if (user.user_type === "VENDOR_STAFF") {
+        setCurrentId(user.vendor.vendor_id);
+        setCurrentType("VENDOR");
+      } else {
+        setCurrentId(user.user_id);
+        setCurrentType("LOCAL");
+      }
+      setIsTransactionsModalOpen(true);
+      
+  }
+
+  function onCancelTransactionsModal() {
+      setIsTransactionsModalOpen(false);
+  }
 
 
     // when the edit profile button is clicked
@@ -632,8 +653,11 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                             <Row>
                             <Col span={5} style={{fontSize: '150%'}}>Wallet balance: ${commaWith2DP(user.vendor.wallet_balance)}</Col>
 
-                              <Col span={8}>
+                              <Col span={2}>
                                 <Button type="primary" icon={<DollarOutlined />} onClick={onClickWithdrawButton}>Withdraw</Button>
+                              </Col>
+                              <Col >
+                                <Button type="primary" icon={<DollarOutlined />} onClick={onClickOpenTransactionsModal}>View Transactions</Button>
                               </Col>
                             </Row>
                             <Row>
@@ -1097,6 +1121,14 @@ async function onClickSubmitWithdraw(withdrawalDetails) {
                     bankAccounts={bankAccounts}
                 />
             }
+
+                <TransactionsModal
+                        id={currentId}
+                        type={currentType}
+                        isTransactionsModalOpen={isTransactionsModalOpen}
+                        onCancelTransactionsModal={onCancelTransactionsModal}
+
+                    />
 
 {isWithdrawModalOpen && 
                 <WalletModal
