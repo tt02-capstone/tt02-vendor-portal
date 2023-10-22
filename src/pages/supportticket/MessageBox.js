@@ -582,14 +582,14 @@ export default function MessageBox(props) {
   };
 
   const getUserImage = (reply) => {
-    if (reply.internal_staff_user) {
+    if (reply.internal_staff_user && reply.internal_staff_user.profile_pic) {
       return reply.internal_staff_user.profile_pic
-    } else if(reply.local_user){
+    } else if(reply.local_user && reply.local_user.profile_pic){
       return reply.local_user.profile_pic
-    } else if(reply.vendor_staff_user){
+    } else if(reply.vendor_staff_user && reply.vendor_staff_user.profile_pic){
       return reply.vendor_staff_user.profile_pic
 
-    } else if(reply.tourist_user){
+    } else if(reply.tourist_user && reply.tourist_user.profile_pic){
       return reply.tourist_user.profile_pic
 
     } else {
