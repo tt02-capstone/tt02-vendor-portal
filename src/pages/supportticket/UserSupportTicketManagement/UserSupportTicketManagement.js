@@ -67,6 +67,7 @@ export default function UserSupportTicketManagement() {
                                 description: val.description,
                                 key: val.support_ticket_id,
                                 title: getNameForSupportTicket(val),
+                                submitted_user_name: val.submitted_user_name,
                                 avatar: response.data
                             };
                         })
