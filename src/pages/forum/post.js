@@ -164,7 +164,7 @@ export default function Post() {
             post_id: selectedPostId,
             title: values.title,
             content: values.content,
-            post_image_list: values.post_image.length == 0 ? oldPostImage : values.post_image,
+            post_image_list: values.post_image && values.post_image.length == 0 ? oldPostImage : values.post_image,
         };
 
         // console.log("postObj", postObj);
