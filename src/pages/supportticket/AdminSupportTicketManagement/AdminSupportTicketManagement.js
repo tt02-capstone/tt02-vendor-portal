@@ -301,6 +301,12 @@ export default function AdminSupportTicketManagement() {
                         <Button type="primary" onClick={handleAdminSearch} style={{ marginLeft: '5px' }}> Search </Button>
                         <Button type="primary" onClick={resetAdminSearch} style={{ marginLeft: '5px', backgroundColor: 'slategray' }}> Clear </Button>
 
+                        <CreateAdminTicketModal
+                            form={form}
+                            openCreateAdminTickerModal={openCreateAdminTickerModal}
+                            cancelAdminTicketModal={onCancelCreateModal}
+                            onCreateSubmit={onCreateSubmit}
+                        />
                         <br /><br />
                         {SupportTicket()}
                         <br /><br />

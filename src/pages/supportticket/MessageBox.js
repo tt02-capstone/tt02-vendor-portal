@@ -110,7 +110,9 @@ export default function MessageBox(props) {
       await handleTicketStatus()
     }
 
-    if (values.description === supportTicket.description && values.ticket_category === supportTicket.ticket_category) {
+    if (values.description === supportTicket.description) {
+      setIsEditing(!isEditing);
+      setFetchSupportTicket(true)
       return
     }
 
