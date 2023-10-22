@@ -251,7 +251,6 @@ export default function MessageBox(props) {
   ];
 
   const handleTicketStatus = async () => {
-    setTicketStatus(!supportTicket.is_resolved);
     console.log("Ticket Status", supportTicket.is_resolved);
 
     let response = await updateSupportTicketStatus(supportTicket.support_ticket_id);
@@ -263,9 +262,10 @@ export default function MessageBox(props) {
       } else {
         props.toggleFetchAdminList();
       }
+      setTicketStatus(!ticketStatus);
 
       console.log("updateSupportTicketStatus response", response.status)
-      toast.success('Support ticket marked as ' + (supportTicket.is_resolved ? 'resolved' : 'unresolved') + '!', {
+      toast.success('Support ticket marked as ' + (ticketStatus ? 'resolved' : 'unresolved') + '!', {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1500
       });
