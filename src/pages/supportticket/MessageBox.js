@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Layout, Input, Button, List, Avatar, Descriptions, Switch, Select} from 'antd';
-import {SendOutlined, UserOutlined} from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { Layout, Input, Button, List, Avatar, Descriptions, Switch, Select, Badge } from 'antd';
+import { SendOutlined, UserOutlined } from '@ant-design/icons';
 import {
   createReply, getAllRepliesBySupportTicket,
   getSupportTicket, updateSupportTicket,
   updateSupportTicketStatus
 } from "../../redux/supportticketRedux";
 import moment from "moment/moment";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import ViewAttractionModal from "../attractions/ViewAttractionModal";
 import CustomButton from "../../components/CustomButton";
 import ViewTelecomModal from "../telecom/ViewTelecomModal";
@@ -17,7 +17,7 @@ import ViewRestaurantModal from "../restaurant/ViewRestaurantModal";
 import ViewTourModal from "../tour/ViewTourModal";
 
 const { Content } = Layout;
-const {Option} = Select;
+const { Option } = Select;
 const { TextArea } = Input;
 
 export default function MessageBox(props) {
@@ -75,7 +75,7 @@ export default function MessageBox(props) {
 
     }
 
-      if (vendorstaff && vendorstaff.user_type === 'VENDOR_STAFF' && fetchReplyList) {
+    if (vendorstaff && vendorstaff.user_type === 'VENDOR_STAFF' && fetchReplyList) {
       const fetchReplyData = async () => {
         console.log(vendorstaff.user_id)
         const response = await getAllRepliesBySupportTicket(props.supportTicketId);
@@ -90,7 +90,7 @@ export default function MessageBox(props) {
       fetchReplyData()
     }
 
-    }, [fetchSupportTicket, fetchReplyList]);
+  }, [fetchSupportTicket, fetchReplyList]);
 
   const handleEdit = async () => {
     console.log(values)
@@ -99,7 +99,7 @@ export default function MessageBox(props) {
       await handleTicketStatus()
     }
 
-    if(values.description === supportTicket.description && values.ticket_category === supportTicket.ticket_category ) {
+    if (values.description === supportTicket.description && values.ticket_category === supportTicket.ticket_category) {
       return
     }
 
@@ -164,29 +164,41 @@ export default function MessageBox(props) {
   }
 
   const getDescriptions = () => [
-    { label: "Support Ticket ID", content: supportTicket.support_ticket_id },
+    { label: "Submitted By", content: supportTicket.submitted_user_name },
+    // { label: "From / To", content: `From ${formatUserType(supportTicket.submitted_user)} to ${formatUserType(supportTicket.ticket_type)}` },
+    {
+      label: "Ticket Category", content: isEditing ? (
+        <Select value={values.ticket_category} style={{ minWidth: 200 }} onChange={(value) => setValues({ ...values, ticket_category: value })}>
+          <Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>
+          <Option value='WALLET'>Finance Related</Option>
+          <Option value='GENERAL_ENQUIRY'>General Inquiries</Option>
+        </Select>
+      ) : supportTicket.ticket_category
+    },
+    {
+      label: "Status", content: isEditing ? (
+        <Switch
+          checked={values.is_resolved}
+          onChange={(is_resolved) => setValues({ ...values, is_resolved })}
+        />
+      ) : (
+        <Badge
+          status={supportTicket.is_resolved ? 'error' : 'success'}
+          text={supportTicket.is_resolved ? 'Closed' : 'Open'}
+        />
+      )
+    },
     { label: "Created Time", content: moment(supportTicket.created_time).format('llll') },
     { label: "Last Updated", content: moment(supportTicket.updated_time).format('llll') },
-    { label: "Description", content: isEditing ? (
-          <TextArea
-              value={values.description}
-              onChange={(e) => setValues({ ...values, description: e.target.value })}
-              autoSize={{ minRows: 2, maxRows: 6 }}
-          />
-      ) : supportTicket.description },
-    { label: "Resolved", content: isEditing ? (
-          <Switch
-              checked={values.is_resolved}
-              onChange={(is_resolved) => setValues({ ...values, is_resolved })}
-          />
-      ): supportTicket.is_resolved? 'YES': 'NO' },
-    { label: "Ticket Category", content: isEditing ? (
-          <Select value={values.ticket_category} style={{ minWidth: 200 }} onChange={(value) => setValues({ ...values, ticket_category: value }) }>
-              <Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>
-              <Option value='WALLET'>Finance Related</Option>
-              <Option value='GENERAL_ENQUIRY'>General Inquiries</Option>
-          </Select>
-      ) : supportTicket.ticket_category },
+    {
+      label: "Description", content: isEditing ? (
+        <TextArea
+          value={values.description}
+          onChange={(e) => setValues({ ...values, description: e.target.value })}
+          autoSize={{ minRows: 2, maxRows: 6 }}
+        />
+      ) : supportTicket.description
+    },
   ];
   const handleTicketStatus = async () => {
     let response = await updateSupportTicketStatus(supportTicket.support_ticket_id);
@@ -258,122 +270,122 @@ export default function MessageBox(props) {
       <Content style={{ padding: '16px' }}>
 
         {supportTicket.attraction ? (
-            <div>
-              <CustomButton
-                  text="View Attraction"
-                  style={{ fontWeight: "bold" }}
-                  onClick={() => { setIsViewAttractionModalOpen(true);}}
+          <div>
+            <CustomButton
+              text="View Attraction"
+              style={{ fontWeight: "bold" }}
+              onClick={() => { setIsViewAttractionModalOpen(true); }}
+            />
+            {supportTicket.attraction.attraction_id ? (
+              <ViewAttractionModal
+                isViewAttractionModalOpen={isViewAttractionModalOpen}
+                onClickCancelViewAttractionModal={() => { setIsViewAttractionModalOpen(false); }}
+                attractionId={supportTicket.attraction.attraction_id}
               />
-              {supportTicket.attraction.attraction_id ? (
-                  <ViewAttractionModal
-                      isViewAttractionModalOpen={isViewAttractionModalOpen}
-                      onClickCancelViewAttractionModal={() => { setIsViewAttractionModalOpen(false);}}
-                      attractionId={supportTicket.attraction.attraction_id}
-                  />
-              ) : null}
-            </div>
+            ) : null}
+          </div>
         ) : null}
 
         {supportTicket.telecom ? (
-            <div>
-              <CustomButton
-                  text="View Telecom"
-                  style={{ fontWeight: "bold" }}
-                  onClick={() => { setIsViewTelecomModal(true);}}
+          <div>
+            <CustomButton
+              text="View Telecom"
+              style={{ fontWeight: "bold" }}
+              onClick={() => { setIsViewTelecomModal(true); }}
+            />
+            {supportTicket.telecom.telecom_id ? (
+              <ViewTelecomModal
+                selectedTelecomId={supportTicket.telecom.telecom_id}
+                viewTelecomModal={isViewTelecomModal}
+                onCancelViewModal={() => { setIsViewTelecomModal(false); }}
               />
-              {supportTicket.telecom.telecom_id ? (
-                      <ViewTelecomModal
-                          selectedTelecomId={supportTicket.telecom.telecom_id }
-                          viewTelecomModal={isViewTelecomModal}
-                          onCancelViewModal={() => { setIsViewTelecomModal(false);}}
-                      />
-              ) : null}
-            </div>
+            ) : null}
+          </div>
         ) : null}
 
 
         {supportTicket.deal ? (
-            <div>
-              <CustomButton
-                  text="View Deal"
-                  style={{ fontWeight: "bold" }}
-                  onClick={() => { setIsViewDealModal(true);}}
+          <div>
+            <CustomButton
+              text="View Deal"
+              style={{ fontWeight: "bold" }}
+              onClick={() => { setIsViewDealModal(true); }}
+            />
+            {supportTicket.deal.deal_id ? (
+              <ViewDealModal
+                selectedDealId={supportTicket.deal.deal_id}
+                viewDealModal={isViewDealModal}
+                onCancelViewModal={() => { setIsViewDealModal(false); }}
               />
-              {supportTicket.deal.deal_id ? (
-                  <ViewDealModal
-                      selectedDealId={supportTicket.deal.deal_id }
-                      viewDealModal={isViewDealModal}
-                      onCancelViewModal={() => { setIsViewDealModal(false);}}
-                  />
-              ) : null}
-            </div>
+            ) : null}
+          </div>
         ) : null}
 
 
         {supportTicket.accommodation ? (
-            <div>
-              <CustomButton
-                  text="View Accommodation"
-                  style={{ fontWeight: "bold" }}
-                  onClick={() => { setIsViewAccommodationModal(true);}}
+          <div>
+            <CustomButton
+              text="View Accommodation"
+              style={{ fontWeight: "bold" }}
+              onClick={() => { setIsViewAccommodationModal(true); }}
+            />
+            {supportTicket.accommodation.accommodation_id ? (
+              <ViewAccommodationModal
+                isViewAccommodationModalOpen={isViewAccommodationModal}
+                onClickCancelViewAccommodationModal={() => { setIsViewAccommodationModal(false); }}
+                accommodationId={supportTicket.accommodation.accommodation_id}
               />
-              {supportTicket.accommodation.accommodation_id ? (
-                  <ViewAccommodationModal
-                      isViewAccommodationModalOpen={isViewAccommodationModal}
-                      onClickCancelViewAccommodationModal={() => { setIsViewAccommodationModal(false);}}
-                      accommodationId={supportTicket.accommodation.accommodation_id}
-                  />
-              ) : null}
-            </div>
+            ) : null}
+          </div>
         ) : null}
 
         {supportTicket.restaurant ? (
-            <div>
-              <CustomButton
-                  text="View Telecom"
-                  style={{ fontWeight: "bold" }}
-                  onClick={() => { setIsViewRestaurantModal(true);}}
+          <div>
+            <CustomButton
+              text="View Telecom"
+              style={{ fontWeight: "bold" }}
+              onClick={() => { setIsViewRestaurantModal(true); }}
+            />
+            {supportTicket.restaurant.restaurant_id ? (
+              <ViewRestaurantModal
+                isViewRestaurantModalOpen={isViewRestaurantModal}
+                onClickCancelViewRestaurantModal={() => { setIsViewRestaurantModal(false); }}
+                restId={supportTicket.restaurant.restaurant_id}
               />
-              {supportTicket.restaurant.restaurant_id ? (
-                  <ViewRestaurantModal
-                      isViewRestaurantModalOpen={isViewRestaurantModal}
-                      onClickCancelViewRestaurantModal={() => { setIsViewRestaurantModal(false);}}
-                      restId={supportTicket.restaurant.restaurant_id}
-                  />
-              ) : null}
-            </div>
+            ) : null}
+          </div>
         ) : null}
 
         {supportTicket.tour ? (
-            <div>
-              <CustomButton
-                  text="View Telecom"
-                  style={{ fontWeight: "bold" }}
-                  onClick={() => { setIsViewTourModal(true);}}
+          <div>
+            <CustomButton
+              text="View Telecom"
+              style={{ fontWeight: "bold" }}
+              onClick={() => { setIsViewTourModal(true); }}
+            />
+            {supportTicket.tour.tour_id ? (
+              <ViewTourModal
+                isViewTourModalOpen={isViewTourModal}
+                onClickCancelViewTourModal={() => { setIsViewTourModal(false); }}
+                tourId={supportTicket.tour.tour_id}
               />
-              {supportTicket.tour.tour_id ? (
-                  <ViewTourModal
-                      isViewTourModalOpen={isViewTourModal}
-                      onClickCancelViewTourModal={() => { setIsViewTourModal(false);}}
-                      tourId={supportTicket.tour.tour_id }
-                  />
-              ) : null}
-            </div>
+            ) : null}
+          </div>
         ) : null}
 
         <Descriptions
-            title="Support Ticket Info"
-            bordered
-            style={styles.descriptions}
-            extra={isEditing? <Button type="primary" onClick={handleEdit}>Save</Button>: <Button type="primary" onClick={handleUpdate}>Edit</Button>}
-            column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4 }}>
+          title="Support Ticket Info"
+          bordered
+          style={styles.descriptions}
+          extra={isEditing ? <Button type="primary" onClick={handleEdit}>Save</Button> : <Button type="primary" onClick={handleUpdate}>Edit</Button>}
+          column={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4 }}>
           {getDescriptions().map((item, index) => (
-              <>
-                <Descriptions.Item key={index} label={item.label} style={styles.item}>
-                  {item.content}
-                </Descriptions.Item>
-                {/* Modal to view attraction */}
-              </>
+            <>
+              <Descriptions.Item key={index} label={item.label} style={styles.item}>
+                {item.content}
+              </Descriptions.Item>
+              {/* Modal to view attraction */}
+            </>
 
           ))}
         </Descriptions>
@@ -381,38 +393,38 @@ export default function MessageBox(props) {
         <br />
         <Content style={styles.replyContainer}>
           <div
-              style={styles.scrollableList}
+            style={styles.scrollableList}
           >
-          <List
+            <List
               itemLayout="horizontal"
               dataSource={replyList}
               renderItem={(reply, index) => (
-                  <List.Item>
-                    <List.Item.Meta
-                        avatar={<Avatar icon={reply.internal_staff_user ? null : <UserOutlined />} style={{ backgroundColor: reply.internal_staff_user ? '#1890ff' : '#52c41a' }} />}
-                        title={getReplyUser(reply)}
-                        description={reply.message}
-                        // style={{
-                        //   textAlign: reply.internal_staff_user ? 'left' : 'right',
-                        //   // You can add more styling here if needed, e.g., setting the background color for each message sender
-                        // }}
-                    />
-                  </List.Item>
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar icon={reply.internal_staff_user ? null : <UserOutlined />} style={{ backgroundColor: reply.internal_staff_user ? '#1890ff' : '#52c41a' }} />}
+                    title={getReplyUser(reply)}
+                    description={reply.message}
+                  // style={{
+                  //   textAlign: reply.internal_staff_user ? 'left' : 'right',
+                  //   // You can add more styling here if needed, e.g., setting the background color for each message sender
+                  // }}
+                  />
+                </List.Item>
               )}
-          />
+            />
           </div>
           <Content style={styles.replyInput}>
             <Input
-                placeholder="Type a message..."
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onPressEnter={handleReplySubmit}
-                style={{ flex: 1, marginRight: '8px' }}
+              placeholder="Type a message..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onPressEnter={handleReplySubmit}
+              style={{ flex: 1, marginRight: '8px' }}
             />
             <Button
-                type="primary"
-                icon={<SendOutlined />}
-                onClick={handleReplySubmit}
+              type="primary"
+              icon={<SendOutlined />}
+              onClick={handleReplySubmit}
             >
               Send
             </Button>
