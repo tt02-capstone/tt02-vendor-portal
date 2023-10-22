@@ -531,9 +531,9 @@ export default function MessageBox(props) {
           />
           {supportTicket.booking.booking_id ? (
             <ViewAttractionBookingModal
-              isViewBookingModalOpen={isViewAttractionBookingModal}
-              onClickCancelViewBookingModal={() => { setIsViewAttractionBookingModal(false); }}
-              bookingId={supportTicket.booking.booking_id}
+                openViewModal={isViewAttractionBookingModal}
+                onClickCancelViewAttractionBookingModal={() => { setIsViewAttractionBookingModal(false); }}
+                id={supportTicket.booking.booking_id}
             />
           ) : null}
         </div>
@@ -550,9 +550,9 @@ export default function MessageBox(props) {
           />
           {supportTicket.booking.booking_id ? (
             <ViewTelecomBookingModal
-              isViewBookingModalOpen={isViewTelecomBookingModal}
-              onClickCancelViewBookingModal={() => { setIsViewTelecomBookingModal(false); }}
-              bookingId={supportTicket.booking.booking_id}
+                openViewModal={isViewTelecomBookingModal}
+                onClickCancelViewTelecomBookingModal={() => { setIsViewTelecomBookingModal(false); }}
+                id={supportTicket.booking.booking_id}
             />
           ) : null}
         </div>
@@ -569,9 +569,9 @@ export default function MessageBox(props) {
           />
           {supportTicket.booking.booking_id ? (
             <ViewRoomBookingModal
-              isViewBookingModalOpen={isViewRoomBookingModal}
-              onClickCancelViewBookingModal={() => { setIsViewRoomBookingModal(false); }}
-              bookingId={supportTicket.booking.booking_id}
+                openViewModal={isViewRoomBookingModal}
+              onClickCancelViewRoomBookingModal={() => { setIsViewRoomBookingModal(false); }}
+                id={supportTicket.booking.booking_id}
             />
           ) : null}
         </div>
@@ -580,6 +580,22 @@ export default function MessageBox(props) {
 
     return buttons;
   };
+
+  const getUserImage = (reply) => {
+    if (reply.internal_staff_user) {
+      return reply.internal_staff_user.profile_pic
+    } else if(reply.local_user){
+      return reply.local_user.profile_pic
+    } else if(reply.vendor_staff_user){
+      return reply.vendor_staff_user.profile_pic
+
+    } else if(reply.tourist_user){
+      return reply.tourist_user.profile_pic
+
+    } else {
+      return  'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'
+    }
+  }
 
   return (
     <Layout style={styles.layout}>
@@ -666,7 +682,10 @@ export default function MessageBox(props) {
                       : null
                   }>
                   <List.Item.Meta
-                    avatar={<Avatar icon={reply.internal_staff_user ? null : <UserOutlined />} style={{ backgroundColor: reply.internal_staff_user ? '#1890ff' : '#52c41a' }} />}
+                    avatar={<img
+                        src={getUserImage(reply)}
+                        style={{borderRadius: '50%', width: '20px', height: '20px'}}
+                    />}
                     title={
                       <div>
                         <div style={styles.replyUserType}>{getReplyUserType(reply)}</div>
