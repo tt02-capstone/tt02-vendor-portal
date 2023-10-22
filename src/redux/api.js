@@ -106,12 +106,13 @@ instanceList.map((api) => {
             if (!error.status && !originalRequest._retry) {
                 originalRequest._retry = true;
                 const resp = await refreshToken();
+                if (resp === undefined) {
+                    return api(originalRequest);
+                }
                 const newToken = resp.refreshToken;
                 console.log("Refresh token", newToken)
 
-                if (newToken === undefined) {
-                    return api(originalRequest);
-                }
+
                 localStorage.setItem(TOKEN_KEY, newToken);
                 axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
                 api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
