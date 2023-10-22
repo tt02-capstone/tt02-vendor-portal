@@ -47,7 +47,8 @@ export default function Post() {
                             content: item.content,
                             postUser: user,
                             publish_time: item.publish_time,
-                            updated_time: item.updated_time
+                            updated_time: item.updated_time,
+                            post_image: item.post_image_list
                         }
 
                         return processItem;
@@ -157,11 +158,13 @@ export default function Post() {
     }
 
     async function onClickSubmitPostUpdate(values) {
+        let oldPostImage = [];
+        oldPostImage.push(selectedPost.post_image[0]);
         const postObj = {
             post_id: selectedPostId,
             title: values.title,
             content: values.content,
-            post_image_list: values.post_image
+            post_image_list: values.post_image.length == 0 ? oldPostImage : values.post_image,
         };
 
         // console.log("postObj", postObj);
