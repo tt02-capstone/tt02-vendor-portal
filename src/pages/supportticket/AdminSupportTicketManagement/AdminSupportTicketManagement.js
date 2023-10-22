@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar, Select } from 'antd';
+import {Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar, Select, Spin} from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import CustomHeader from "../../../components/CustomHeader";
@@ -30,6 +30,7 @@ export default function AdminSupportTicketManagement() {
     const [openCreateAdminTickerModal, setOpenCreateAdminTickerModal] = useState(false);
     const [fetchAdminTicketList, setFetchAdminTicketList] = useState(true);
     const [adminSearchText, setAdminSearchText] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const getNameForSupportTicket = (item) => {
         const submittedUser = item.submitted_user.charAt(0).toUpperCase() + item.submitted_user.slice(1).toLowerCase();
@@ -113,6 +114,7 @@ export default function AdminSupportTicketManagement() {
     }
 
     async function onCreateSubmit(values) {
+        setLoading(true)
         console.log(values);
         let obj = {
             'ticket_type': 'ADMIN',
@@ -130,6 +132,7 @@ export default function AdminSupportTicketManagement() {
         let response = await createSupportTicketToAdmin(vendorstaff.user_id, obj);
         console.log('admin response', response)
         if (response.status) {
+            setLoading(false)
             form.resetFields();
             setFetchAdminTicketList(true);
             setOpenCreateAdminTickerModal(false);
@@ -138,6 +141,7 @@ export default function AdminSupportTicketManagement() {
                 autoClose: 1500
             });
         } else {
+            setLoading(false)
             toast.error(response.data.errorMessage, {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
@@ -306,6 +310,8 @@ export default function AdminSupportTicketManagement() {
                             openCreateAdminTickerModal={openCreateAdminTickerModal}
                             cancelAdminTicketModal={onCancelCreateModal}
                             onCreateSubmit={onCreateSubmit}
+                            setLoading = {setLoading}
+                            isLoading = {loading}
                         />
                         <br /><br />
                         {SupportTicket()}

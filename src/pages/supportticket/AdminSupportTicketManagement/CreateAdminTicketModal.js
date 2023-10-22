@@ -1,4 +1,4 @@
-import {Button, Form, Input, InputNumber, Modal, Select, Switch} from "antd";
+import {Button, Form, Input, InputNumber, Modal, Select, Spin, Switch} from "antd";
 import React from "react";
 import  { FormInstance } from 'antd/es/form';
 
@@ -85,6 +85,8 @@ export default function CreateAdminTicketModal(props) {
                 style={{minWidth: 650}}
                 footer={[]}
             >
+                <Spin spinning={props.isLoading} size={"large"} >
+
                 <Form
                     name="form"
                     form={props.form}
@@ -141,6 +143,7 @@ export default function CreateAdminTicketModal(props) {
                         </Button>
                     </Form.Item>
                 </Form>
+                </Spin>
             </Modal>
         </div>
     )
