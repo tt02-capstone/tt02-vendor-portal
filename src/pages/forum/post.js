@@ -65,6 +65,7 @@ export default function Post() {
     async function retrieveAllPosts() {
         try {
             const response = await getAllPostByCategoryItemId(category_item_id);
+            console.log(response)
 
             if (response.status) {
                 let data = response.data
@@ -78,7 +79,8 @@ export default function Post() {
                             content: item.content,
                             postUser: user,
                             publish_time: item.publish_time,
-                            updated_time: item.updated_time
+                            updated_time: item.updated_time,
+                            post_image : item.post_image_list
                         }
 
                         return processItem;
@@ -159,7 +161,7 @@ export default function Post() {
 
     async function onClickSubmitPostUpdate(values) {
         let oldPostImage = [];
-        if (selectedPost.postImage != []) {
+        if (selectedPost.post_image != []) {
             oldPostImage.push(selectedPost.post_image[0]);
         }
         const postObj = {

@@ -45,7 +45,6 @@ export default function CreatePostModal(props) {
     }
 
     const onFinish = async () => {
-        console.log(imageFiles)
         const uploadPromises = imageFiles.map(async (file) => {
             const postImageName = 'user_' + props.user_id + '_cat_item_id_' + props.category_item_id + '_' + file.name;
             const blob = new Blob([file.originFileObj]);
