@@ -96,6 +96,8 @@ export default function CreatePostModal(props) {
             setUploadedImage(uploadedImage);
 
             props.onClickSubmitPostCreate({ ...props.form.getFieldsValue(), post_image: uploadedImage });
+            props.form.resetFields();
+            setImageFiles([]);
 
         } catch (error) {
             console.error("Error uploading image:", error);
