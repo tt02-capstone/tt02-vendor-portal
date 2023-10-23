@@ -77,6 +77,9 @@ export default function MessageBox(props) {
             description: response.data.description,
             ticket_category: response.data.ticket_category
           })
+
+          setTicketStatus(response.data.is_resolved)
+          console.log("Curr vl", response.data.is_resolved)
         } else {
           console.log("Admin Ticket list not fetched!");
         }
@@ -253,6 +256,8 @@ export default function MessageBox(props) {
   const handleTicketStatus = async () => {
     console.log("Ticket Status", supportTicket.is_resolved);
 
+    setTicketStatus(!ticketStatus);
+
     let response = await updateSupportTicketStatus(supportTicket.support_ticket_id);
     if (response.status) {
       setFetchSupportTicket(true);
@@ -262,10 +267,8 @@ export default function MessageBox(props) {
       } else {
         props.toggleFetchAdminList();
       }
-      setTicketStatus(!ticketStatus);
-
-      console.log("updateSupportTicketStatus response", response.status)
-      toast.success('Support ticket marked as ' + (ticketStatus ? 'resolved' : 'unresolved') + '!', {
+      console.log("updateSupportTicketStatus response", response.data.is_resolved)
+      toast.success('Support ticket marked as ' + (response.data.is_resolved ? 'resolved' : 'unresolved') + '!', {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1500
       });
