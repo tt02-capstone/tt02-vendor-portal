@@ -106,23 +106,23 @@ export default function CreateAdminTicketModal(props) {
                         // onChange={onTypeChange}
                     >
                         <Select placeholder="Finance Related">
-                            <Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>
+                            {/*<Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>*/}
                             <Option value='WALLET'>Finance Related</Option>
                             <Option value='GENERAL_ENQUIRY'>General Inquiries</Option>
                         </Select>
                     </Form.Item>
 
-                    <Form.Item
-                        noStyle
-                        shouldUpdate={(prevValues, currentValues) => prevValues.ticket_category !== currentValues.ticket_category}
-                    >
-                        {({ getFieldValue }) =>
-                            getFieldValue('ticket_category') === 'MASTER_ACCOUNT_CREATION' ? (
-                                createMasterAccount()
-                            ) : null
-                        }
-                    </Form.Item>
-                    {console.log(props.form.getFieldValue('ticket_category'))}
+                    {/*<Form.Item*/}
+                    {/*    noStyle*/}
+                    {/*    shouldUpdate={(prevValues, currentValues) => prevValues.ticket_category !== currentValues.ticket_category}*/}
+                    {/*>*/}
+                    {/*    {({ getFieldValue }) =>*/}
+                    {/*        getFieldValue('ticket_category') === 'MASTER_ACCOUNT_CREATION' ? (*/}
+                    {/*            createMasterAccount()*/}
+                    {/*        ) : null*/}
+                    {/*    }*/}
+                    {/*</Form.Item>*/}
+                    {/*{console.log(props.form.getFieldValue('ticket_category'))}*/}
                     {/*{props.form.getFieldValue('ticket_category') === 'MASTER_ACCOUNT_CREATION' && (*/}
                     {/*   createMasterAccount()*/}
                     {/*)}*/}
