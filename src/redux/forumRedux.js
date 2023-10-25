@@ -1,4 +1,4 @@
-import { categoryApi, categoryItemApi, postApi } from "./api";
+import { categoryApi, categoryItemApi, postApi, badgeApi } from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
 export async function createCategoryItem(categoryId, categoryItemToCreate) {
@@ -118,5 +118,15 @@ export async function downvote(userId, postId) {
     } catch (error) {
         console.error("forumRedux downvote Error : ", error);
         return {status: false, data: error.message};
+    }
+}
+
+export async function retrieveBadgesByUserId(userId) {
+    try {
+        const response = await badgeApi.get(`/retrieveBadgesByUserId/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux retrieveBadgesByUserId Error : ", error);
+        return { status: false, data: error.message };
     }
 }
