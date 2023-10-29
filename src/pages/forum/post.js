@@ -263,7 +263,7 @@ export default function Post() {
                                     avatar={<Avatar size="large" src={`${item.postUser.profile_pic ? item.postUser.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}`} />}
                                     title={item.title}
                                     description={item.content}
-                                    style={{ width:'1600px' }}
+                                    style={{ width:'1200px' }}
                                 />
                             </Link>
 
