@@ -27,7 +27,7 @@ import {
     PhoneOutlined,
     ScheduleOutlined,
     FormOutlined,
-    ExclamationCircleOutlined
+    SolutionOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
@@ -66,7 +66,7 @@ function AppLayout() {
         {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
-        {key: '/support', label: 'Support', icon: <ExclamationCircleOutlined/>, 
+        {key: '/support', label: 'Support', icon: <SolutionOutlined/>, 
             children: [
                 {key: '/usersupportticket', label: 'User Tickets', icon: <UserOutlined/>,},
                 {key: '/adminsupportticket', label: 'Admin Tickets', icon: <UserOutlined/>,},

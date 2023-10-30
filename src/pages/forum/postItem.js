@@ -73,7 +73,8 @@ export default function PostItems() {
                     post_image: item.post_image_list[0],
                     img_file : fileName,
                     upvote_list: item.upvoted_user_id_list,
-                    downvote_list: item.downvoted_user_id_list
+                    downvote_list: item.downvoted_user_id_list, 
+                    is_published: item.is_published
                 }
 
                 setPost(formatItem)
@@ -202,7 +203,8 @@ export default function PostItems() {
             const temp_comment = {
                 comment_id: commentIdToDelete,
                 content: '[deleted]', 
-                updated_time : new Date()
+                updated_time : new Date(), 
+                is_published : false
             };
 
             const response = await updateComment(temp_comment); // to update any comments w child to be 'deleted'
@@ -226,7 +228,8 @@ export default function PostItems() {
     async function edit_comment(values) {
         const commentObj = {
             comment_id: values.comment_id,
-            content: values.content
+            content: values.content,
+            is_published : true
         };
 
         let response = await updateComment(commentObj);
@@ -750,9 +753,12 @@ export default function PostItems() {
                             )}
 
                             <div style={{ marginLeft: 'auto', marginTop: '80px', marginRight: 30, display:'flex'}}>
-                                <Link style = {{ color: '#096dd9', fontWeight:'bold', fontSize:'15px', marginRight:20, marginTop:4 }} onClick={() => {setSelectedReportPost(post); setReportPostModal(true) }}>
-                                    Report 
-                                </Link>
+                                {/* the original poster will not be able to report the post */}
+                                { post.is_published && post.postUser.user_id !== user.user_id && (
+                                    <Link style = {{ color: '#096dd9', fontWeight:'bold', fontSize:'15px', marginRight:20, marginTop:4 }} onClick={() => {setSelectedReportPost(post); setReportPostModal(true) }}>
+                                        Report 
+                                    </Link>
+                                )}
 
                                 <Link style={{ color: (post.upvote_list && post.upvote_list.includes(user.user_id) ? "#096dd9" : "black") , fontWeight:"bold", fontSize:'20px'}} onClick={() => onUpvotePost(post.post_id)} > 
                                     <ArrowUpOutlined />
