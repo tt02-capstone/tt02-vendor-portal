@@ -3,11 +3,11 @@ import { React, useEffect, useState } from 'react';
 import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link, useParams } from 'react-router-dom';
-import { getPost, upvote, downvote, createComment, deleteComment, updateComment, getAllPostComment, upvoteComment, downvoteComment} from '../../redux/forumRedux';
+import { getPost, upvote, downvote, createComment, deleteComment, updateComment, getAllPostComment, upvoteComment, downvoteComment, reportPost, reportComment } from '../../redux/forumRedux';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
 import { PaperClipOutlined, ArrowUpOutlined , ArrowDownOutlined } from '@ant-design/icons';
-import { Button, Comment, Header, Form, Modal, Tab } from 'semantic-ui-react';
+import { Button, Comment, Header, Form, Modal, Tab, Dropdown } from 'semantic-ui-react';
 import { viewUserProfile } from '../../redux/userRedux';
 
 
@@ -73,7 +73,8 @@ export default function PostItems() {
                     post_image: item.post_image_list[0],
                     img_file : fileName,
                     upvote_list: item.upvoted_user_id_list,
-                    downvote_list: item.downvoted_user_id_list
+                    downvote_list: item.downvoted_user_id_list, 
+                    is_published: item.is_published
                 }
 
                 setPost(formatItem)
@@ -202,7 +203,8 @@ export default function PostItems() {
             const temp_comment = {
                 comment_id: commentIdToDelete,
                 content: '[deleted]', 
-                updated_time : new Date()
+                updated_time : new Date(), 
+                is_published : false
             };
 
             const response = await updateComment(temp_comment); // to update any comments w child to be 'deleted'
@@ -226,7 +228,8 @@ export default function PostItems() {
     async function edit_comment(values) {
         const commentObj = {
             comment_id: values.comment_id,
-            content: values.content
+            content: values.content,
+            is_published : true
         };
 
         let response = await updateComment(commentObj);
@@ -241,6 +244,59 @@ export default function PostItems() {
 
         } else {
             console.log("Comment Update Failed!");
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+    }
+
+    async function report_comment(comment_id, content) {
+        let report = {
+            reason_type: content.reason_type,
+            content: content.content,
+            creation_date: new Date(),
+        }
+
+        let response = await reportComment(comment_id,report);
+
+        if (response.status) {
+            toast.success('Comment Reported! Our admins will review it!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+            setTriggerComment(true);
+            setTriggerPost(true);
+
+        } else {
+            console.log("Report Comment Failed!");
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+
+    }
+
+    async function report_post(post_id, content) {
+        let report = {
+            reason_type: content.reason_type,
+            content: content.content,
+            creation_date: new Date(),
+        }
+
+        let response = await reportPost(post_id,report);
+
+        if (response.status) {
+            toast.success('Post Reported! Our admins will review it!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+            setTriggerComment(true);
+            setTriggerPost(true);
+
+        } else {
+            console.log("Report Post Failed!");
             toast.error(response.data.errorMessage, {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
@@ -277,11 +333,11 @@ export default function PostItems() {
                     </Link>
                     <Comment.Metadata>
                         <div> {moment(comment.publish_time).format('L LT')}</div>
-                        { commenter.user_id !== user.user_id && commenter.user_type !== "INTERNAL_STAFF" && (     // user can report any comment except for theirs + admin
+                        { comment.is_published && commenter.user_id !== user.user_id && commenter.user_type !== "INTERNAL_STAFF" && (   // user can report any comment except for theirs + admin 
                             <>
                             <Comment.Action
-                                onClick={() => { console.log('report')}}
-                                style={{ color:'pink', marginLeft:5, fontWeight:'bold'}}>
+                                onClick={() => { setSelectedReportComment(comment); setReportCommentModal(true) }}
+                                style={{ color:'#096dd9', marginLeft:4, fontWeight:'bold'}}>
                                 Report
                             </Comment.Action>
                             </>
@@ -293,12 +349,14 @@ export default function PostItems() {
                     <Comment.Actions>
                         <div style={{display:'flex'}}>
                         
-                        <Comment.Action
-                            onClick={() => { setHideReply(!hideReply); setHideEdit(true);}}>
-                            Reply
-                        </Comment.Action>
+                        { comment.is_published && ( // cnnt reply to a reported comment 
+                            <Comment.Action
+                                onClick={() => { setHideReply(!hideReply); setHideEdit(true);}}>
+                                Reply
+                            </Comment.Action>
+                        )}
 
-                        { commenter.user_id === user.user_id && (     // only the user that commented can edit / delete 
+                        { commenter.user_id === user.user_id && comment.is_published && (  // only the user that commented can edit / delete if reported this wont appear
                             <>
                             <Comment.Action
                                 onClick={() => { setHideEdit(!hideEdit); setHideReply(true);}}>
@@ -311,19 +369,23 @@ export default function PostItems() {
                             </>
                         )} 
 
-                        <Comment.Action
-                                onClick={() => { onUpvoteComment(comment.comment_id);}}
-                                style= {{ color: (comment.upvoted_user_id_list && comment.upvoted_user_id_list.includes(user.user_id) ? "#096dd9" : "black")}} >
-                                <ArrowUpOutlined/>
-                        </Comment.Action>
+                        { comment.is_published && ( // remove upvote and downvote for reported comment  
+                            <>
+                                <Comment.Action
+                                        onClick={() => { onUpvoteComment(comment.comment_id);}}
+                                        style= {{ color: (comment.upvoted_user_id_list && comment.upvoted_user_id_list.includes(user.user_id) ? "#096dd9" : "black")}} >
+                                        <ArrowUpOutlined/>
+                                </Comment.Action>
 
-                        <div style={{marginRight:10}}> {comment.upvoted_user_id_list.length} </div>
+                                <div style={{marginRight:10}}> {comment.upvoted_user_id_list.length} </div>
 
-                        <Comment.Action
-                            onClick={() => { onDownvoteComment(comment.comment_id); }}
-                            style= {{ color: (comment.downvoted_user_id_list && comment.downvoted_user_id_list.includes(user.user_id) ? "#096dd9" : "black")}} >
-                            <ArrowDownOutlined/>
-                        </Comment.Action>
+                                <Comment.Action
+                                    onClick={() => { onDownvoteComment(comment.comment_id); }}
+                                    style= {{ color: (comment.downvoted_user_id_list && comment.downvoted_user_id_list.includes(user.user_id) ? "#096dd9" : "black")}} >
+                                    <ArrowDownOutlined/>
+                                </Comment.Action>
+                            </>
+                        )}
 
                         <div style={{marginLeft:2, color:'#096dd9', fontWeight:'bold'}}> {comment.child_comment_list.length} Replies </div>
 
@@ -471,12 +533,36 @@ export default function PostItems() {
             console.log('user profile not fetched')
         }
 
-        setOpen(true)
+        setProfileOpen(true)
     }
 
-    const [open, setOpen] = useState(false)
+    // to view user profile in the forum 
+    const [profileOpen, setProfileOpen] = useState(false)
     const [userProfile, setUserProfile] = useState('')
     const [tabs, setTabs] = useState([]);
+
+    // report post 
+    const [reportPostModal, setReportPostModal] = useState(false)
+    const [selectedReportPost, setSelectedReportPost] = useState('')
+    const [postData, setPostData] = useState({ // report post form 
+        content: '',
+        reason_type: ''
+    })
+
+    // report comment 
+    const [reportCommentModal, setReportCommentModal] = useState(false)
+    const [selectedReportComment, setSelectedReportComment] = useState('')
+    const [commentData, setCommentData] = useState({ // report comment form 
+        content: '',
+        reason_type: ''
+    })
+
+    // report reason shared between post + comments 
+    const report_reasons = [
+        { text: 'Offensive Behaviour', value: 'OFFENSIVE_BEHAVIOUR' },
+        { text: 'Inappropriate Content', value: 'INAPPROPRIATE_CONTENT' },
+        { text: 'Others', value: 'OTHER' }
+    ]
 
     return user ? (
         <Layout style={styles.layout}>
@@ -485,9 +571,9 @@ export default function PostItems() {
                 {/* modal to view user profile  */}
                 { userProfile && tabs && (
                     <Modal
-                    onClose={() => setOpen(false)}
-                    onOpen={() => setOpen(true)}
-                    open={open}
+                    onClose={() => setProfileOpen(false)}
+                    onOpen={() => setProfileOpen(true)}
+                    open={profileOpen}
                     >
 
                     <Modal.Header>User Profile</Modal.Header>
@@ -504,6 +590,103 @@ export default function PostItems() {
                         </Modal.Description>
                     </Modal.Content>
 
+                    </Modal>
+                )}
+
+                {reportPostModal && ( <Modal
+                    onClose={() => setReportPostModal(false)}
+                    onOpen={() => setReportPostModal(true)}
+                    open={reportPostModal}>
+                        <Modal.Header>Report Post</Modal.Header>
+                        <Modal.Content>
+                            <Form 
+                                onSubmit={() => {
+                                    report_post(selectedReportPost.post_id, postData);
+                                    setReportPostModal(false)
+                                    setPostData({
+                                        content: '',
+                                        reason_type: ''
+                                    }); // reset form fields 
+                            }}>
+                            
+                            <Form.Field>
+                            <label>Reason Type</label>
+                                <Dropdown
+                                    placeholder='Select Reason Type'
+                                    selection 
+                                    options={report_reasons}
+                                    value={postData.reason_type}
+                                    onChange={(e, {value}) => setPostData({...postData, reason_type: value})}
+                                />
+
+                            </Form.Field>
+
+                            <Form.Field>
+                                <label>Reason</label>
+                                <input 
+                                    placeholder='Reason' 
+                                    value = {postData.content}
+                                    onChange={(e) => setPostData({...postData, content: e.target.value})}
+                                />
+                            </Form.Field>
+
+                            <Button
+                                type="submit"
+                                content="Report"
+                                primary
+                                style = {{ marginLeft: 370}}
+                            />
+                            </Form>
+                        </Modal.Content>
+                </Modal>
+                )}
+
+                {reportCommentModal && (
+                    <Modal
+                        onClose={() => setReportCommentModal(false)}
+                        onOpen={() => setReportCommentModal(true)}
+                        open={reportCommentModal}>
+                            <Modal.Header>Report Comment</Modal.Header>
+                            <Modal.Content>
+                                <Form 
+                                    onSubmit={() => {
+                                        report_comment(selectedReportComment.comment_id, commentData);
+                                        setReportCommentModal(false)
+                                        setCommentData({
+                                            content: '',
+                                            reason_type: '',
+                                        }); // reset form fields 
+                                }}>
+                                
+                                <Form.Field>
+                                <label>Reason Type</label>
+                                    <Dropdown
+                                        placeholder='Select Reason Type'
+                                        selection 
+                                        options={report_reasons}
+                                        value={commentData.reason_type}
+                                        onChange={(e, {value}) => setCommentData({...commentData, reason_type: value})}
+                                    />
+
+                                </Form.Field>
+
+                                <Form.Field>
+                                    <label>Reason</label>
+                                    <input 
+                                        placeholder='Reason' 
+                                        value = {commentData.content}
+                                        onChange={(e) => setCommentData({...commentData, content: e.target.value})}
+                                    />
+                                </Form.Field>
+
+                                <Button
+                                    type="submit"
+                                    content="Report"
+                                    primary
+                                    style = {{ marginLeft: 370}}
+                                />
+                                </Form>
+                            </Modal.Content>
                     </Modal>
                 )}
 
@@ -570,6 +753,13 @@ export default function PostItems() {
                             )}
 
                             <div style={{ marginLeft: 'auto', marginTop: '80px', marginRight: 30, display:'flex'}}>
+                                {/* the original poster will not be able to report the post */}
+                                { post.is_published && post.postUser.user_id !== user.user_id && (
+                                    <Link style = {{ color: '#096dd9', fontWeight:'bold', fontSize:'15px', marginRight:20, marginTop:4 }} onClick={() => {setSelectedReportPost(post); setReportPostModal(true) }}>
+                                        Report 
+                                    </Link>
+                                )}
+
                                 <Link style={{ color: (post.upvote_list && post.upvote_list.includes(user.user_id) ? "#096dd9" : "black") , fontWeight:"bold", fontSize:'20px'}} onClick={() => onUpvotePost(post.post_id)} > 
                                     <ArrowUpOutlined />
                                 </Link>

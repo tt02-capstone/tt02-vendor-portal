@@ -48,7 +48,8 @@ export default function Post() {
                             postUser: user,
                             publish_time: item.publish_time,
                             updated_time: item.updated_time,
-                            post_image: item.post_image_list
+                            post_image: item.post_image_list, 
+                            is_published: item.is_published
                         }
 
                         return processItem;
@@ -80,7 +81,8 @@ export default function Post() {
                             postUser: user,
                             publish_time: item.publish_time,
                             updated_time: item.updated_time,
-                            post_image : item.post_image_list
+                            post_image : item.post_image_list,
+                            is_published: item.is_published
                         }
 
                         return processItem;
@@ -254,7 +256,7 @@ export default function Post() {
 
                 <List
                     itemLayout="horizontal"
-                    dataSource={postList}
+                    dataSource={postList.filter(item => item.is_published)}
                     renderItem={(item, index) => (
                         <>
                         <List.Item style={{ fontSize: 25, marginTop: 4, marginBottom: -25 }}>
