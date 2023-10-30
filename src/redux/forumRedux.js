@@ -1,4 +1,4 @@
-import { categoryApi, categoryItemApi, postApi, badgeApi, commentApi } from "./api";
+import { categoryApi, categoryItemApi, postApi, badgeApi, commentApi, reportApi } from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
 export async function createCategoryItem(categoryId, categoryItemToCreate) {
@@ -187,6 +187,26 @@ export async function getAllPostComment(postId) {
         return handleApiErrors(response);
     } catch (error) {
         console.error("forumRedux getAllPostComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function reportPost(postId, report) {
+    try {
+        const response = await reportApi.post(`/reportPost/${postId}`, report);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux reportPost Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function reportComment(commentId, report) {
+    try {
+        const response = await reportApi.post(`/reportComment/${commentId}`, report);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux reportreportCommentPost Error : ", error);
         return {status: false, data: error.message};
     }
 }
