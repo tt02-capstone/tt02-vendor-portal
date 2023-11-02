@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
-import { Dropdown, Button, Menu } from 'antd';
+import { Dropdown, Button, Menu, Layout } from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
+import CustomHeader from "../../components/CustomHeader";
+import { Content } from "antd/es/layout/layout";
 
 import { Chart as ChartJS, LineController,LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend,TimeScale} from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
@@ -23,6 +25,12 @@ const DataDashboard = () => {
   const [isSubscribed, setIsSubscribed] = useState(true);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [data, setData] = useState([]);
+
+  const dataBreadCrumb = [
+    {
+      title: 'Dashboard',
+    }
+];
 
   /* useEffect(() => {
     // Fetch user subscription status here
@@ -178,38 +186,50 @@ const DataDashboard = () => {
   };
 
   
-
   return (
-    <div>
-      {isSubscribed ? (
-        <div>
-        <Dropdown menu={{
-            items,
-          }}>
-          <Button>
-            Choose an Option
-          </Button>
-        </Dropdown>
-        <Line data={lineData} 
-        options={chartOptions}/>
-        </div>
-
-
-          
- 
-      ) : (
-        <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center' 
-          }}>
-          <p>Empower your business with data</p>
-          <Button type="primary">Subscribe Now</Button>
-        </div>
-      )}
-    </div>
+    <Layout style={styles.layout}>
+        <CustomHeader items={dataBreadCrumb} />
+        <Content style={styles.content}>
+          <div>
+            {isSubscribed ? (
+              <div>
+                <Dropdown menu={{
+                    items,
+                  }}>
+                <Button> Choose an Option </Button>
+                </Dropdown>
+              <Line data={lineData} options={chartOptions}/>
+              </div>
+              ) : (
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
+                  <p>Empower your business with data</p>
+                  <Button type="primary">Subscribe Now</Button>
+                </div>
+              )}    
+          </div>
+        </Content>
+      </Layout>
   );
 };
 
 export default DataDashboard;
+
+const styles = {
+  layout: {
+      minHeight: '100vh',
+      minWidth: '90vw',
+      backgroundColor: 'white'
+  },
+  content: {
+      margin: '1vh 3vh 1vh 3vh',
+      marginTop: -10, 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      marginLeft: 57,
+  }
+}
