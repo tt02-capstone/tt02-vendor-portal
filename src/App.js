@@ -28,7 +28,7 @@ import {
     ScheduleOutlined,
     FormOutlined,
     ExclamationCircleOutlined,
-    BarChartOutlined
+    BarChartOutlined,
     SolutionOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
