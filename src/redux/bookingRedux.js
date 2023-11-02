@@ -1,8 +1,6 @@
 import { bookingApi } from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
-const bookingURL = "http://localhost:8080/booking";
-
 export async function getBookingListByVendor(vendorStaffId) {
   try {
     const response = await bookingApi.get(`/getAllBookingsByVendor/${vendorStaffId}`);

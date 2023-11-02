@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Layout, Form, Input, Space, Button } from 'antd';
-import {useNavigate} from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Highlighter from 'react-highlight-words';
@@ -15,8 +14,7 @@ import { UserAddOutlined }  from "@ant-design/icons";
 
 export default function VendorStaff() {
 
-    const navigate = useNavigate();
-    const { Header, Content, Sider, Footer } = Layout;
+    const { Content } = Layout;
     const vendor = JSON.parse(localStorage.getItem("user"));
 
     const breadcrumbItems = [
