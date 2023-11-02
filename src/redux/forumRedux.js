@@ -1,4 +1,4 @@
-import { categoryApi, categoryItemApi, postApi } from "./api";
+import { categoryApi, categoryItemApi, postApi, badgeApi, commentApi, reportApi } from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
 export async function createCategoryItem(categoryId, categoryItemToCreate) {
@@ -117,6 +117,96 @@ export async function downvote(userId, postId) {
         return handleApiErrors(response);
     } catch (error) {
         console.error("forumRedux downvote Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function retrieveBadgesByUserId(userId) {
+    try {
+        const response = await badgeApi.get(`/retrieveBadgesByUserId/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux retrieveBadgesByUserId Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
+
+export async function createComment(postId, parentCommentId, userId, commentToCreate) {
+    try {
+        const response = await commentApi.post(`/createComment/${postId}/${parentCommentId}/${userId}`, commentToCreate);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux createComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function updateComment(commentToUpdate) {
+    try {
+        const response = await commentApi.put(`/updateComment`, commentToUpdate);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux updateComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function deleteComment(commentIdToDelete) {
+    try {
+        const response = await commentApi.delete(`/deleteComment/${commentIdToDelete}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux deleteComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function upvoteComment(userId, commentId) {
+    try {
+        const response = await commentApi.put(`/upvoteComment/${userId}/${commentId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux upvoteComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function downvoteComment(userId, commentId) {
+    try {
+        const response = await commentApi.put(`/downvoteComment/${userId}/${commentId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux downvoteComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function getAllPostComment(postId) {
+    try {
+        const response = await commentApi.get(`/getAllPostComment/${postId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux getAllPostComment Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function reportPost(postId, report) {
+    try {
+        const response = await reportApi.post(`/reportPost/${postId}`, report);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux reportPost Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function reportComment(commentId, report) {
+    try {
+        const response = await reportApi.post(`/reportComment/${commentId}`, report);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux reportreportCommentPost Error : ", error);
         return {status: false, data: error.message};
     }
 }

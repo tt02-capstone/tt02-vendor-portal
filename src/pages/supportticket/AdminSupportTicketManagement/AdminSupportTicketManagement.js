@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
-import {Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar, Select} from 'antd';
+import {Layout, Form, Input, Button, Badge, Space, Tag, List, Avatar, Select, Spin} from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import CustomHeader from "../../../components/CustomHeader";
-import {toast, ToastContainer} from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import CreateAdminTicketModal from "./CreateAdminTicketModal";
 import CustomButton from "../../../components/CustomButton";
-import {CalendarOutlined, PlusOutlined} from "@ant-design/icons";
+import { CalendarOutlined, PlusOutlined } from "@ant-design/icons";
 import {
     createSupportTicketToAdmin,
     getAllOutgoingSupportTicketsByVendorStaff,
-    getAllSupportTicketsByVendorStaff
+    getAllSupportTicketsByVendorStaff, getUserAvatarImage
 } from "../../../redux/supportticketRedux";
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
-import {AdminTicketFilter} from "./AdminTicketFilter";
-import {getAssociatedTelecomList} from "../../../redux/telecomRedux";
+import { LikeOutlined, MessageOutlined, StarOutlined, EyeOutlined } from '@ant-design/icons';
+import { AdminTicketFilter } from "./AdminTicketFilter";
+import { getAssociatedTelecomList } from "../../../redux/telecomRedux";
 import moment from "moment";
 import MessageBox from "../MessageBox";
 
@@ -22,17 +22,26 @@ const Search = Input.Search;
 
 export default function AdminSupportTicketManagement() {
     const navigate = useNavigate();
-    const {Content} = Layout;
+    const { Content } = Layout;
     const vendorstaff = JSON.parse(localStorage.getItem("user"));
     const [form] = Form.useForm(); // create
     const [editForm] = Form.useForm(); // create
     const [adminTicketList, setAdminTicketList] = useState([]);
     const [openCreateAdminTickerModal, setOpenCreateAdminTickerModal] = useState(false);
     const [fetchAdminTicketList, setFetchAdminTicketList] = useState(true);
+    const [adminSearchText, setAdminSearchText] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const getNameForSupportTicket = (item) => {
-            return 'Enquiry to Admin for ' + item.ticket_category;
-    }
+        const submittedUser = item.submitted_user.charAt(0).toUpperCase() + item.submitted_user.slice(1).toLowerCase();
+        const ticketType = item.ticket_type.charAt(0).toUpperCase() + item.ticket_type.slice(1).toLowerCase();
+
+        if (item.submitted_user === 'VENDOR_STAFF') {
+            return 'Enquiry from Vendor to ' + ticketType;
+        } else {
+            return 'Enquiry from ' + submittedUser + ' to ' + ticketType;
+        }
+    };
 
     const [viewReplySection, setViewReplySection] = useState(false);
     const [currSupportTicket, setCurrSupportTicket] = useState('');
@@ -51,18 +60,25 @@ export default function AdminSupportTicketManagement() {
                 const response = await getAllOutgoingSupportTicketsByVendorStaff(vendorstaff.user_id);
                 console.log(response)
                 if (response.status) {
-                    var tempData = response.data.map((val) => ({
-                        ...val,
-                        reply_list: val.reply_list,
-                        is_resolved: val.is_resolved,
-                        ticket_category: val.ticket_category,
-                        ticket_type: val.ticket_type,
-                        start_datetime: moment(val.created_time).format('llll'),
-                        description: val.description,
-                        key: val.support_ticket_id,
-                        title: getNameForSupportTicket(val),
-                        avatar: `https://xsgames.co/randomusers/avatar.php?g=pixel&key=${val.support_ticket_id}`
-                    }));
+                    const tempData = await Promise.all(
+                        response.data.map(async (val) => {
+                            const response = await getUserAvatarImage(val.submitted_user_id);
+                            return {
+                                ...val,
+                                reply_list: val.reply_list,
+                                is_resolved: val.is_resolved,
+                                ticket_category: val.ticket_category,
+                                ticket_type: val.ticket_type,
+                                start_datetime: moment(val.created_time).format('llll'),
+                                description: val.description,
+                                key: val.support_ticket_id,
+                                title: getNameForSupportTicket(val),
+                                submitted_user_name: val.submitted_user_name,
+                                avatar: response.data
+                            };
+                        })
+                    );
+
                     tempData.sort((a, b) => {
                         const momentA = moment(a.start_datetime);
                         const momentB = moment(b.start_datetime);
@@ -98,6 +114,7 @@ export default function AdminSupportTicketManagement() {
     }
 
     async function onCreateSubmit(values) {
+        setLoading(true)
         console.log(values);
         let obj = {
             'ticket_type': 'ADMIN',
@@ -115,6 +132,7 @@ export default function AdminSupportTicketManagement() {
         let response = await createSupportTicketToAdmin(vendorstaff.user_id, obj);
         console.log('admin response', response)
         if (response.status) {
+            setLoading(false)
             form.resetFields();
             setFetchAdminTicketList(true);
             setOpenCreateAdminTickerModal(false);
@@ -123,6 +141,7 @@ export default function AdminSupportTicketManagement() {
                 autoClose: 1500
             });
         } else {
+            setLoading(false)
             toast.error(response.data.errorMessage, {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 1500
@@ -153,6 +172,26 @@ export default function AdminSupportTicketManagement() {
 
         </Space>
     );
+
+    const categoryColorMap = {
+        REFUND: 'red',
+        CANCELLATION: 'blue',
+        GENERAL_ENQUIRY: 'purple',
+        BOOKING: 'gold',
+        DEAL: 'cyan',
+        RESTAURANT: 'magenta',
+        ATTRACTION: 'orange',
+        TELECOM: 'volcano',
+        ACCOMMODATION: 'lime',
+        TOUR: 'geekblue',
+    };
+
+    const getColorForCategory = (category) => {
+        const color = categoryColorMap[category] || 'gray';
+        const formattedCategory = category.replace('_', ' ');
+        return { color, formattedCategory };
+    };
+
     const SupportTicket = () => (
         <List
             itemLayout="horizontal"
@@ -161,7 +200,7 @@ export default function AdminSupportTicketManagement() {
                 onChange: (page) => {
                     console.log(page);
                 },
-                pageSize: 3,
+                pageSize: 10,
             }}
             bordered={true}
             dataSource={adminTicketList}
@@ -174,39 +213,54 @@ export default function AdminSupportTicketManagement() {
                 <List.Item
                     key={item.title}
                     actions={[
-                        // <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-                        <IconText icon={CalendarOutlined} text={item.start_datetime}/>,
-                        <Button
-                            type="primary"
-                            icon={<MessageOutlined />}
-                            onClick={() => handleSendMessage(item)}
-                        />
+                        <span>
+                            <Tag color={getColorForCategory(item.ticket_category).color}>
+                                {getColorForCategory(item.ticket_category).formattedCategory}
+                            </Tag>
+                        </span>,
+                        <span style={{ width: '70px', display: 'inline-block' }}> {item.is_resolved === true ? (<Tag color="red">CLOSED</Tag>) : (<Tag color="green">OPEN</Tag>)}</span>,
+                        <span style={{ width: '230px', display: 'inline-block' }}>
+                            <IconText icon={CalendarOutlined} text={item.start_datetime} />
+                        </span>,
+                        <span>
+                            <Button
+                                type="primary"
+                                icon={<EyeOutlined />}
+                                onClick={() => handleSendMessage(item)}
+                                style={{ marginRight: '8px' }}
+                            >
+                                View
+                            </Button>
+                        </span>
 
                     ]}
                 >
                     <List.Item.Meta
                         avatar={<Avatar src={item.avatar} />}
-                        title={<a>{item.title}</a>}
+                        title={<a>{`#${item.support_ticket_id} - ${item.submitted_user_name}`}</a>}
+                        description={<span>{item.title}</span>}
                     />
                     {item.description}
-                    {/*/!*{}*!/ //Add toggle here for is resolved*/}
 
                 </List.Item>
             )}
         />
     )
 
+    const handleAdminSearch = (searchText) => {
+        const filteredEvents = adminTicketList.filter(({ description }) => {
+            description = description.toLowerCase();
+            console.log(description);
+            return description.includes(adminSearchText);
+        });
 
-    const TitleSearch = ({ onSearch, ...props }) => (
-        <div {...props}>
-            <Search
-                allowClear
-                placeholder="Search Description"
-                onSearch={onSearch}
-                style={{ width: '100%' }}
-            />
-        </div>
-    );
+        setAdminTicketList(filteredEvents);
+    };
+
+    const resetAdminSearch = () => {
+        setAdminSearchText('');
+        setFetchAdminTicketList(true);
+    };
 
     // const handleFilter = (key) => {
     //     const selected = parseInt(key);
@@ -231,48 +285,45 @@ export default function AdminSupportTicketManagement() {
     //     });
     // };
     //
-    const handleSearch = (searchText, event) => {
-        event.preventDefault();
-        const filteredEvents = adminTicketList.filter(({ description }) => {
-            console.log(description)
-            description = description.toLowerCase();
-            return description.includes(searchText);
-        });
-
-        setAdminTicketList(filteredEvents)
-    };
 
     return (
         <Layout style={styles.layout}>
             {/* <CustomHeader text={"Header"} /> */}
-            <CustomHeader items={viewAdminSupportBreadCrumb}/>
-            <Layout style={{ padding: '0 24px 24px', backgroundColor:'white' }}>
+            <CustomHeader items={viewAdminSupportBreadCrumb} />
+            <Layout style={{ padding: '0 24px 24px', backgroundColor: 'white' }}>
                 <Content style={styles.content}>
                     <CustomButton text="Create Admin Ticket" icon={<PlusOutlined />} onClick={() => setOpenCreateAdminTickerModal(true)} />
                     <br /><br />
 
-                    <TitleSearch onSearch={handleSearch} />
+                    <div>
+                        <Input
+                            placeholder="Search description"
+                            value={adminSearchText}
+                            onChange={(e) => setAdminSearchText(e.target.value)}
+                            style={{ width: 200 }}
+                        />
+                        <Button type="primary" onClick={handleAdminSearch} style={{ marginLeft: '5px' }}> Search </Button>
+                        <Button type="primary" onClick={resetAdminSearch} style={{ marginLeft: '5px', backgroundColor: 'slategray' }}> Clear </Button>
 
-                    <br />
-                    {/*<AdminTicketFilter*/}
-                    {/*    filterBy={this.handleFilter}*/}
-                    {/*    className={styles.action}*/}
-                    {/*/>*/}
-                    <CreateAdminTicketModal
-                        form={form}
-                        openCreateAdminTickerModal={openCreateAdminTickerModal}
-                        cancelAdminTicketModal={onCancelCreateModal}
-                        onCreateSubmit={onCreateSubmit}
-                    />
-                    {SupportTicket()}
-                    <br /><br />
+                        <CreateAdminTicketModal
+                            form={form}
+                            openCreateAdminTickerModal={openCreateAdminTickerModal}
+                            cancelAdminTicketModal={onCancelCreateModal}
+                            onCreateSubmit={onCreateSubmit}
+                            setLoading = {setLoading}
+                            isLoading = {loading}
+                        />
+                        <br /><br />
+                        {SupportTicket()}
+                        <br /><br />
 
-                    {viewReplySection?
-                        <MessageBox
-                            supportTicketId={currSupportTicket}
-                            toggleFetchAdminList = {toggleFetchAdminList}
-                        />: null
-                    }
+                        {viewReplySection ?
+                            <MessageBox
+                                supportTicketId={currSupportTicket}
+                                toggleFetchAdminList={toggleFetchAdminList}
+                            /> : null
+                        }
+                    </div>
                 </Content>
             </Layout>
             <ToastContainer />
@@ -293,7 +344,7 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         width: "97%",
-        marginTop:'-5px'
+        marginTop: '-5px'
     },
     customRow: {
         height: '280px',

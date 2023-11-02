@@ -1,4 +1,4 @@
-import {Button, Form, Input, InputNumber, Modal, Select, Switch} from "antd";
+import {Button, Form, Input, InputNumber, Modal, Select, Spin, Switch} from "antd";
 import React from "react";
 import  { FormInstance } from 'antd/es/form';
 
@@ -85,6 +85,8 @@ export default function CreateAdminTicketModal(props) {
                 style={{minWidth: 650}}
                 footer={[]}
             >
+                <Spin spinning={props.isLoading} size={"large"} >
+
                 <Form
                     name="form"
                     form={props.form}
@@ -104,23 +106,23 @@ export default function CreateAdminTicketModal(props) {
                         // onChange={onTypeChange}
                     >
                         <Select placeholder="Finance Related">
-                            <Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>
+                            {/*<Option value='MASTER_ACCOUNT_CREATION'>Admin Account Creation</Option>*/}
                             <Option value='WALLET'>Finance Related</Option>
                             <Option value='GENERAL_ENQUIRY'>General Inquiries</Option>
                         </Select>
                     </Form.Item>
 
-                    <Form.Item
-                        noStyle
-                        shouldUpdate={(prevValues, currentValues) => prevValues.ticket_category !== currentValues.ticket_category}
-                    >
-                        {({ getFieldValue }) =>
-                            getFieldValue('ticket_category') === 'MASTER_ACCOUNT_CREATION' ? (
-                                createMasterAccount()
-                            ) : null
-                        }
-                    </Form.Item>
-                    {console.log(props.form.getFieldValue('ticket_category'))}
+                    {/*<Form.Item*/}
+                    {/*    noStyle*/}
+                    {/*    shouldUpdate={(prevValues, currentValues) => prevValues.ticket_category !== currentValues.ticket_category}*/}
+                    {/*>*/}
+                    {/*    {({ getFieldValue }) =>*/}
+                    {/*        getFieldValue('ticket_category') === 'MASTER_ACCOUNT_CREATION' ? (*/}
+                    {/*            createMasterAccount()*/}
+                    {/*        ) : null*/}
+                    {/*    }*/}
+                    {/*</Form.Item>*/}
+                    {/*{console.log(props.form.getFieldValue('ticket_category'))}*/}
                     {/*{props.form.getFieldValue('ticket_category') === 'MASTER_ACCOUNT_CREATION' && (*/}
                     {/*   createMasterAccount()*/}
                     {/*)}*/}
@@ -141,6 +143,7 @@ export default function CreateAdminTicketModal(props) {
                         </Button>
                     </Form.Item>
                 </Form>
+                </Spin>
             </Modal>
         </div>
     )

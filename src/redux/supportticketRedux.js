@@ -163,3 +163,13 @@ export async function deleteReply(supportTicketId, replyId) {
         return {status: false, data: error.message};
     }
 }
+
+export async function getUserAvatarImage(userId) {
+    try {
+        const response = await supportApi.get(`/getUserAvatarImage/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("supportRedux getUserAvatarImage Error : ", error);
+        return {status: false, data: error.message};
+    };
+}

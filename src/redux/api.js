@@ -76,11 +76,24 @@ export const supportApi = axios.create({
     baseURL: HOST_WITH_PORT + '/supportTicket'
 })
 
+export const badgeApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/badge'
+})
+
+export const commentApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/comment'
+})
+
+export const reportApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/report'
+})
+
 export const dataApi = axios.create({
     baseURL: HOST_WITH_PORT + '/data'
 })
 
-const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi,categoryApi, categoryItemApi, postApi, supportApi, dataApi]
+const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi,categoryApi, categoryItemApi, postApi, supportApi, badgeApi, commentApi, reportApi, dataApi]
+
 
 instanceList.map((api) => {
     api.interceptors.request.use( (config) => {
@@ -110,8 +123,12 @@ instanceList.map((api) => {
             if (!error.status && !originalRequest._retry) {
                 originalRequest._retry = true;
                 const resp = await refreshToken();
+                if (resp === undefined) {
+                    return api(originalRequest);
+                }
                 const newToken = resp.refreshToken;
                 console.log("Refresh token", newToken)
+
 
                 localStorage.setItem(TOKEN_KEY, newToken);
                 axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;

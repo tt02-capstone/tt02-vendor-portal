@@ -47,7 +47,9 @@ export default function Post() {
                             content: item.content,
                             postUser: user,
                             publish_time: item.publish_time,
-                            updated_time: item.updated_time
+                            updated_time: item.updated_time,
+                            post_image: item.post_image_list, 
+                            is_published: item.is_published
                         }
 
                         return processItem;
@@ -64,6 +66,7 @@ export default function Post() {
     async function retrieveAllPosts() {
         try {
             const response = await getAllPostByCategoryItemId(category_item_id);
+            console.log(response)
 
             if (response.status) {
                 let data = response.data
@@ -77,7 +80,9 @@ export default function Post() {
                             content: item.content,
                             postUser: user,
                             publish_time: item.publish_time,
-                            updated_time: item.updated_time
+                            updated_time: item.updated_time,
+                            post_image : item.post_image_list,
+                            is_published: item.is_published
                         }
 
                         return processItem;
@@ -157,17 +162,19 @@ export default function Post() {
     }
 
     async function onClickSubmitPostUpdate(values) {
+        let oldPostImage = [];
+        if (selectedPost.post_image != []) {
+            oldPostImage.push(selectedPost.post_image[0]);
+        }
         const postObj = {
             post_id: selectedPostId,
             title: values.title,
             content: values.content,
-            post_image_list: values.post_image
+            post_image_list: values.post_image && values.post_image.length == 0 ? oldPostImage : values.post_image,
         };
 
-        // console.log("postObj", postObj);
 
         let response = await updatePost(postObj);
-        // console.log("updatePost response", response);
         if (response.status) {
             updatePostForm.resetFields();
             setIsUpdatePostModalOpen(false);
@@ -249,16 +256,16 @@ export default function Post() {
 
                 <List
                     itemLayout="horizontal"
-                    dataSource={postList}
+                    dataSource={postList.filter(item => item.is_published)}
                     renderItem={(item, index) => (
                         <>
                         <List.Item style={{ fontSize: 25, marginTop: 4, marginBottom: -25 }}>
                             <Link to={`/forum/post/${category_id}/${category_name}/${category_item_id}/${category_item_name}/${item.post_id}/${item.title}`}>
                                 <List.Item.Meta
-                                    avatar={<Avatar size="large" src={`${item.postUser.profile_pic}`} />}
+                                    avatar={<Avatar size="large" src={`${item.postUser.profile_pic ? item.postUser.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}`} />}
                                     title={item.title}
                                     description={item.content}
-                                    style={{ width:'1600px' }}
+                                    style={{ width:'1200px' }}
                                 />
                             </Link>
 
