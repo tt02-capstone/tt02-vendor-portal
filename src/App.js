@@ -27,6 +27,8 @@ import {
     PhoneOutlined,
     ScheduleOutlined,
     FormOutlined,
+    ExclamationCircleOutlined,
+    BarChartOutlined
     SolutionOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
@@ -47,6 +49,7 @@ import PostItems from "./pages/forum/postItem";
 import UserSupportTicketManagement from "./pages/supportticket/UserSupportTicketManagement/UserSupportTicketManagement";
 import AdminSupportTicketManagement
     from "./pages/supportticket/AdminSupportTicketManagement/AdminSupportTicketManagement";
+import DataDashboard from "./pages/data/DataDashboard";
 function AppLayout() {
 
     const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');
@@ -72,6 +75,7 @@ function AppLayout() {
                 {key: '/adminsupportticket', label: 'Admin Tickets', icon: <UserOutlined/>,},
             ]
         },
+        {key: '/datadashboard', label: 'Data Dashboard', icon: <BarChartOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -79,6 +83,7 @@ function AppLayout() {
         {key: '/profile', label: 'Profile', icon: <UserOutlined/>},
         {key: '/tourtypes', label: 'Tours', icon: <ScheduleOutlined/>},
         {key: '/tourbookings', label: 'Tour Bookings', icon: <CalendarOutlined/>},
+        {key: '/datadashboard', label: 'Data Dashboard', icon: <BarChartOutlined/>},
         {key: '/', label: 'Logout', icon: <Logout/>,}
     ];
 
@@ -128,6 +133,7 @@ function AppLayout() {
                         <Route path="/forum/post/:category_id/:category_name/:category_item_id/:category_item_name" element={< Post/>}/>
                         <Route path="/forum/post/:category_id/:category_name/:category_item_id/:category_item_name/:post_id/:post_title" element={< PostItems/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
+                        <Route path="/datadashboard" element={<DataDashboard />}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
                         <Route path="/signup" element={<Signup/>}/>
