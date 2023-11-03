@@ -12,9 +12,19 @@ export async function getData(vendor_id) {
     }
 }
 
-export async function subscribe(vendor_id, user_type, subscription_type, auto_renew) {
+export async function subscribe(user_id, user_type, subscription_type, auto_renew) {
     try {
-        const response = await dataApi.post(`/subscribe/${vendor_id}/${user_type}/${subscription_type}/${auto_renew}`);
+        const response = await dataApi.post(`/subscribe/${user_id}/${user_type}/${subscription_type}/${auto_renew}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("Error : ", error);
+        return {status: false, data: error.message};
+    }
+}
+
+export async function getSubscriptionStatus(user_id, user_type) {
+    try {
+        const response = await dataApi.get(`/getSubscriptionStatus/${user_id}/${user_type}`);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);
@@ -32,9 +42,9 @@ export async function getSubscription(vendor_id, user_type) {
     }
 }
 
-export async function renewSubscription(vendor_id, user_type, subscription_type, auto_renew) {
+export async function renewSubscription(subscription_id) {
     try {
-        const response = await dataApi.put(`/subscribe/${vendor_id}/${user_type}/${subscription_type}/${auto_renew}`);
+        const response = await dataApi.put(`/subscribe/${subscription_id}`);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);

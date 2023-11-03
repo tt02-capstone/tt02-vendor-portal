@@ -7,7 +7,7 @@ import SubscriptionModal from "./SubscriptionModal";
 import CustomButton from "../../components/CustomButton";
 import { Chart as ChartJS, LineController,LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend,TimeScale} from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
-import { getData, subscribe, getSubscription } from "../../redux/dataRedux";
+import { getData, subscribe, getSubscription, getSubscriptionStatus } from "../../redux/dataRedux";
 import { set } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -24,10 +24,10 @@ ChartJS.register(
 );
 
 const DataDashboard = () => {
-  const [isSubscribed, setIsSubscribed] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [data, setData] = useState([]);
-  const [subscriptionDetails, setSubscriptionDetails] = useState(null);
+  //const [subscriptionDetails, setSubscriptionDetails] = useState(null);
   const [operation, setOperation] = useState("SUBSCRIBE");
 
   const navigate = useNavigate();
@@ -53,11 +53,11 @@ const DataDashboard = () => {
     const fetchSubscriptionStatus = async () => {
       try {
         // Replace this with your API call to fetch user subscription status
-        const response = await getSubscription(user.vendor.vendor_id, "VENDOR");
+        const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
 
         if (response.status) {
           const details = response.data;
-          setSubscriptionDetails(response.data);
+          
           if (details == "active") {
             setIsSubscribed(true);
           }
