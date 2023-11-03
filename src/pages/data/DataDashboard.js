@@ -255,38 +255,33 @@ const DataDashboard = () => {
                     items,
                   }}>
                 <Button> Choose an Option </Button>
-        
-          
-        </Dropdown>
-              <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
-        <Line data={lineData} options={chartOptions}/>
-              
-        </div>
-              ) : (
-        
-        
+                </Dropdown>
+
+                <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
+                <Line data={lineData} options={chartOptions}/>
+            </div>
+          ) : (
         <div style={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
                     alignItems: 'center', 
                     justifyContent: 'center' 
                   }}>
-                  <p>Empower your business with data</p>
-                  <CustomButton text="Subscribe Now" icon={<DashboardOutlined />} onClick={onClickManageSubButton} />
 
-          {isSubModalOpen &&
-          <SubscriptionModal
-            operation={operation}
-            isSubModalOpen={isSubModalOpen}
-            onClickSubmitSubscription={onClickSubmitSubscription}
-            onClickCancelManageSubButton={onClickCancelManageSubButton}
-          />
-        } 
-                </div>
-        
-        
+            <p>Empower your business with data</p>
+            <CustomButton text="Subscribe Now" icon={<DashboardOutlined />} onClick={onClickManageSubButton} />
+
+            {isSubModalOpen &&
+            <SubscriptionModal
+              operation={operation}
+              isSubModalOpen={isSubModalOpen}
+              onClickSubmitSubscription={onClickSubmitSubscription}
+              onClickCancelManageSubButton={onClickCancelManageSubButton}
+            />
+          } 
+        </div>
       )}    
-          </div>
+        </div>
         </Content>
       </Layout>
   );
