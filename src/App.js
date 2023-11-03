@@ -50,6 +50,7 @@ import UserSupportTicketManagement from "./pages/supportticket/UserSupportTicket
 import AdminSupportTicketManagement
     from "./pages/supportticket/AdminSupportTicketManagement/AdminSupportTicketManagement";
 import DataDashboard from "./pages/data/DataDashboard";
+import SubscriptionManagement from "./pages/data/SubscriptionManagement";
 function AppLayout() {
 
     const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');
@@ -134,6 +135,7 @@ function AppLayout() {
                         <Route path="/forum/post/:category_id/:category_name/:category_item_id/:category_item_name/:post_id/:post_title" element={< PostItems/>}/>
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/datadashboard" element={<DataDashboard />}/>
+                        <Route path="/datadashboard/subscription" element={<SubscriptionManagement />}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
                         <Route path="/signup" element={<Signup/>}/>

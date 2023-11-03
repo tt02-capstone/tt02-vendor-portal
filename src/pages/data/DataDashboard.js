@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { DownOutlined, SmileOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { DownOutlined, SmileOutlined, DashboardOutlined } from '@ant-design/icons';
 import { Dropdown, Button, Menu } from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
-
+import SubscriptionModal from "./SubscriptionModal";
+import CustomButton from "../../components/CustomButton";
 import { Chart as ChartJS, LineController,LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend,TimeScale} from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
-import { getData } from "../../redux/dataRedux";
+import { getData, subscribe, getSubscription, getSubscriptionStatus } from "../../redux/dataRedux";
+import { set } from 'date-fns';
+import { ToastContainer, toast } from 'react-toastify';
 
 ChartJS.register(
   CategoryScale,
@@ -20,30 +24,84 @@ ChartJS.register(
 );
 
 const DataDashboard = () => {
-  const [isSubscribed, setIsSubscribed] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [data, setData] = useState([]);
+  //const [subscriptionDetails, setSubscriptionDetails] = useState(null);
+  const [operation, setOperation] = useState("SUBSCRIBE");
 
-  /* useEffect(() => {
+  const navigate = useNavigate();
+
+  const onClickViewSubButton = () => {
+    navigate('/datadashboard/subscription'); // Replace with your route
+  };
+
+  // Subscription 
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+
+  function onClickCancelManageSubButton() {
+    setIsSubModalOpen(false);
+  }
+
+  function onClickManageSubButton() {
+    setIsSubModalOpen(true);
+  }
+
+
+  useEffect(() => {
     // Fetch user subscription status here
     const fetchSubscriptionStatus = async () => {
       try {
         // Replace this with your API call to fetch user subscription status
-        const response = await fetch('/api/subscription-status');
-        const data = await response.json();
-        
-        if (data.isSubscribed) {
-          setIsSubscribed(true);
+        const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
+
+        if (response.status) {
+          const details = response.data;
+          
+          if (details == "active") {
+            setIsSubscribed(true);
+          }
+          
         } else {
-          setIsSubscribed(false);
+          toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+          });
         }
       } catch (error) {
-        console.error("Error fetching subscription status:", error);
+        toast.error(error, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
       }
     };
 
     fetchSubscriptionStatus();
-  }, []); */
+  }, []);
+
+  async function onClickSubmitSubscription(subscriptionDetails) {
+    try {
+
+      const response = await subscribe(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
+      if (response.status) {
+        setIsSubscribed(true);
+      } else {
+        toast.error(response.data.errorMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
+      }
+
+
+    } catch (error) {
+      toast.error(error, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1500
+      });
+    }
+
+
+  }
 
   useEffect(() => {
     // Fetch user subscription status here
@@ -189,15 +247,21 @@ const DataDashboard = () => {
           <Button>
             Choose an Option
           </Button>
+
+          
         </Dropdown>
+        <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
         <Line data={lineData} 
         options={chartOptions}/>
+        
         </div>
 
 
           
  
       ) : (
+
+        
         <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -205,8 +269,19 @@ const DataDashboard = () => {
             justifyContent: 'center' 
           }}>
           <p>Empower your business with data</p>
-          <Button type="primary">Subscribe Now</Button>
+          <CustomButton text="Subscribe Now" icon={<DashboardOutlined />} onClick={onClickManageSubButton} />
+
+          {isSubModalOpen &&
+          <SubscriptionModal
+            operation={operation}
+            isSubModalOpen={isSubModalOpen}
+            onClickSubmitSubscription={onClickSubmitSubscription}
+            onClickCancelManageSubButton={onClickCancelManageSubButton}
+          />
+        } 
         </div>
+
+        
       )}
     </div>
   );
