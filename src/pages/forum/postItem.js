@@ -24,13 +24,15 @@ export default function PostItems() {
     const { Meta } = Card;
     const [visible, setVisible] = useState(false); // check if the post has a img or not 
     const [triggerPost, setTriggerPost] = useState(true);
-    const [postBadge, setPostBadge] = useState();
-    const [commentBadge, setCommentBadge] = useState();
 
     // comments 
     const [comments, setComments] = useState([]);
     const [triggerComment, setTriggerComment] = useState(true);
     const [newComment, setNewComment] = useState("");
+
+    // badge 
+    const [postBadge, setPostBadge] = useState();
+    const [commentBadge, setCommentBadge] = useState();
 
     const forumBreadCrumb = [
         {
