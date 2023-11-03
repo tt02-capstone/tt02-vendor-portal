@@ -1,9 +1,9 @@
-import { Layout, Card, Avatar, Image, Input } from 'antd';
+import { Layout, Card, Avatar, Image, Input, Tag } from 'antd';
 import { React, useEffect, useState } from 'react';
 import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
 import { Navigate, Link, useParams } from 'react-router-dom';
-import { getPost, upvote, downvote, createComment, deleteComment, updateComment, getAllPostComment, upvoteComment, downvoteComment, reportPost, reportComment } from '../../redux/forumRedux';
+import { getPost, upvote, downvote, createComment, deleteComment, updateComment, getAllPostComment, upvoteComment, downvoteComment, reportPost, reportComment, getPrimaryBadge } from '../../redux/forumRedux';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
 import { PaperClipOutlined, ArrowUpOutlined , ArrowDownOutlined } from '@ant-design/icons';
@@ -24,6 +24,8 @@ export default function PostItems() {
     const { Meta } = Card;
     const [visible, setVisible] = useState(false); // check if the post has a img or not 
     const [triggerPost, setTriggerPost] = useState(true);
+    const [postBadge, setPostBadge] = useState();
+    const [commentBadge, setCommentBadge] = useState();
 
     // comments 
     const [comments, setComments] = useState([]);
@@ -51,6 +53,7 @@ export default function PostItems() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await getPost(post_id);
+
             if (response.status) {
                 let item = response.data
                 const user = item.internal_staff_user || item.local_user || item.tourist_user || item.vendor_staff_user;
@@ -78,6 +81,7 @@ export default function PostItems() {
                 }
 
                 setPost(formatItem)
+                get_post_badge(user.user_id)
             } else {
                 console.log("Post not fetched!");
             }
@@ -124,7 +128,6 @@ export default function PostItems() {
     useEffect(() => {
         const fetchData = async () => {
             let response = await getAllPostComment(post_id);
-            console.log(response.data)
             if (response.status) {
                 setComments([]);
                 setComments(response.data);
@@ -515,20 +518,20 @@ export default function PostItems() {
                 )))
             : (
                 <div> No comments posted! </div>
-            );
-            
+            );            
 
             const tabInfo = [
                 {
-                  menuItem: 'Post(s)',
+                  menuItem: 'Post',
                   render: () => <Tab.Pane attached={false}> {postList}</Tab.Pane>,
                 },
                 {
-                  menuItem: 'Comment(s)',
+                  menuItem: 'Comment',
                   render: () => <Tab.Pane attached={false}>{commentList}</Tab.Pane>,
                 }
             ]
             setTabs(tabInfo)
+            get_comment_badge(user_id) // the current user u r viewing 
         } else {
             console.log('user profile not fetched')
         }
@@ -564,6 +567,24 @@ export default function PostItems() {
         { text: 'Others', value: 'OTHER' }
     ]
 
+    const get_post_badge = async (user_id) => {
+        const response = await getPrimaryBadge(user_id);
+        if (response.status) {
+            setPostBadge(response.data);
+        } else {
+            console.log('No badge found for this user!');
+        }
+    }
+
+    const get_comment_badge = async (user_id) => {
+        const response = await getPrimaryBadge(user_id);
+        if (response.status) {
+            setCommentBadge(response.data);
+        } else {
+            console.log('No badge found for this user!');
+        }
+    }
+
     return user ? (
         <Layout style={styles.layout}>
             <CustomHeader items={forumBreadCrumb} />
@@ -582,7 +603,12 @@ export default function PostItems() {
                             <div style={{display:'flex'}}>
                                 <Image size='small' src={userProfile.profile_pic ? userProfile.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'} wrapped/>
                                 <div style={{marginLeft: 15}}>
-                                    <Header>{userProfile.name}</Header>
+                                    <div style={{display: "flex"}}>
+                                        <Header>{userProfile.name}</Header>
+                                        {commentBadge && (
+                                            <Tag color='green' style={{marginLeft:12, height:23, fontWeight:"bold"}}>{commentBadge.badge_type}</Tag>
+                                        )}
+                                    </div>
                                     <p style={{fontWeight:"bold"}}> Recent Forum Activity </p>
                                     <Tab menu={{ pointing: true }} panes={tabs}  style={{width:750}} />
                                 </div>
@@ -708,7 +734,10 @@ export default function PostItems() {
                                 <div>
                                      <Link style={{color:'black'}} onClick={() => viewProfile(post.postUser.user_id)}>
                                         {post.postUser.name}
-                                    </Link>
+                                        {postBadge && (
+                                            <Tag color='green' style={{marginLeft:10, height:23, fontWeight:"bold", marginBottom:5, marginTop:2}}>{postBadge.badge_type}</Tag>
+                                        )}
+                                    </Link>                                
                                     <div style={{ fontSize: '14px', color: '#666' }}>Posted on: {moment(post.publish_time).format('L')} {moment(post.publish_time).format('LT')}</div>
 
                                 </div>
