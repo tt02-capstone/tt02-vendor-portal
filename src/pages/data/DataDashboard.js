@@ -28,11 +28,12 @@ const DataDashboard = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [data, setData] = useState([]);
   const [subscriptionDetails, setSubscriptionDetails] = useState(null);
+  const [operation, setOperation] = useState("SUBSCRIBE");
 
   const navigate = useNavigate();
 
-  const onClickManageSubButton = () => {
-    navigate('/manage-subscription'); // Replace with your route
+  const onClickViewSubButton = () => {
+    navigate('/datadashboard/subscription'); // Replace with your route
   };
 
   // Subscription 
@@ -249,7 +250,7 @@ const DataDashboard = () => {
 
           
         </Dropdown>
-        <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickManageSubButton} />
+        <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
         <Line data={lineData} 
         options={chartOptions}/>
         
@@ -272,6 +273,7 @@ const DataDashboard = () => {
 
           {isSubModalOpen &&
           <SubscriptionModal
+            operation={operation}
             isSubModalOpen={isSubModalOpen}
             onClickSubmitSubscription={onClickSubmitSubscription}
             onClickCancelManageSubButton={onClickCancelManageSubButton}

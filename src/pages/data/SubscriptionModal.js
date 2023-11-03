@@ -5,18 +5,56 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 export default function SubscriptionModal(props) {
+    const [form] = Form.useForm();
     const { Option } = Select;
+    let initialValues = {};
+    console.log(props)
+  if (props.subscriptionPlan) {
+    initialValues.subscriptionType = props.subscriptionPlan;
+  }
+
+  if (props.autoRenewal !== null) {
+    
+    initialValues.autoRenew = props.autoRenewal;
+    console.log(initialValues)
+  }
+
+  useEffect(() => {
+    // Check the values in the console
+    
+    
+    // Set the initial values
+    if (props.subscriptionType && props.autoRenew) {
+        form.setFieldsValue({
+            subscriptionType: props.subscriptionType,
+            autoRenew: props.autoRenew,
+          });
+    }
+    
+  }, [form, props.subscriptionType, props.autoRenew]);
+
+    function generateTitle() {
+        if (props.operation == "UPDATE") {
+            return "Update Subscription";
+        } else if (props.operation == "RENEW") {
+            return "Renew Subscription";
+        } else if (props.operation == "SUBSCRIBE") {
+            return "Subscribe to Data Dashboard";
+        }
+
+    }
 
     return(
         <div>
             <Modal
-                title="Subscribe to Data Dashboard"
+                title={generateTitle()}
                 centered
                 open={props.isSubModalOpen}
                 onCancel={props.onClickCancelManageSubButton}
                 footer={[]} // hide default buttons of modal
             >
                 <Form 
+                    form={form}
                     name="basic"
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
@@ -24,6 +62,7 @@ export default function SubscriptionModal(props) {
                     required={true}
                     requiredMark={true}
                     onFinish={props.onClickSubmitSubscription}
+                    initialValues={initialValues}
                 >
                     <Form.Item
                     label="Subscription Type"
@@ -43,6 +82,7 @@ export default function SubscriptionModal(props) {
                     labelAlign="left"
                     name="autoRenew"
                     rules={[{ required: true, message: 'Please indicate whether to auto-renew or not' },]}
+                    valuePropName="checked"
                     >
                     <Switch />
                     </Form.Item>
