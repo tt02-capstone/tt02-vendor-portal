@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { getTourByTourId } from "../../redux/tourRedux";
-import { ToastContainer, toast } from 'react-toastify';
-import { Modal, Form, Input, Button, Select, DatePicker, TimePicker } from "antd";
+import { Modal, Form, Button, DatePicker, TimePicker } from "antd";
 import moment from 'moment';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 export default function EditTourModal(props) {
 
-    const { TextArea } = Input;
-    const { Option } = Select;
     const [form] = Form.useForm();
     const [selectedTour, setSelectedTour] = useState([]);
-    const local = JSON.parse(localStorage.getItem("user"));
+    // const local = JSON.parse(localStorage.getItem("user"));
     const [fieldTouched, setFieldTouched] = useState(false);
 
     async function getTour(props) {

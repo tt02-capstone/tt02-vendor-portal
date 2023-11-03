@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DownOutlined, SmileOutlined, DashboardOutlined } from '@ant-design/icons';
-import { Dropdown, Button, Menu } from 'antd';
+import { Dropdown, Button, Menu, Layout } from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 import SubscriptionModal from "./SubscriptionModal";
-import CustomButton from "../../components/CustomButton";
+import CustomButton from "../../components/CustomButton";import CustomHeader from "../../components/CustomHeader";
+import { Content } from "antd/es/layout/layout";
+
 import { Chart as ChartJS, LineController,LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend,TimeScale} from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { getData, subscribe, getSubscription, getSubscriptionStatus } from "../../redux/dataRedux";
@@ -27,6 +29,12 @@ const DataDashboard = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [data, setData] = useState([]);
+
+  const dataBreadCrumb = [
+    {
+      title: 'Dashboard',
+    }
+];
   //const [subscriptionDetails, setSubscriptionDetails] = useState(null);
   const [operation, setOperation] = useState("SUBSCRIBE");
 
@@ -236,55 +244,62 @@ const DataDashboard = () => {
   };
 
   
-
   return (
-    <div>
-      {isSubscribed ? (
-        <div>
-        <Dropdown menu={{
-            items,
-          }}>
-          <Button>
-            Choose an Option
-          </Button>
+    <Layout style={styles.layout}>
+        <CustomHeader items={dataBreadCrumb} />
+        <Content style={styles.content}>
+          <div>
+            {isSubscribed ? (
+              <div>
+                <Dropdown menu={{
+                    items,
+                  }}>
+                <Button> Choose an Option </Button>
+                </Dropdown>
 
-          
-        </Dropdown>
-        <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
-        <Line data={lineData} 
-        options={chartOptions}/>
-        
-        </div>
-
-
-          
- 
-      ) : (
-
-        
+                <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
+                <Line data={lineData} options={chartOptions}/>
+            </div>
+          ) : (
         <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center' 
-          }}>
-          <p>Empower your business with data</p>
-          <CustomButton text="Subscribe Now" icon={<DashboardOutlined />} onClick={onClickManageSubButton} />
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                  }}>
 
-          {isSubModalOpen &&
-          <SubscriptionModal
-            operation={operation}
-            isSubModalOpen={isSubModalOpen}
-            onClickSubmitSubscription={onClickSubmitSubscription}
-            onClickCancelManageSubButton={onClickCancelManageSubButton}
-          />
-        } 
+            <p>Empower your business with data</p>
+            <CustomButton text="Subscribe Now" icon={<DashboardOutlined />} onClick={onClickManageSubButton} />
+
+            {isSubModalOpen &&
+            <SubscriptionModal
+              operation={operation}
+              isSubModalOpen={isSubModalOpen}
+              onClickSubmitSubscription={onClickSubmitSubscription}
+              onClickCancelManageSubButton={onClickCancelManageSubButton}
+            />
+          } 
         </div>
-
-        
-      )}
-    </div>
+      )}    
+        </div>
+        </Content>
+      </Layout>
   );
 };
 
 export default DataDashboard;
+
+const styles = {
+  layout: {
+      minHeight: '100vh',
+      minWidth: '90vw',
+      backgroundColor: 'white'
+  },
+  content: {
+      margin: '1vh 3vh 1vh 3vh',
+      marginTop: -10, 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      marginLeft: 57,
+  }
+}

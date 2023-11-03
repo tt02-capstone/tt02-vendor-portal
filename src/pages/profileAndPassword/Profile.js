@@ -462,12 +462,13 @@ export default function Profile() {
           console.log("Vendor staff total earnings not shown!");
         }
 
-        let badgeResponse = await retrieveBadgesByUserId(user.user_id);
-        if (badgeResponse.status) {
-          setBadges(badgeResponse.data);
-        } else {
-          console.log("Vendor staff badges not shown!");
-        }
+        // let badgeResponse = await retrieveBadgesByUserId(user.user_id);
+        // if (badgeResponse.status) {
+        //   setBadges(badgeResponse.data);
+        // } else {
+        //   console.log("Vendor staff badges not shown!");
+        // }
+        
       } else if (user.user_type === 'LOCAL') {
         let response = await getTourTotalEarningForLocal(user.user_id);
         if (response.status) {
@@ -706,7 +707,7 @@ export default function Profile() {
 
                 </Row>
 
-                <Divider orientation="left" style={{ fontSize: '150%' }}>Badges</Divider>
+                {/* <Divider orientation="left" style={{ fontSize: '150%' }}>Badges</Divider>
                 <Row>
                   <ul style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                     {badges &&
@@ -730,7 +731,7 @@ export default function Profile() {
                         </li>
                       ))}
                   </ul>
-                </Row>
+                </Row> */}
               </div>
             }
 

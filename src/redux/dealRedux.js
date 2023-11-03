@@ -1,4 +1,4 @@
-import {attractionApi, dealsApi} from "./api";
+import {dealsApi} from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
 export async function createDeal(dealToCreate, vendorId) {

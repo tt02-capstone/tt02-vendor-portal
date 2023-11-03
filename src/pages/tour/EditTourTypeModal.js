@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, Button, Select, Switch, InputNumber, Space, Upload } from "antd";
-import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { getTourTypeByTourTypeId, getAttractionForTourTypeId } from "../../redux/tourRedux";
 import { ToastContainer, toast } from 'react-toastify';
 import AWS from 'aws-sdk';
@@ -14,12 +14,11 @@ export default function EditTourTypeModal(props) {
     const { Option } = Select;
     const [form] = Form.useForm();
     const [selectedTourType, setSelectedTourType] = useState([]);
-    const [editedTourTypeName, setEditedTourTypeName] = useState('');
     const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
     const [file, setFile] = useState(null);
     const [existingImageUrls, setExistingImageUrls] = useState([]);
-    const vendor = JSON.parse(localStorage.getItem("user"));
+    // const vendor = JSON.parse(localStorage.getItem("user"));
     const [publishedAttractions, setPublishedAttractions] = useState([]);
     const [selectedAttraction, setSelectedAttraction] = useState('');
 

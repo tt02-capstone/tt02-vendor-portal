@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Tag, Badge, Carousel } from "antd";
+import { Modal } from "antd";
 import { getTourByTourId } from "../../redux/tourRedux";
 import moment from 'moment';
 
 export default function ViewTourModal(props) {
 
     const [selectedTour, setSelectedTour] = useState([]);
-    const local = JSON.parse(localStorage.getItem("user"));
+    // const local = JSON.parse(localStorage.getItem("user"));
 
     async function getTour(props) {
         try {
@@ -59,24 +59,3 @@ export default function ViewTourModal(props) {
         </div>
     )
 }
-
-const styles = {
-    carousel: {
-        backgroundColor: 'white',
-        paddingBottom: '50px',
-    },
-    container: {
-        display: 'flex',
-        justifyContent: 'center',
-        backgroundColor: 'white',
-        alignContent: 'center',
-        height: '300px',
-    },
-    image: {
-        maxWidth: '100%',
-        maxHeight: '100%',
-        width: 'auto',
-        height: '100%',
-        objectFit: 'cover',
-    },
-};

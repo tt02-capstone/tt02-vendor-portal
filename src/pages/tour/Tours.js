@@ -1,6 +1,6 @@
-import { React, useEffect, useState, useRef } from 'react';
-import { Layout, Form, Input, Badge, Space, Tag, Modal } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { React, useEffect, useState } from 'react';
+import { Layout, Form, Input, Space, Modal } from 'antd';
+import { useParams } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAllToursByTourType, createTour, updateTour, getTourByTourId, deleteTour, getTourTypeByTourTypeId } from "../../redux/tourRedux";
@@ -9,9 +9,8 @@ import CustomTablePagination from "../../components/CustomTablePagination";
 import { ToastContainer, toast } from 'react-toastify';
 import CustomButton from "../../components/CustomButton";
 import { PlusOutlined } from "@ant-design/icons";
-import { Table, Button } from 'antd';
+import { Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
 import CreateTourModal from './CreateTourModal';
 import moment from 'moment';
 import ViewTourModal from './ViewTourModal';
@@ -19,13 +18,12 @@ import EditTourModal from './EditTourModal';
 
 export default function Tours() {
 
-    const navigate = useNavigate();
-    const { Header, Content, Sider, Footer } = Layout;
+    const { Content } = Layout;
     const local = JSON.parse(localStorage.getItem("user"));
     const tourTypeId = useParams().tourTypeId;
     const [getToursData, setGetToursData] = useState(true);
     const [tours, setTours] = useState([]);
-    const [selectedTour, setSelectedTour] = useState([]);
+    const [setSelectedTour] = useState([]);
     const [selectedTourId, setSelectedTourId] = useState(null);
     const [selectedTourType, setSelectedTourType] = useState();
 
