@@ -15,6 +15,7 @@ export async function getData(vendor_id) {
 export async function subscribe(user_id, user_type, subscription_type, auto_renew) {
     try {
         const response = await dataApi.post(`/subscribe/${user_id}/${user_type}/${subscription_type}/${auto_renew}`);
+        console.log(response)
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);

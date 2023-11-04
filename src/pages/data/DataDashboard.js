@@ -24,7 +24,7 @@ ChartJS.register(
 );
 
 const DataDashboard = () => {
-  const [isSubscribed, setIsSubscribed] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [data, setData] = useState([]);
   //const [subscriptionDetails, setSubscriptionDetails] = useState(null);
@@ -48,41 +48,42 @@ const DataDashboard = () => {
   }
 
 
-  // useEffect(() => {
-  //   // Fetch user subscription status here
-  //   const fetchSubscriptionStatus = async () => {
-  //     try {
-  //       // Replace this with your API call to fetch user subscription status
-  //       const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
+  useEffect(() => {
+    // Fetch user subscription status here
+    const fetchSubscriptionStatus = async () => {
+      try {
+        // Replace this with your API call to fetch user subscription status
+        const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
 
-  //       if (response.status) {
-  //         const subscribed = response.data;
+        if (response.status) {
+          const subscribed = response.data;
           
-  //         if (subscribed) {
-  //           setIsSubscribed(true);
-  //         }
+          if (subscribed) {
+            setIsSubscribed(true);
+          }
           
-  //       } else {
-  //         toast.error(response.data.errorMessage, {
-  //           position: toast.POSITION.TOP_RIGHT,
-  //           autoClose: 1500
-  //         });
-  //       }
-  //     } catch (error) {
-  //       toast.error(error, {
-  //         position: toast.POSITION.TOP_RIGHT,
-  //         autoClose: 1500
-  //       });
-  //     }
-  //   };
+        } else {
+          toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+          });
+        }
+      } catch (error) {
+        toast.error(error, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
+      }
+    };
 
-  //   fetchSubscriptionStatus();
-  // }, []);
+    fetchSubscriptionStatus();
+  }, []);
 
   async function onClickSubmitSubscription(subscriptionDetails) {
     try {
-
+      console.log(subscriptionDetails)
       const response = await subscribe(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
+      console.log(response)
       if (response.status) {
         setIsSubscribed(true);
       } else {
@@ -279,6 +280,7 @@ const DataDashboard = () => {
             onClickCancelManageSubButton={onClickCancelManageSubButton}
           />
         } 
+        <ToastContainer />
         </div>
 
         
