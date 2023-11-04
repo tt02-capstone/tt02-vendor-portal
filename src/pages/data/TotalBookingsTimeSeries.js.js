@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DownOutlined, SmileOutlined, DashboardOutlined } from '@ant-design/icons';
-import { Dropdown, Button, Menu, Layout } from 'antd';
+import {Dropdown, Button, Menu, Layout, Select} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 import SubscriptionModal from "./SubscriptionModal";
 import CustomButton from "../../components/CustomButton";import CustomHeader from "../../components/CustomHeader";
@@ -25,9 +25,13 @@ ChartJS.register(
   Legend
 );
 
+const WEEKLY = 'weekly';
+const YEARLY = 'yearly';
+const MONTHLY = 'monthly';
+
 export const TotalBookingsTimeSeries = (props) => {
   const data = props.data
-
+  const [selectedXAxis, setSelectedXAxis] = useState(YEARLY);
 
   const dataBreadCrumb = [
     {
@@ -37,53 +41,42 @@ export const TotalBookingsTimeSeries = (props) => {
 
   const items = [
     {
-      key: '1',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-          1st menu item
-        </a>
-      ),
+      value: MONTHLY,
+      label: 'Monthly',
     },
     {
-      key: '2',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-          2nd menu item (disabled)
-        </a>
-      ),
-      icon: <SmileOutlined />,
-      disabled: true,
+      value: WEEKLY,
+      label: 'Weekly',
     },
     {
-      key: '3',
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-          3rd menu item (disabled)
-        </a>
-      ),
-      disabled: true,
+      value: YEARLY,
+      label: 'Yearly',
     },
-    {
-      key: '4',
-      danger: true,
-      label: 'a danger item',
-    },
+
   ];
 
-  const aggregateDataByMonth = (data) => {
+
+  const aggregateDatafromDropdown = (data) => {
     const aggregatedData = new Map(); // Use a Map to store aggregated data by month
-  
+
     // Loop through the data and aggregate by month
     data.forEach((item) => {
-      const [date, count] = item;
-      const monthKey = date.substr(0, 7); // Extract yyyy-MM part of the date
-  
-      if (aggregatedData.has(monthKey)) {
+      const [date, count] = item; //    ["2023-05-17", 1]
+      let xAxisKey;
+      if(selectedXAxis === MONTHLY) {
+         xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
+      } else if (selectedXAxis === YEARLY) {
+        xAxisKey = date.substr(0, 4); // Extract yyyy-MM part of the date
+        console.log(xAxisKey)
+      }
+
+
+      if (aggregatedData.has(xAxisKey)) {
         // Increment the count for the existing month
-        aggregatedData.set(monthKey, aggregatedData.get(monthKey) + count);
+        aggregatedData.set(xAxisKey, aggregatedData.get(xAxisKey) + count);
       } else {
         // Initialize the count for a new month
-        aggregatedData.set(monthKey, count);
+        aggregatedData.set(xAxisKey, count);
       }
     });
   
@@ -97,7 +90,7 @@ export const TotalBookingsTimeSeries = (props) => {
   };
   
   // Usage:
-  const aggregatedData = aggregateDataByMonth(data);
+  const aggregatedData = aggregateDatafromDropdown(data);
   
 
   const lineData = {
@@ -117,7 +110,7 @@ export const TotalBookingsTimeSeries = (props) => {
 
   console.log(data.map(item => item[1]))
 
-  const chartOptions = {
+  const defaultChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
@@ -127,6 +120,8 @@ export const TotalBookingsTimeSeries = (props) => {
           unit: 'month',
           displayFormats: {
             month: 'yyyy-MM',
+            week: 'YYYY [W]WW', // Adjust the format for weeks
+            year: 'yyyy',
           },
         },
       },
@@ -136,13 +131,45 @@ export const TotalBookingsTimeSeries = (props) => {
     },
   };
 
-  
+  const getChartOptions = () => {
+    const chartOptions = {
+      ...defaultChartOptions, // Start with the default options
+    };
+
+    // Adjust time unit-specific settings
+    if (selectedXAxis === WEEKLY) {
+      chartOptions.scales.x.time.unit = 'week';
+    } else if (selectedXAxis === YEARLY) {
+      chartOptions.scales.x.time.unit = 'year';
+    } else if (selectedXAxis === MONTHLY)   {
+      chartOptions.scales.x.time.unit = 'month';
+    }
+
+    return chartOptions;
+  };
+
+  const handleChange = (value) => {
+    console.log(value); // { value: "lucy", label: "Lucy (101)" }
+    setSelectedXAxis(value.value)
+  };
+
+
   return (
       <>
+
+        <Select
+              labelInValue
+              defaultValue={items[0]}
+              style={{ width: 120 }}
+              onChange={handleChange}
+              options={items}
+          />
+
+
         <div style={styles.line}>
           <Line
               data={lineData}
-              options={chartOptions}
+              options={getChartOptions()}
           />
         </div>
       </>

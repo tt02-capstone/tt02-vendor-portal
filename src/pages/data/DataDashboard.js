@@ -119,7 +119,7 @@ const DataDashboard = () => {
         // Replace this with your API call to fetch user subscription status
         const response = await getData('3');
         if (response.status) {
-          
+          console.log(response.data)
           setData(response.data)
 
       } else {
@@ -186,6 +186,8 @@ const DataDashboard = () => {
                 <Button> Choose an Option </Button>
                 </Dropdown>
                 <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
+                <br></br>
+                <br></br>
                 <TotalBookingsTimeSeries data={data} />
 
               </div>
