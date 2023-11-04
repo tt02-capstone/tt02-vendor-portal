@@ -32,6 +32,7 @@ export default function SubscriptionManagement() {
   }
 
   function onClickManageSubButton(operationString) {
+    console.log('check')
     setIsSubModalOpen(true);
     setOperation(operationString);
   }
@@ -46,17 +47,14 @@ export default function SubscriptionManagement() {
       async onOk() {
         try {
           // Replace this with your API call to fetch user subscription status
-          const response = await unsubscribe(user.vendor.vendor_id, "VENDOR");
-  
+          const response = await unsubscribe(subscriptionDetails.subscription_id);
+          console.log(response.status)
           if (response.status) {
-            const details = response.data;
-            setSubscriptionDetails(response.data);
-            if (details == "active") {
-              setIsSubscribed(true);
-            }
+            setIsSubscribed(false);
             
           } else {
-            toast.error(response.data.errorMessage, {
+            console.log("trigger")
+            toast.error("Error!", {
               position: toast.POSITION.TOP_RIGHT,
               autoClose: 1500
             });
@@ -84,6 +82,7 @@ export default function SubscriptionManagement() {
     
             if (response.status) {
               const details = response.data;
+              console.log(details)
               setSubscriptionDetails(response.data);
               if (details == "active") {
                 setIsSubscribed(true);
@@ -106,11 +105,13 @@ export default function SubscriptionManagement() {
         fetchSubscriptionStatus();
       }, []);
 
-      async function onClickSubmitSubscription(subscriptionDetails) {
+      async function onClickSubmitSubscription(subscriptionFormDetails) {
         try {
 
           if (operation == "UPDATE") {
-            const response = await updateSubscription(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
+            console.log(subscriptionFormDetails)
+            console.log(subscriptionDetails)
+            const response = await updateSubscription(subscriptionDetails.subscription_id, subscriptionFormDetails.subscriptionType, subscriptionFormDetails.autoRenew);
             if (response.status) {
               setSubscriptionDetails(response.data);
             } else {
@@ -120,8 +121,12 @@ export default function SubscriptionManagement() {
               });
             }
           } else if (operation == "RENEW") {
-            const response = await renewSubscription(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
+            
+            const response = await renewSubscription(subscriptionDetails.subscription_id);
+            console.log(response)
             if (response.status) {
+              console.log(response.data)
+              onClickCancelManageSubButton()
               setSubscriptionDetails(response.data);
             } else {
               toast.error(response.data.errorMessage, {
@@ -131,7 +136,7 @@ export default function SubscriptionManagement() {
             }
 
           } else if (operation == "SUBSCRIBE") {
-            const response = await subscribe(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
+            const response = await subscribe(user.vendor.vendor_id, "VENDOR", subscriptionFormDetails.subscriptionType, subscriptionFormDetails.autoRenew);
             if (response.status) {
               setIsSubscribed(true);
               setSubscriptionDetails(response.data);
@@ -169,10 +174,10 @@ export default function SubscriptionManagement() {
                 {subscriptionDetails.plan}
                 </Descriptions.Item>
                 <Descriptions.Item label="Subscription Expiry">
-                {subscriptionDetails.expiry}
+                {subscriptionDetails.current_period_end}
                 </Descriptions.Item>
                 <Descriptions.Item label="Next Billing Date">
-                {subscriptionDetails.nextBillingDate}
+                {subscriptionDetails.current_period_end}
                 </Descriptions.Item>
                 <Descriptions.Item label="Auto-renewal">
                 {subscriptionDetails.autoRenewal ? 'Enabled' : 'Disabled'}
@@ -213,7 +218,16 @@ export default function SubscriptionManagement() {
               }}>
               <p>Empower your business with data</p>
               <CustomButton text="Subscribe Now" icon={<DashboardOutlined />} onClick={() => onClickManageSubButton("SUBSCRIBE")} />
-    
+              {isSubModalOpen &&
+              <SubscriptionModal
+                operation={operation}
+                isSubModalOpen={isSubModalOpen}
+                onClickSubmitSubscription={onClickSubmitSubscription}
+                onClickCancelManageSubButton={onClickCancelManageSubButton}
+                subscriptionPlan={subscriptionDetails.plan}
+                autoRenewal={subscriptionDetails.auto_renewal}
+              />
+            } 
               
             </div>
     

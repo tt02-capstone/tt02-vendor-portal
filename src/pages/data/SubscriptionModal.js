@@ -16,7 +16,7 @@ export default function SubscriptionModal(props) {
   if (props.autoRenewal !== null) {
     
     initialValues.autoRenew = props.autoRenewal;
-    console.log(initialValues)
+
   }
 
   useEffect(() => {
@@ -64,7 +64,10 @@ export default function SubscriptionModal(props) {
                     onFinish={props.onClickSubmitSubscription}
                     initialValues={initialValues}
                 >
-                    <Form.Item
+                    
+                    {!(props.operation == "RENEW") &&
+                    <div>
+                        <Form.Item
                     label="Subscription Type"
                     labelAlign="left"
                     name="subscriptionType"
@@ -76,7 +79,6 @@ export default function SubscriptionModal(props) {
                             <Option value='YEARLY'>Yearly</Option>
                     </Select>
                     </Form.Item>
-
                     <Form.Item
                     label="Auto Renew"
                     labelAlign="left"
@@ -86,13 +88,47 @@ export default function SubscriptionModal(props) {
                     >
                     <Switch />
                     </Form.Item>
+                    </div>
+                    }
 
-                   
+                        { props.operation == "RENEW" &&
+
+                        <div>
+                            <p>Do you want to renew your subscription?</p>
+                            <Form.Item
+                    label="Subscription Type"
+                    labelAlign="left"
+                    name="subscriptionType"
+                    rules={[{ required: true, message: 'Please select the subscription type' }]}
+                    >
+                    
+                    <Select>
+                            <Option value='MONTHLY'>Monthly</Option>
+                            <Option value='YEARLY'>Yearly</Option>
+                    </Select>
+                    </Form.Item>
+    
+                        </div>
+
+                            
+
+                            
+                            
+                        }
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                        { !(props.operation == "RENEW") &&
+                            <Button type="primary" htmlType="submit">
                             Submit
-                        </Button>
+                            </Button>
+                        }
+                        
+                        {
+                            props.operation == "RENEW" &&
+                            <Button type="primary" htmlType="submit">
+                            Renew
+                            </Button>
+                        }
                     </Form.Item>
                 </Form>
             </Modal>
