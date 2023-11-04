@@ -92,7 +92,11 @@ export const dataApi = axios.create({
     baseURL: HOST_WITH_PORT + '/data'
 })
 
-const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi,categoryApi, categoryItemApi, postApi, supportApi, badgeApi, commentApi, reportApi, dataApi]
+export const itemApi = axios.create({
+    baseURL: HOST_WITH_PORT + '/item'
+})
+
+const instanceList = [userApi, localApi, adminApi, bookingApi, vendorApi, vendorStaffApi, paymentApi, touristApi, attractionApi, accommodationApi, telecomApi, tourApi, restaurantApi, dealsApi,categoryApi, categoryItemApi, postApi, supportApi, badgeApi, commentApi, reportApi, dataApi, itemApi]
 
 
 instanceList.map((api) => {

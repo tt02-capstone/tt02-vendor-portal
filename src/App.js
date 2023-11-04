@@ -29,7 +29,8 @@ import {
     FormOutlined,
     ExclamationCircleOutlined,
     BarChartOutlined,
-    SolutionOutlined
+    SolutionOutlined,
+    ShopOutlined
 } from '@ant-design/icons';
 import {Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
@@ -51,6 +52,8 @@ import AdminSupportTicketManagement
     from "./pages/supportticket/AdminSupportTicketManagement/AdminSupportTicketManagement";
 import DataDashboard from "./pages/data/DataDashboard";
 import SubscriptionManagement from "./pages/data/SubscriptionManagement";
+import Items from "./pages/items/Items";
+
 function AppLayout() {
 
     const stripePromise = loadStripe('pk_test_51NmFq8JuLboRjh4q4oxGO4ZUct2x8EzKnOtukgnrwTU2rr7A8AcL33OpPxtxGPLHoqCspNQtRA0M1P1uuaViRXNF00HZxqJgEg');
@@ -68,6 +71,7 @@ function AppLayout() {
         {key: '/accommodation', label: 'Accommodations', icon: <BankOutlined/>,},
         {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
         {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
+        {key: '/item', label: 'Items', icon: <ShopOutlined />,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/support', label: 'Support', icon: <SolutionOutlined/>, 
@@ -136,6 +140,7 @@ function AppLayout() {
                         <Route path="*" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/datadashboard" element={<DataDashboard />}/>
                         <Route path="/datadashboard/subscription" element={<SubscriptionManagement />}/>
+                        <Route path="/item" element={<Items />}/>
                     </>) : (<>
                         <Route path="/" element={<Login/>}/>
                         <Route path="/signup" element={<Signup/>}/>
