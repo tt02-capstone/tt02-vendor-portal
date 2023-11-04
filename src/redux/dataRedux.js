@@ -32,9 +32,10 @@ export async function getSubscriptionStatus(user_id, user_type) {
     }
 }
 
-export async function getSubscription(vendor_id, user_type) {
+export async function getSubscription(user_id, user_type) {
     try {
-        const response = await dataApi.get(`/subscribe/${vendor_id}/${user_type}`);
+        console.log(user_id, user_type)
+        const response = await dataApi.get(`/getSubscription/${user_id}/${user_type}`);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);
@@ -44,7 +45,8 @@ export async function getSubscription(vendor_id, user_type) {
 
 export async function renewSubscription(subscription_id) {
     try {
-        const response = await dataApi.put(`/subscribe/${subscription_id}`);
+        console.log(subscription_id)
+        const response = await dataApi.put(`/renewSubscription/${subscription_id}`);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);
@@ -52,9 +54,9 @@ export async function renewSubscription(subscription_id) {
     }
 }
 
-export async function updateSubscription(vendor_id, user_type, subscription_type, auto_renew) {
+export async function updateSubscription(subscription_id, subscription_type, auto_renew) {
     try {
-        const response = await dataApi.put(`/subscribe/${vendor_id}/${user_type}/${subscription_type}/${auto_renew}`);
+        const response = await dataApi.put(`/updateSubscription/${subscription_id}/${subscription_type}/${auto_renew}`);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);
@@ -62,9 +64,9 @@ export async function updateSubscription(vendor_id, user_type, subscription_type
     }
 }
 
-export async function unsubscribe(vendor_id, user_type) {
+export async function unsubscribe(subscription_id) {
     try {
-        const response = await dataApi.delete(`/subscribe/${vendor_id}/${user_type}`);
+        const response = await dataApi.delete(`/cancelSubscription/${subscription_id}`);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);
