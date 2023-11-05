@@ -132,12 +132,20 @@ const DataDashboard = () => {
 
     }
 
-    useEffect(() => {
+    useEffect((selectedDataUseCase) => {
         // Fetch user subscription status here
         const callGetData = async () => {
             try {
+
+                let dataUseCase = selectedDataUseCase
+
+                if (!dataUseCase) {
+                  dataUseCase = TOTAL_BOOKINGS_OVER_TIME;
+                  setSelectedDataUseCase(TOTAL_BOOKINGS_OVER_TIME);
+                }
+
                 // Replace this with your API call to fetch user subscription status
-                const response = await getData('3');
+                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id);
                 if (response.status) {
                     console.log(response.data)
                     setData(response.data)
@@ -153,7 +161,7 @@ const DataDashboard = () => {
         };
 
         callGetData();
-    }, []);
+    }, [selectedDataUseCase]);
 
 
     const items = [
@@ -177,6 +185,12 @@ const DataDashboard = () => {
             value: BOOKINGS_BREAKDOWN
 
         },
+
+        {
+          label: CUSTOMER_RETENTION,
+          value: CUSTOMER_RETENTION
+
+      },
 
     ];
 
