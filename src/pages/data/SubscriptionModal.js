@@ -75,8 +75,8 @@ export default function SubscriptionModal(props) {
                     >
                     
                     <Select>
-                            <Option value='MONTHLY'>Monthly</Option>
-                            <Option value='YEARLY'>Yearly</Option>
+                            <Option value='Monthly'>Monthly</Option>
+                            <Option value='Yearly'>Yearly</Option>
                     </Select>
                     </Form.Item>
                     <Form.Item
@@ -103,8 +103,8 @@ export default function SubscriptionModal(props) {
                     >
                     
                     <Select>
-                            <Option value='MONTHLY'>Monthly</Option>
-                            <Option value='YEARLY'>Yearly</Option>
+                            <Option value='Monthly'>Monthly</Option>
+                            <Option value='Yearly'>Yearly</Option>
                     </Select>
                     </Form.Item>
     

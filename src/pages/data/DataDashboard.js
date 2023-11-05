@@ -45,6 +45,7 @@ const REVENUE_BREAKDOWN = "Revenue Breakdown by Activity, Nationality, Age";
 const CUSTOMER_RETENTION = "Customer Retention (Number of Repeat Bookings Over Time)";
 
 const DataDashboard = () => {
+
     const [isSubscribed, setIsSubscribed] = useState(true);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [data, setData] = useState([]);
@@ -61,7 +62,7 @@ const DataDashboard = () => {
     const navigate = useNavigate();
 
     const onClickViewSubButton = () => {
-        navigate('/datadashboard/subscription'); // Replace with your route
+        navigate('/datadashboard/subscription'); 
     };
 
     // Subscription
@@ -74,38 +75,38 @@ const DataDashboard = () => {
     function onClickManageSubButton() {
         setIsSubModalOpen(true);
     }
+  
+  useEffect(() => {
+    // Fetch user subscription status here
+    const fetchSubscriptionStatus = async () => {
+      try {
+        // Replace this with your API call to fetch user subscription status
+        const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
 
+        if (response.status) {
+          const subscribed = response.data;
+          
+          if (subscribed) {
+            setIsSubscribed(true);
+          }
+          
+        } else {
+          toast.error(response.data.errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 1500
+          });
+        }
+      } catch (error) {
+        toast.error(error, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1500
+        });
+      }
+    };
 
-    // useEffect(() => {
-    //   // Fetch user subscription status here
-    //   const fetchSubscriptionStatus = async () => {
-    //     try {
-    //       // Replace this with your API call to fetch user subscription status
-    //       const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
+    fetchSubscriptionStatus();
+  }, []);
 
-    //       if (response.status) {
-    //         const subscribed = response.data;
-
-    //         if (subscribed) {
-    //           setIsSubscribed(true);
-    //         }
-
-    //       } else {
-    //         toast.error(response.data.errorMessage, {
-    //           position: toast.POSITION.TOP_RIGHT,
-    //           autoClose: 1500
-    //         });
-    //       }
-    //     } catch (error) {
-    //       toast.error(error, {
-    //         position: toast.POSITION.TOP_RIGHT,
-    //         autoClose: 1500
-    //       });
-    //     }
-    //   };
-
-    //   fetchSubscriptionStatus();
-    // }, []);
 
     async function onClickSubmitSubscription(subscriptionDetails) {
         try {
@@ -160,6 +161,7 @@ const DataDashboard = () => {
             label: TOTAL_BOOKINGS_OVER_TIME,
             value: TOTAL_BOOKINGS_OVER_TIME
         },
+
         {
             label: REVENUE_OVER_TIME,
             value: REVENUE_OVER_TIME
@@ -214,6 +216,7 @@ const DataDashboard = () => {
                             <br></br>
                             <br></br>
                             {returnChart()}
+                             <ToastContainer />
 
                         </div>
                     ) : (
@@ -236,12 +239,14 @@ const DataDashboard = () => {
                                     onClickCancelManageSubButton={onClickCancelManageSubButton}
                                 />
                             }
+                            <ToastContainer />
                         </div>
                     )}
                 </div>
             </Content>
         </Layout>
     );
+
 };
 
 export default DataDashboard;

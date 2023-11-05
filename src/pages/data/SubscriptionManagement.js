@@ -113,6 +113,7 @@ export default function SubscriptionManagement() {
             console.log(subscriptionDetails)
             const response = await updateSubscription(subscriptionDetails.subscription_id, subscriptionFormDetails.subscriptionType, subscriptionFormDetails.autoRenew);
             if (response.status) {
+              console.log(response.data)
               setSubscriptionDetails(response.data);
             } else {
               toast.error(response.data.errorMessage, {
@@ -148,7 +149,7 @@ export default function SubscriptionManagement() {
             }
           }
     
-          
+          setIsSubModalOpen(false);
     
     
         } catch (error) {
@@ -177,7 +178,7 @@ export default function SubscriptionManagement() {
                 {subscriptionDetails.current_period_end}
                 </Descriptions.Item>
                 <Descriptions.Item label="Next Billing Date">
-                {subscriptionDetails.current_period_end}
+                {subscriptionDetails.current_period_start}
                 </Descriptions.Item>
                 <Descriptions.Item label="Auto-renewal">
                 {subscriptionDetails.autoRenewal ? 'Enabled' : 'Disabled'}
@@ -205,7 +206,10 @@ export default function SubscriptionManagement() {
                 autoRenewal={subscriptionDetails.autoRenewal}
               />
             } 
+            <ToastContainer />
           </div>   
+
+          
      
           ) : (
     
@@ -228,6 +232,8 @@ export default function SubscriptionManagement() {
                 autoRenewal={subscriptionDetails.auto_renewal}
               />
             } 
+
+            <ToastContainer />
               
             </div>
     
