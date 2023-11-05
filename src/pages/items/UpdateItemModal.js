@@ -158,7 +158,7 @@ export default function UpdateItemModal(props) {
                         label="Quantity"
                         name="quantity"
                         rules={[{ required: true, message: 'Please enter quantity!' }]}>
-                        <InputNumber style={{ width: '110px' }} min={1} />
+                        <InputNumber style={{ width: '110px' }} min={0} />
                     </Form.Item>
 
                     <Form.Item
