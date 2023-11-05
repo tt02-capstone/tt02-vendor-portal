@@ -26,7 +26,12 @@ export default function Items() {
         const fetchData = async () => {
             const response = await retrieveAllItemsByVendor(user.vendor.vendor_id);
             if (response.status) {
-                setItems(response.data);
+                if (response.data.length > 0) {
+                    const sortedItems = response.data.sort((a, b) => a.name.localeCompare(b.name));
+                    setItems(sortedItems);
+                } else {
+                    setItems(response.data);
+                }
             } else {
                 console.log("List of items not fetched!");
             }
@@ -37,7 +42,16 @@ export default function Items() {
     async function retrieveItems() {
         try {
             let response = await retrieveAllItemsByVendor(user.vendor.vendor_id);
-            setItems(response.data);
+            if (response.status) {
+                if (response.data.length > 0) {
+                    const sortedItems = response.data.sort((a, b) => a.name.localeCompare(b.name));
+                    setItems(sortedItems);
+                } else {
+                    setItems(response.data);
+                }
+            } else {
+                console.log("List of items not fetched!");
+            }
         } catch (error) {
             alert('An error occurred! Failed to retrieve items!');
         }
@@ -199,30 +213,42 @@ export default function Items() {
                     {items.map((item, index) => (
                         <Card
                             style={{
-                                width: 500,
-                                height: 630,
+                                width: 300,
+                                height: 450,
                                 marginLeft: '-5px',
                                 marginRight: '50px',
                                 marginBottom: '50px'
                             }}
                             cover={
-                                <img alt={item.name} src={item.image} style={{ width: 500, height: 500 }} />
+                                <img alt={item.name} src={item.image} style={{ width: 300, height: 300 }} />
                             }
                             bordered={false}
                             key={index}
                         >
                             <Meta
-                                title={item.name}
-                                description={item.description} />
-
-                            <div style={{ marginTop: '15px', marginLeft: '-10px', fontSize: 18 }}>
-                                <Link style={{ color: '#FFA53F', marginLeft: '10px' }} onClick={() => handleUpdate(item.item_id)}>
-                                    <EditOutlined />
-                                </Link>
-                                <Link style={{ color: '#FFA53F', marginLeft: '20px' }} onClick={() => handleDelete(item.item_id)}>
-                                    <DeleteOutlined />
-                                </Link>
-                            </div>
+                                title={
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span>{item.name}</span>
+                                        <div style={{ fontSize: 18 }}>
+                                            <Link style={{ color: '#FFA53F', marginLeft: '10px' }} onClick={() => handleUpdate(item.item_id)}>
+                                                <EditOutlined />
+                                            </Link>
+                                            <Link style={{ color: '#FFA53F', marginLeft: '20px' }} onClick={() => handleDelete(item.item_id)}>
+                                                <DeleteOutlined />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                }
+                                description={
+                                    <div>
+                                        <p>{item.description}</p>
+                                        <p style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>{`$${item.price} per unit`}</span>
+                                            <span>{`${item.quantity} in stock`}</span>
+                                        </p>
+                                    </div>
+                                }
+                            />
                         </Card>
                     ))}
                 </div>
