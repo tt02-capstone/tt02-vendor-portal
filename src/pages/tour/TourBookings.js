@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Layout, Input, Button, Space, Tag } from 'antd';
 import { Content } from "antd/es/layout/layout";
-import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAllBookingsByLocal } from "../../redux/tourRedux";
@@ -17,12 +16,12 @@ import { CSVLink } from 'react-csv';
 
 export default function TourBookings() {
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const local = JSON.parse(localStorage.getItem("user"));
     const [getBookingsData, setGetBookingsData] = useState(true);
     const [bookingsData, setBookingsData] = useState([]);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
-    const [selectedBooking, setSelectedBooking] = useState();
+    // const [selectedBooking, setSelectedBooking] = useState();
 
     const viewBookingBreadCrumb = [
         {

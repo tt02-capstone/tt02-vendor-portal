@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Space, Button, Select, InputNumber, Upload } from "antd";
-import { MinusCircleOutlined, PlusOutlined, InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Button, Select, InputNumber, Upload } from "antd";
+import { PlusOutlined } from '@ant-design/icons';
 import { getLastTourTypeId } from "../../redux/tourRedux";
-import CustomFileUpload from "../../components/CustomFileUpload";
-import { ToastContainer, toast } from 'react-toastify';
 import AWS from 'aws-sdk';
 import { getPublishedAttractions } from "../../redux/attractionRedux";
 
@@ -15,7 +13,7 @@ export default function CreateTourTypeModal(props) {
     const { Option } = Select;
     const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
-    const [tourTypeName, setTourTypeName] = useState('');
+    // const [tourTypeName, setTourTypeName] = useState('');
     const [lastTourTypeId, setLastTourTypeId] = useState(null);
     const [tourTypeId, setTourTypeId] = useState(null);
     const [publishedAttractions, setPublishedAttractions] = useState([]);
@@ -277,28 +275,4 @@ export default function CreateTourTypeModal(props) {
             </Modal>
         </div>
     )
-}
-
-const styles = {
-    layout: {
-        minHeight: '100vh',
-    },
-    content: {
-        margin: '24px 16px 0',
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    customRow: {
-        height: '280px',
-    },
-    imageContainer: {
-        maxWidth: '180px',
-        maxHeight: '100px',
-        overflow: 'hidden',
-    },
-    image: {
-        width: '100%',
-        height: 'auto',
-    },
 }

@@ -206,7 +206,20 @@ export async function reportComment(commentId, report) {
         const response = await reportApi.post(`/reportComment/${commentId}`, report);
         return handleApiErrors(response);
     } catch (error) {
-        console.error("forumRedux reportreportCommentPost Error : ", error);
+        console.error("forumRedux reportCommentPost Error : ", error);
         return {status: false, data: error.message};
     }
 }
+
+export async function getPrimaryBadge(userId) {
+    try {
+        const response = await badgeApi.get(`/getPrimaryBadge/${userId}`);
+        return handleApiErrors(response);
+    } catch (error) {
+        console.error("forumRedux getPrimaryBadge Error : ", error);
+        return { status: false, data: error.message };
+    }
+}
+
+
+

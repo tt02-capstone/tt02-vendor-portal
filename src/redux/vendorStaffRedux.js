@@ -1,4 +1,4 @@
-import { userApi, vendorStaffApi } from "./api";
+import { vendorStaffApi } from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
 export async function createVendorStaff(vendorStaff) { // not intial signup

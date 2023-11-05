@@ -6,7 +6,7 @@ export default function ViewTourTypeModal(props) {
 
     const [selectedTourType, setSelectedTourType] = useState([]);
     const [selectedAttraction, setSelectedAttraction] = useState('');
-    const local = JSON.parse(localStorage.getItem("user"));
+    // const local = JSON.parse(localStorage.getItem("user"));
 
     async function getTourType(props) {
         try {

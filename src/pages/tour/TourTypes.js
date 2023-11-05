@@ -1,5 +1,5 @@
 import { React, useEffect, useState, useRef } from 'react';
-import { Layout, Form, Input, Badge, Space, Tag } from 'antd';
+import { Layout, Form, Input, Badge, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,7 +11,7 @@ import CustomButton from "../../components/CustomButton";
 import { PlusOutlined } from "@ant-design/icons";
 import CreateTourTypeModal from "./CreateTourTypeModal";
 import ViewTourTypeModal from "./ViewTourTypeModal";
-import { Table, Button } from 'antd';
+import { Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import EditTourTypeModal from './EditTourTypeModal';
@@ -19,7 +19,7 @@ import EditTourTypeModal from './EditTourTypeModal';
 export default function TourTypes() {
 
     const navigate = useNavigate();
-    const { Header, Content, Sider, Footer } = Layout;
+    const { Content } = Layout;
     const local = JSON.parse(localStorage.getItem("user"));
 
     const [getTourTypesData, setGetTourTypesData] = useState(true);
