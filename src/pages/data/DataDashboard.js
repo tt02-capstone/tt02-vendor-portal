@@ -133,7 +133,7 @@ const DataDashboard = () => {
 
     }
 
-    useEffect((selectedDataUseCase) => {
+    useEffect(() => {
         // Fetch user subscription status here
         const callGetData = async () => {
             try {
