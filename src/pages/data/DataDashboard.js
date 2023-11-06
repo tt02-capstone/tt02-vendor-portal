@@ -75,6 +75,7 @@ const DataDashboard = () => {
     function onClickManageSubButton() {
         setIsSubModalOpen(true);
     }
+    
   
   useEffect(() => {
     // Fetch user subscription status here

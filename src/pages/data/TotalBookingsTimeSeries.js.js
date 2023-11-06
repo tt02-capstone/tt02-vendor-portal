@@ -16,6 +16,7 @@ import {
 } from 'chart.js';
 import {Bar, Line} from 'react-chartjs-2';
 
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -36,10 +37,14 @@ const NUMBER_OF_BOOKINGS_LOCAL = "Number of Bookings by Local";
 const NUMBER_OF_BOOKINGS_TOURIST = "Number of Bookings by Tourist";
 const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Bookings by Country";
 
+
+
 export const TotalBookingsTimeSeries = (props) => {
     const data = props.data
     const [selectedXAxis, setSelectedXAxis] = useState(MONTHLY);
     const [selectedYAxis, setSelectedYAxis] = useState(NUMBER_OF_BOOKINGS);
+    const [selectedDataset, setSelectedDataset] = useState([{}]);
+
 
     const itemsXAxis = [
         {
@@ -77,47 +82,85 @@ export const TotalBookingsTimeSeries = (props) => {
 
     ];
 
+    const getRandomColor = (index) => {
+        
+        const colors = [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 0, 0, 1)',
+            'rgba(0, 255, 0, 1)',
+            'rgba(0, 0, 255, 1)',
+            'rgba(255, 255, 0, 1)',
+            'rgba(255, 0, 255, 1)',
+            'rgba(0, 255, 255, 1)',
+            'rgba(128, 0, 0, 1)',
+            'rgba(0, 128, 0, 1)',
+            'rgba(0, 0, 128, 1)',
+        ];
+        console.log(index)
+        const randomIndex = Math.floor(Math.random() * colors.length);
+        return colors[index];
+      };
 
-    const aggregateDatafromDropdown = (data) => {
-        const aggregatedData = new Map(); // Use a Map to store aggregated data by month
 
-        // Loop through the data and aggregate by month
+      const aggregateDatafromDropdown = (data) => {
+        const aggregatedData = new Map(); // Use a Map to store aggregated data by date
+      
+        // Loop through the data and aggregate by date
         data.forEach((item) => {
-            const [date, count] = item; //    ["2023-05-17", 1]
-            let xAxisKey;
-            if (selectedXAxis === MONTHLY) {
-                xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
-            } else if (selectedXAxis === YEARLY) {
-                xAxisKey = date.substr(0, 4); // Extract yyyy-MM part of the date
-                console.log(xAxisKey)
-            }
-
-
-            if (aggregatedData.has(xAxisKey)) {
-                // Increment the count for the existing month
-                aggregatedData.set(xAxisKey, aggregatedData.get(xAxisKey) + count);
-            } else {
-                // Initialize the count for a new month
-                aggregatedData.set(xAxisKey, count);
-            }
+          const [date, country] = item; // ["2023-05-17", "CountryName"]
+          let xAxisKey;
+          if (selectedXAxis === MONTHLY) {
+            xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
+          } else if (selectedXAxis === YEARLY) {
+            xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
+          }
+      
+          if (!aggregatedData.has(xAxisKey)) {
+            // Initialize data for the date
+            aggregatedData.set(xAxisKey, { Date: xAxisKey, Count: 0, Countries: {} });
+          }
+      
+          // Increment the count for the date
+          aggregatedData.get(xAxisKey).Count++;
+      
+          // Increment the count for the country within the date
+          if (!aggregatedData.get(xAxisKey).Countries[country]) {
+            aggregatedData.get(xAxisKey).Countries[country] = 1;
+          } else {
+            aggregatedData.get(xAxisKey).Countries[country]++;
+          }
         });
-
-        // Convert the aggregated Map back to an array of [month, count] pairs
-        const aggregatedArray = Array.from(aggregatedData, ([month, count]) => [month, count]);
-
-        // Sort the array by month if needed
-        aggregatedArray.sort((a, b) => a[0].localeCompare(b[0]));
-
+      
+        // Convert the aggregated Map back to an array of lists
+        const aggregatedArray = Array.from(aggregatedData.values()).map((value) => [
+          value.Date,
+          value.Count,
+          Object.entries(value.Countries).map(([country, count]) => [country, count]),
+        ]);
+      
+        console.log(aggregatedArray);
+      
         return aggregatedArray;
-    };
+      };
 
+      
+      
+      
+      
     // Usage:
+    console.log(data)
     const aggregatedData = aggregateDatafromDropdown(data);
 
+    let dataset = [];
 
-    const lineData = {
-        labels: aggregatedData.map(item => item[0]), // Convert dates to strings
-        datasets: [
+    const uniqueCountries = [...new Set(aggregatedData.flatMap((item) => item[2].map(([country]) => country)))];
+    if (selectedYAxis === NUMBER_OF_BOOKINGS) {
+        dataset = [
             {
                 label: 'Number of Bookings',
                 data: aggregatedData.map(item => item[1]),
@@ -125,8 +168,52 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderWidth: 1,
                 fill: false,
             },
-        ],
-    };
+        ]; 
+      } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
+        dataset = [
+            {
+              label: `Number of Bookings by Local`,
+              data: aggregatedData.map((item) =>
+                item[2].find(([c]) => c === 'Singapore') ? item[2].find(([c]) => c === 'Singapore')[1] : 0
+              ),
+              borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
+              borderWidth: 1,
+              fill: false,
+            },
+          ];
+      } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
+        dataset = [
+            {
+              label: `Number of Bookings by Tourist`,
+              data: aggregatedData.map((item) => {
+                const singaporeCount = item[2].find(([c]) => c === 'Singapore');
+                const totalTouristCount = item[1] - (singaporeCount ? singaporeCount[1] : 0);
+                return totalTouristCount > 0 ? totalTouristCount : 0;
+              }),
+              borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
+              borderWidth: 1,
+              fill: false,
+            },
+          ];
+      } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
+        dataset = aggregatedData[0][2].map(([country]) => ({
+            label: `Number of Bookings in ${country}`,
+            data: aggregatedData.map((item) =>
+            item[2].find(([c]) => c === country) ? item[2].find(([c]) => c === country)[1] : 0
+            ),
+            borderColor: getRandomColor(uniqueCountries.indexOf(country)),
+            borderWidth: 1,
+            fill: false,
+        }));
+      }
+    
+
+    
+
+    const lineData = {
+        labels: aggregatedData.map((item) => item[0]), // Convert dates to strings
+        datasets: dataset,
+        };
 
     console.log(data)
 
