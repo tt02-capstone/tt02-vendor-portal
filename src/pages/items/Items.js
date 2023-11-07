@@ -190,11 +190,9 @@ export default function Items() {
             <CustomHeader items={itemBreadCrumb} />
             <Content style={styles.content}>
                 <div style={{ display: 'flex' }}>
-                    <div style={{ fontWeight: "bold", fontSize: 26, marginBottom: 5 }}> Your Items </div> <br />
-
                     <CustomButton
                         text="Add Item"
-                        style={{ marginLeft: 'auto', fontWeight: "bold", marginRight: '60px' }}
+                        style={{ marginLeft: '-35px', marginBottom: '10px' }}
                         icon={<PlusOutlined />}
                         onClick={() => handleCreate()}
                     />
