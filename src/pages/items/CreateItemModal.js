@@ -206,7 +206,7 @@ export default function CreateItemModal(props) {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
-                        <Button type="primary" htmlType="submit" style={{backgroundColor: '#FFA53F', fontWeight:"bold", width:80}}>
+                        <Button type="primary" htmlType="submit" style={{ fontWeight:"bold", width:80}}>
                             Add
                         </Button>
                     </Form.Item>
