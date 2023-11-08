@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {Dropdown, Button, Menu, Layout, Select, Typography} from 'antd';
+import {Dropdown, Row, Col, Menu, Layout, Select, Typography} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
 import {
@@ -181,7 +181,7 @@ export const BookingBreakdown = (props) => {
             </div>
             <br></br>
 
-            <div style={styles.content}>
+            <Row style={styles.content}>
                 {Object.keys(data).map((key) => {
                     const labels = Object.keys(data[key]);
                     const values = Object.values(data[key]);
@@ -197,13 +197,15 @@ export const BookingBreakdown = (props) => {
                     };
 
                     return (
-                        <div key={key} style={styles.line}>
+                        <Col>
+                                                <div key={key} style={styles.line}>
                             {/*<h3>{key}</h3>*/}
                             <Pie data={pieData} options={getChartOptions(key)} />
                         </div>
+                        </Col>
                     );
                 })}
-            </div>
+            </Row>
             </>
     );
 };
@@ -226,10 +228,13 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
+        marginLeft: 0
     },
     line: {
         display: 'flex',
         flexDirection: 'row',
+        height: 450,
+        width: 450,
         margin: '0 20px', // Increase the margin to add spacing between charts
     },
     chart: {

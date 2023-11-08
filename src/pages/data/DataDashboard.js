@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {DownOutlined, SmileOutlined, DashboardOutlined} from '@ant-design/icons';
-import {Dropdown, Button, Menu, Layout, Typography, Select, DatePicker} from 'antd';
+import { Row, Col, Layout, Typography, Select, DatePicker} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 import SubscriptionModal from "./SubscriptionModal";
 import CustomButton from "../../components/CustomButton";
@@ -233,18 +233,25 @@ const DataDashboard = () => {
                 <div>
                     {isSubscribed ? (
                         <div>
-                            <CustomButton style= {{margin: '10px'}}text="Manage Subscription" icon={<DashboardOutlined/>} onClick={onClickViewSubButton}/>
+                            <Row style={{marginBottom: 100}}>
+                                <Col>
+                                    <div style={styles.container}>
+                                        <Typography.Title level={5} style={{marginRight: '10px'}}>Chart Type: </Typography.Title>
+                                        <Select
+                                            labelInValue
+                                            defaultValue={items[0]}
+                                            style={{width: 400}}
+                                            onChange={handleChangeDataUseCase}
+                                            options={items}
+                                        />
+                                    </div>
+                                </Col>
 
-                            <div style={styles.container}>
-                                <Typography.Title level={5} style={{marginRight: '10px'}}>Chart Type: </Typography.Title>
-                                <Select
-                                    labelInValue
-                                    defaultValue={items[0]}
-                                    style={{width: 400}}
-                                    onChange={handleChangeDataUseCase}
-                                    options={items}
-                                />
-                            </div>
+                                <Col>
+                                    <CustomButton style= {{marginLeft: 1100}}text="Manage Subscription" icon={<DashboardOutlined/>} onClick={onClickViewSubButton}/>
+                                </Col>
+                            </Row>
+
 
                             {/*<RangePicker*/}
                             {/*    format="YYYY-MM-DD"*/}
