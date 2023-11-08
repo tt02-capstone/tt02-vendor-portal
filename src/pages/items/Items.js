@@ -192,7 +192,7 @@ export default function Items() {
                 <div style={{ display: 'flex' }}>
                     <CustomButton
                         text="Add Item"
-                        style={{ marginLeft: '-35px', marginBottom: '10px' }}
+                        style={{ marginLeft: '-5px', marginBottom: '10px' }}
                         icon={<PlusOutlined />}
                         onClick={() => handleCreate()}
                     />
@@ -228,10 +228,10 @@ export default function Items() {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span>{item.name}</span>
                                         <div style={{ fontSize: 18 }}>
-                                            <Link style={{ color: '#FFA53F', marginLeft: '10px' }} onClick={() => handleUpdate(item.item_id)}>
+                                            <Link style={{ marginLeft: '10px' }} onClick={() => handleUpdate(item.item_id)}>
                                                 <EditOutlined />
                                             </Link>
-                                            <Link style={{ color: '#FFA53F', marginLeft: '20px' }} onClick={() => handleDelete(item.item_id)}>
+                                            <Link style={{ marginLeft: '20px' }} onClick={() => handleDelete(item.item_id)}>
                                                 <DeleteOutlined />
                                             </Link>
                                         </div>
@@ -264,7 +264,7 @@ export default function Items() {
                     visible={isDeleteConfirmationVisible}
                     onOk={() => onDeleteConfirmed()}
                     onCancel={closeDeleteConfirmation}
-                    okButtonProps={{ style: { backgroundColor: '#FFA53F', borderColor: '#FFA53F', fontWeight: "bold" } }}
+                    okButtonProps={{ style: { fontWeight: "bold" } }}
                     cancelButtonProps={{ style: { fontWeight: "bold" } }}
                 >
                     <p>Are you sure you want to delete this item?</p>
@@ -286,7 +286,7 @@ const styles = {
     },
     content: {
         margin: '1vh 3vh 1vh 3vh',
-        marginTop: -10,
+        marginTop: -20,
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 60,

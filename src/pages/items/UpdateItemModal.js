@@ -202,7 +202,7 @@ export default function UpdateItemModal(props) {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
-                        <Button type="primary" htmlType="submit" style={{ backgroundColor: '#FFA53F', fontWeight: "bold", width: 100 }}>
+                        <Button type="primary" htmlType="submit" style={{ fontWeight: "bold", width: 100 }}>
                             Update
                         </Button>
                     </Form.Item>
