@@ -1,12 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect , useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {DownOutlined, SmileOutlined, DashboardOutlined} from '@ant-design/icons';
 import {Dropdown, Button, Menu, Layout, Typography, Select} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 import SubscriptionModal from "./SubscriptionModal";
+import ExportModal from './ExportModal.js';
 import CustomButton from "../../components/CustomButton";
 import CustomHeader from "../../components/CustomHeader";
 import {Content} from "antd/es/layout/layout";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 import {
     Chart as ChartJS,
@@ -50,6 +53,7 @@ const DataDashboard = () => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [data, setData] = useState([]);
     const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME);
+    const chartRef = useRef(null);
 
     const dataBreadCrumb = [
         {
@@ -67,6 +71,14 @@ const DataDashboard = () => {
 
     // Subscription
     const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+    function onClickCancelManageExportButton() {
+        setIsExportModalOpen(false);
+    }
+
+    function onClickManageExportButton() {
+        setIsExportModalOpen(true);
+    }
 
     function onClickCancelManageSubButton() {
         setIsSubModalOpen(false);
@@ -115,12 +127,85 @@ const DataDashboard = () => {
             const response = await subscribe(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
             if (response.status) {
                 setIsSubscribed(true);
+                setIsSubModalOpen(false);
             } else {
                 toast.error(response.data.errorMessage, {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 1500
                 });
             }
+
+
+        } catch (error) {
+            toast.error(error, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+
+
+    }
+
+    async function onClickSubmitExport(exportDetails) {
+        try {
+
+            console.log(exportDetails);
+            
+            if (exportDetails.fileType == "pdf") {
+ 
+                html2canvas(chartRef.current).then((canvas) => {
+                    const imgData = canvas.toDataURL("image/png");
+                    const pdf = new jsPDF("landscape");
+                    pdf.addImage(imgData, "PNG", 10, 10, 190, 100);
+                    pdf.save(exportDetails.fileName + ".pdf");
+                  });
+
+            } else if (exportDetails.fileType == "csv") {
+
+                if (selectedDataUseCase == TOTAL_BOOKINGS_OVER_TIME) {
+                    const header = "Date,Country";
+
+                    const csv = data.map((row) => row.join(",")).join("\n");
+
+                    const csvContent = header + "\n" + csv;
+
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = `${exportDetails.fileName}.csv`;
+
+                    document.body.appendChild(a);
+                    a.click();
+
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+
+                
+
+            } else if (exportDetails.fileType == "png") {
+                html2canvas(chartRef.current).then((canvas) => {
+                    const imgData = canvas.toDataURL(`image/${exportDetails.fileType}`);
+                    const a = document.createElement("a");
+                    a.href = imgData;
+                    a.download = `${exportDetails.fileName}.${exportDetails.fileType}`;
+                    a.click();
+                  });
+            } else if (exportDetails.fileType == "jpeg") {
+                html2canvas(chartRef.current).then((canvas) => {
+                    const imgData = canvas.toDataURL(`image/${exportDetails.fileType}`);
+                    const a = document.createElement("a");
+                    a.href = imgData;
+                    a.download = `${exportDetails.fileName}.${exportDetails.fileType}`;
+                    a.click();
+                  });
+
+            }
+
+            setIsExportModalOpen(false);
 
 
         } catch (error) {
@@ -146,7 +231,7 @@ const DataDashboard = () => {
                 }
 
                 // Replace this with your API call to fetch user subscription status
-                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id);
+                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, new Date(2023, 0, 1) , new Date(2023, 9, 31));
                 if (response.status) {
                     console.log(response.data)
                     setData(response.data)
@@ -203,7 +288,7 @@ const DataDashboard = () => {
 
     const returnChart = () => {
         if(selectedDataUseCase === TOTAL_BOOKINGS_OVER_TIME) {
-            return  <TotalBookingsTimeSeries data={data}/>
+            return  <TotalBookingsTimeSeries chartRef={chartRef} data={data}/>
         }
     }
 
@@ -215,7 +300,7 @@ const DataDashboard = () => {
                     {isSubscribed ? (
                         <div>
                             <CustomButton style= {{margin: '10px'}}text="Manage Subscription" icon={<DashboardOutlined/>} onClick={onClickViewSubButton}/>
-
+                            <CustomButton style= {{margin: '10px'}}text="Export Data" icon={<DashboardOutlined/>} onClick={onClickManageExportButton}/>
                             <div style={styles.container}>
                                 <Typography.Title level={5} style={{marginRight: '10px'}}>Chart Type: </Typography.Title>
                                 <Select
@@ -226,6 +311,14 @@ const DataDashboard = () => {
                                     options={items}
                                 />
                             </div>
+
+                            {isExportModalOpen &&
+                                <ExportModal
+                                    isExportModalOpen={isExportModalOpen}
+                                    onClickSubmitExport={onClickSubmitExport}
+                                    onClickCancelManageExportButton={onClickCancelManageExportButton}
+                                />
+                            }
 
 
                             <br></br>
@@ -254,6 +347,7 @@ const DataDashboard = () => {
                                     onClickCancelManageSubButton={onClickCancelManageSubButton}
                                 />
                             }
+                            
                             <ToastContainer />
                         </div>
                     )}

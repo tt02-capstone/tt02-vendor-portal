@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {Dropdown, Button, Menu, Layout, Select, Typography} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
@@ -40,6 +40,7 @@ const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Bookings by Country";
 
 
 export const TotalBookingsTimeSeries = (props) => {
+    const chartRef = props.chartRef;
     const data = props.data
     const [selectedXAxis, setSelectedXAxis] = useState(MONTHLY);
     const [selectedYAxis, setSelectedYAxis] = useState(NUMBER_OF_BOOKINGS);
@@ -267,6 +268,13 @@ export const TotalBookingsTimeSeries = (props) => {
         setSelectedYAxis(value.value)
     };
 
+    useEffect(() => {
+        const chart = chartRef.current;
+
+        console.log(chart)
+    
+      }, []);
+
 
     return (
         <>
@@ -297,8 +305,9 @@ export const TotalBookingsTimeSeries = (props) => {
             </div>
 
 
-            <div style={styles.line}>
+            <div ref={chartRef}  style={styles.line}>
                 <Line
+                    
                     data={lineData}
                     options={getChartOptions()}
                 />
