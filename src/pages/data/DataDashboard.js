@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {DownOutlined, SmileOutlined, DashboardOutlined} from '@ant-design/icons';
-import {Dropdown, Button, Menu, Layout, Typography, Select} from 'antd';
+import {Dropdown, Button, Menu, Layout, Typography, Select, DatePicker} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 import SubscriptionModal from "./SubscriptionModal";
 import CustomButton from "../../components/CustomButton";
@@ -25,6 +25,11 @@ import {getData, subscribe, getSubscription, getSubscriptionStatus} from "../../
 import {set} from 'date-fns';
 import {ToastContainer, toast} from 'react-toastify';
 import {TotalBookingsTimeSeries} from "./TotalBookingsTimeSeries.js";
+import {BookingBreakdown} from "./BookingBreakdown";
+import {TotalRevenueTimeSeries} from "./TotalRevenueTimeSeries";
+import {disabledDateChecker} from "../../helper/dateFormat";
+
+const { RangePicker } = DatePicker;
 
 ChartJS.register(
     CategoryScale,
@@ -133,20 +138,26 @@ const DataDashboard = () => {
 
     }
 
-    useEffect((selectedDataUseCase) => {
+    useEffect(() => {
         // Fetch user subscription status here
         const callGetData = async () => {
             try {
 
                 let dataUseCase = selectedDataUseCase
+                console.log(dataUseCase)
 
                 if (!dataUseCase) {
                   dataUseCase = TOTAL_BOOKINGS_OVER_TIME;
                   setSelectedDataUseCase(TOTAL_BOOKINGS_OVER_TIME);
                 }
 
+
+                const start_date =  new Date(2023, 0, 1)
+                const end_date = new Date(2023, 9, 31)
+
+                console.log(dataUseCase)
                 // Replace this with your API call to fetch user subscription status
-                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id);
+                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, start_date, end_date);
                 if (response.status) {
                     console.log(response.data)
                     setData(response.data)
@@ -201,10 +212,18 @@ const DataDashboard = () => {
     };
     // Usage:
 
+    function onCalendarChange(dates) {
+        console.log("onCalendarChange", dates);
+    }
     const returnChart = () => {
         if(selectedDataUseCase === TOTAL_BOOKINGS_OVER_TIME) {
             return  <TotalBookingsTimeSeries data={data}/>
+        } else if (selectedDataUseCase === REVENUE_OVER_TIME) {
+           return  <TotalRevenueTimeSeries data={data}/>
+        } else if (selectedDataUseCase === BOOKINGS_BREAKDOWN) {
+            return <BookingBreakdown data={data} />
         }
+
     }
 
     return (
@@ -227,6 +246,10 @@ const DataDashboard = () => {
                                 />
                             </div>
 
+                            {/*<RangePicker*/}
+                            {/*    format="YYYY-MM-DD"*/}
+                            {/*    onCalendarChange={onCalendarChange}*/}
+                            {/*/>*/}
 
                             <br></br>
                             <br></br>
