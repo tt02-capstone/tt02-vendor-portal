@@ -1,4 +1,4 @@
-import { bookingApi } from "./api";
+import {bookingApi, itemApi} from "./api";
 import { handleApiErrors } from "../helper/errorCatching";
 
 export async function getBookingListByVendor(vendorStaffId) {
@@ -11,6 +11,15 @@ export async function getBookingListByVendor(vendorStaffId) {
   }
 }
 
+export async function updateBookingItemStatus(bookingId, bookingStatus) {
+  try {
+    const response = await bookingApi.put(`/updateBookingItemStatus/${bookingId}?status=${bookingStatus}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("itemRedux retrieveAllItemsByVendor Error : ", error);
+    return { status: false, data: error.message };
+  }
+}
 export async function getBookingById(id) {
   try {
     const response = await bookingApi.get(`/getBookingByBookingId/${id}`);

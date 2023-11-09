@@ -32,7 +32,7 @@ import {
     SolutionOutlined,
     ShopOutlined
 } from '@ant-design/icons';
-import {Logout} from "@mui/icons-material";
+import {LocalShippingRounded, Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
 import {Elements} from '@stripe/react-stripe-js';
 import {AuthContext, AuthProvider} from "./redux/AuthContext";
@@ -53,6 +53,7 @@ import AdminSupportTicketManagement
 import DataDashboard from "./pages/data/DataDashboard";
 import SubscriptionManagement from "./pages/data/SubscriptionManagement";
 import Items from "./pages/items/Items";
+import DeliveryManagement from "./pages/delivery/DeliveryManagement";
 
 function AppLayout() {
 
@@ -74,6 +75,7 @@ function AppLayout() {
         {key: '/item', label: 'Items', icon: <ShopOutlined />,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
+        {key: '/deliverymanagement', label: 'Delivery', icon: <LocalShippingRounded/>,},
         {key: '/support', label: 'Support', icon: <SolutionOutlined/>, 
             children: [
                 {key: '/usersupportticket', label: 'User Tickets', icon: <UserOutlined/>,},
@@ -122,6 +124,7 @@ function AppLayout() {
                         <Route path="/attraction/viewTicket" element={<AttractionManageTicket/>}/>
                         <Route path="/accommodation/rooms" element={<RoomManagement/>}/>
                         <Route path="/bookingmanagement" element={<BookingManagement/>}/>
+                        <Route path="/deliverymanagement" element={<DeliveryManagement/>}/>
                         <Route path="/profile" element={<Elements stripe={stripePromise}><Profile/></Elements>}/>
                         <Route path="/vendorStaff" element={<VendorStaff/>}/>
                         <Route path="/telecom" element={<TelecomManagement/>}/>
