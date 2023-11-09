@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Dropdown, Button, Menu, Layout, Select, Typography, Col, Row} from 'antd';
+import {Dropdown, Button, Menu, Layout, Select, Typography} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
 import {
@@ -15,7 +15,6 @@ import {
     TimeScale
 } from 'chart.js';
 import {Bar, Line} from 'react-chartjs-2';
-import moment from "moment";
 
 
 ChartJS.register(
@@ -33,18 +32,18 @@ ChartJS.register(
 const WEEKLY = 'weekly';
 const YEARLY = 'yearly';
 const MONTHLY = 'monthly';
-const NUMBER_OF_BOOKINGS = "Number of Bookings";
-const NUMBER_OF_BOOKINGS_LOCAL = "Number of Bookings by Local";
-const NUMBER_OF_BOOKINGS_TOURIST = "Number of Bookings by Tourist";
-const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Bookings by Country";
+const TOTAL_REVENUE = "Total Revenue";
+const TOTAL_REVENUE_LOCAL = "Total Revenue from Local";
+const TOTAL_REVENUE_TOURIST = "Total Revenue from  Tourist";
+const TOTAL_REVENUE_BY_COUNTRY = "Total Revenue from  Country";
 
 
 
-export const TotalBookingsTimeSeries = (props) => {
+export const RevenueToBooking = (props) => {
     const chartRef = props.chartRef;
     const data = props.data
     const [selectedXAxis, setSelectedXAxis] = useState(MONTHLY);
-    const [selectedYAxis, setSelectedYAxis] = useState(NUMBER_OF_BOOKINGS);
+    const [selectedYAxis, setSelectedYAxis] = useState(TOTAL_REVENUE);
     const [selectedDataset, setSelectedDataset] = useState([{}]);
 
 
@@ -66,20 +65,20 @@ export const TotalBookingsTimeSeries = (props) => {
 
     const itemsYAxis = [
         {
-            value: NUMBER_OF_BOOKINGS,
-            label: NUMBER_OF_BOOKINGS,
+            value: TOTAL_REVENUE,
+            label: TOTAL_REVENUE,
         },
         {
-            value: NUMBER_OF_BOOKINGS_LOCAL,
-            label: NUMBER_OF_BOOKINGS_LOCAL,
+            value: TOTAL_REVENUE_LOCAL,
+            label: TOTAL_REVENUE_LOCAL,
         },
         {
-            value: NUMBER_OF_BOOKINGS_TOURIST,
-            label: NUMBER_OF_BOOKINGS_TOURIST,
+            value: TOTAL_REVENUE_TOURIST,
+            label: TOTAL_REVENUE_TOURIST,
         },
         {
-            value: NUMBER_OF_BOOKINGS_BY_COUNTRY,
-            label: NUMBER_OF_BOOKINGS_BY_COUNTRY,
+            value: TOTAL_REVENUE_BY_COUNTRY,
+            label: TOTAL_REVENUE_BY_COUNTRY,
         },
 
     ];
@@ -114,44 +113,47 @@ export const TotalBookingsTimeSeries = (props) => {
       
         // Loop through the data and aggregate by date
         data.forEach((item) => {
-          const [date, country] = item; // ["2023-05-17", "CountryName"]
+          const [date, country, revenue] = item; // ["2023-05-17", "CountryName"]
           let xAxisKey;
           if (selectedXAxis === MONTHLY) {
-              xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
+            xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
           } else if (selectedXAxis === YEARLY) {
-              xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
-          } else if (selectedXAxis === WEEKLY) {
-              const currdate = moment(date)
-              xAxisKey= currdate.clone().startOf('week').format('YYYY-MM-DD').toString()
-              console.log(xAxisKey)
+            xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
           }
       
           if (!aggregatedData.has(xAxisKey)) {
             // Initialize data for the date
-            aggregatedData.set(xAxisKey, { Date: xAxisKey, Count: 0, Countries: {} });
+            aggregatedData.set(xAxisKey, { Date: xAxisKey, Revenue: 0, Count: 0, Countries: {} });
           }
       
           // Increment the count for the date
+          aggregatedData.get(xAxisKey).Revenue += parseFloat(revenue);
           aggregatedData.get(xAxisKey).Count++;
       
           // Increment the count for the country within the date
           if (!aggregatedData.get(xAxisKey).Countries[country]) {
-            aggregatedData.get(xAxisKey).Countries[country] = 1;
-          } else {
-            aggregatedData.get(xAxisKey).Countries[country]++;
-          }
+            aggregatedData.get(xAxisKey).Countries[country] = { Count: 1, Revenue: parseFloat(revenue) };
+        } else {
+            aggregatedData.get(xAxisKey).Countries[country].Count++;
+            aggregatedData.get(xAxisKey).Countries[country].Revenue += parseFloat(revenue);
+        }
         });
+
+        console.log(Array.from(aggregatedData.values()))
+
+        //console.log(Array.from(aggregatedData.values()).map((value) => []))
       
         // Convert the aggregated Map back to an array of lists
-        const aggregatedArray = Array.from(aggregatedData.values()).map((value) => [
-          value.Date,
-          value.Count,
-          Object.entries(value.Countries).map(([country, count]) => [country, count]),
-        ]);
+        // const aggregatedArray = Array.from(aggregatedData.values()).map((value) => [
+        //   value.Date,
+        //   value.Count,
+        //   value.Revenue,
+        //   Object.entries(value.Countries).map(([country, count]) => [country, count]),
+        // ]);
       
-        console.log(aggregatedArray);
+        //console.log(aggregatedArray);
       
-        return aggregatedArray;
+        return Array.from(aggregatedData.values());
       };
 
       
@@ -161,65 +163,79 @@ export const TotalBookingsTimeSeries = (props) => {
     // Usage:
     console.log(data)
     const aggregatedData = aggregateDatafromDropdown(data);
-
+    console.log(aggregatedData)
+    console.log(aggregatedData.map(item => item.Revenue))
     let dataset = [];
 
-    const uniqueCountries = [...new Set(aggregatedData.flatMap((item) => item[2].map(([country]) => country)))];
-    if (selectedYAxis === NUMBER_OF_BOOKINGS) {
+    //const uniqueCountries = [...new Set(aggregatedData.flatMap((item) => item[2].map(([country]) => country)))];
+    const uniqueCountries = [...new Set(data.map((item) => item[1]))];
+    console.log(uniqueCountries);
+    if (selectedYAxis === TOTAL_REVENUE) {
         dataset = [
             {
-                label: 'Number of Bookings',
-                data: aggregatedData.map(item => item[1]),
+                label: 'Total Revenue',
+                data: aggregatedData.map(item => item.Revenue/item.Count),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 fill: false,
             },
         ]; 
-      } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
+      } else if (selectedYAxis === TOTAL_REVENUE_LOCAL) {
         dataset = [
             {
-              label: `Number of Bookings by Local`,
-              data: aggregatedData.map((item) =>
-                item[2].find(([c]) => c === 'Singapore') ? item[2].find(([c]) => c === 'Singapore')[1] : 0
-              ),
+              label: `Total Revenue from Local`,
+              data: aggregatedData.map((item) => {
+                if (item.Countries && item.Countries.Singapore) {
+
+                  return item.Countries.Singapore.Revenue/item.Countries.Singapore.Count || 0; // Use 0 if Revenue is null or undefined
+                } else {
+                  return 0; // Handle the case where item.Countries.Singapore is null or undefined
+                }
+              }),
               borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
               borderWidth: 1,
               fill: false,
             },
           ];
-      } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
+      } else if (selectedYAxis === TOTAL_REVENUE_TOURIST) {
         dataset = [
             {
-              label: `Number of Bookings by Tourist`,
+              label: `Total Revenue from Tourist`,
               data: aggregatedData.map((item) => {
-                const singaporeCount = item[2].find(([c]) => c === 'Singapore');
-                const totalTouristCount = item[1] - (singaporeCount ? singaporeCount[1] : 0);
-                return totalTouristCount > 0 ? totalTouristCount : 0;
+                if (item.Countries && item.Countries.Singapore) {
+                    const touristRevenue = item.Revenue - (item.Countries.Singapore.Revenue || 0);
+                    const touristCount = item.Count - (item.Countries.Singapore.Count || 0);
+
+                  return touristRevenue/touristCount; // Use 0 if Revenue is null or undefined
+                } else {
+                  return item.Revenue/item.Count; // Handle the case where item.Countries.Singapore is null or undefined
+                }
               }),
               borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
               borderWidth: 1,
               fill: false,
             },
           ];
-      } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
-        dataset = aggregatedData[0][2].map(([country]) => ({
-            label: `Number of Bookings in ${country}`,
-            data: aggregatedData.map((item) =>
-            item[2].find(([c]) => c === country) ? item[2].find(([c]) => c === country)[1] : 0
-            ),
-            borderColor: getRandomColor(uniqueCountries.indexOf(country)),
-            borderWidth: 1,
-            fill: false,
-        }));
-        console.log(dataset)
+      } else if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
+        dataset = uniqueCountries.map((country) => {
+            return {
+              label: `Total Revenue in ${country}`,
+              data: aggregatedData.map((item) => {
+                const countryData = item.Countries[country];
+                return countryData ? countryData.Revenue/countryData.Count : 0;
+              }),
+              borderColor: getRandomColor(uniqueCountries.indexOf(country)),
+              borderWidth: 1,
+              fill: false,
+            };
+          });
       }
     
 
-     
     
 
     const lineData = {
-        labels: aggregatedData.map((item) => item[0]), // Convert dates to strings
+        labels: aggregatedData.map((item) => item.Date), // Convert dates to strings
         datasets: dataset,
         };
 
@@ -237,7 +253,7 @@ export const TotalBookingsTimeSeries = (props) => {
                     unit: 'month',
                     displayFormats: {
                         month: 'yyyy-MM',
-                        week: 'yyyy-MM-dd', // Adjust the format for weeks
+                        week: 'YYYY [W]WW', // Adjust the format for weeks
                         year: 'yyyy',
                     },
                 },
@@ -286,36 +302,31 @@ export const TotalBookingsTimeSeries = (props) => {
     return (
         <>
 
-            <Row style={{ marginRight: 50 }}>
-                <Col style={{ marginLeft: 'auto', marginRight: 16 }}>
-                    <div style={styles.container}>
-                        <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
-                        <Select
-                            labelInValue
-                            defaultValue={itemsXAxis[0]}
-                            style={{width: 120}}
-                            onChange={handleChangeXAxis}
-                            options={itemsXAxis}
-                        />
+            <div style={styles.container}>
+                <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
+                <Select
+                    labelInValue
+                    defaultValue={itemsXAxis[0]}
+                    style={{width: 120}}
+                    onChange={handleChangeXAxis}
+                    options={itemsXAxis}
+                />
 
-                    </div>
-                </Col>
-                <Col>
-                    <div style={styles.container}>
-                        <Typography.Title level={5} style={{marginRight: '10px'}}>Y Axis: </Typography.Title>
-                        <Select
-                            labelInValue
-                            defaultValue={itemsYAxis[0]}
-                            style={{width: 300}}
-                            onChange={handleChangeYAxis}
-                            options={itemsYAxis}
-                        />
-                    </div>
-                </Col>
-
-            </Row>
-
+            </div>
             <br></br>
+
+            <div style={styles.container}>
+                <Typography.Title level={5} style={{marginRight: '10px'}}>Y Axis: </Typography.Title>
+                <Select
+                    labelInValue
+                    defaultValue={itemsYAxis[0]}
+                    style={{width: 400}}
+                    onChange={handleChangeYAxis}
+                    options={itemsYAxis}
+                />
+
+            </div>
+
 
             <div ref={chartRef}  style={styles.line}>
                 <Line
