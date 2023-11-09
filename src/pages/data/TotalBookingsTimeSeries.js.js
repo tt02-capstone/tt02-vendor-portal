@@ -206,9 +206,11 @@ export const TotalBookingsTimeSeries = (props) => {
             borderWidth: 1,
             fill: false,
         }));
+        console.log(dataset)
       }
     
 
+     
     
 
     const lineData = {

@@ -28,6 +28,8 @@ import {getData, subscribe, getSubscription, getSubscriptionStatus} from "../../
 import {set} from 'date-fns';
 import {ToastContainer, toast} from 'react-toastify';
 import {TotalBookingsTimeSeries} from "./TotalBookingsTimeSeries.js";
+import {TotalRevenueTimeSeries} from "./TotalRevenueTimeSeries.js";
+import { RevenueToBooking } from './RevenueToBooking.js';
 
 ChartJS.register(
     CategoryScale,
@@ -43,6 +45,7 @@ ChartJS.register(
 
 const TOTAL_BOOKINGS_OVER_TIME = "Total Bookings Over Time";
 const REVENUE_OVER_TIME = "Revenue Over Time";
+const BOOKING_REVENUE_RATIO = "Revenue to Bookings Ratio Over Time";
 const BOOKINGS_BREAKDOWN = "Bookings Breakdown by Activity, Nationality, Age";
 const REVENUE_BREAKDOWN = "Revenue Breakdown by Activity, Nationality, Age";
 const CUSTOMER_RETENTION = "Customer Retention (Number of Repeat Bookings Over Time)";
@@ -52,7 +55,7 @@ const DataDashboard = () => {
     const [isSubscribed, setIsSubscribed] = useState(true);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [data, setData] = useState([]);
-    const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME);
+    const [selectedDataUseCase, setSelectedDataUseCase] = useState(REVENUE_OVER_TIME); //REVENUE_OVER_TIME
     const chartRef = useRef(null);
 
     const dataBreadCrumb = [
@@ -262,6 +265,10 @@ const DataDashboard = () => {
 
         },
         {
+            label: BOOKING_REVENUE_RATIO,
+            value: BOOKING_REVENUE_RATIO
+        },
+        {
             label: REVENUE_BREAKDOWN,
             value: REVENUE_BREAKDOWN
 
@@ -289,6 +296,12 @@ const DataDashboard = () => {
     const returnChart = () => {
         if(selectedDataUseCase === TOTAL_BOOKINGS_OVER_TIME) {
             return  <TotalBookingsTimeSeries chartRef={chartRef} data={data}/>
+        } else if (selectedDataUseCase === REVENUE_OVER_TIME) {
+            return <TotalRevenueTimeSeries chartRef={chartRef} data={data}/>
+        } else if (selectedDataUseCase === BOOKING_REVENUE_RATIO) {
+            return <RevenueToBooking chartRef={chartRef} data={data}/>
+        } else if (selectedDataUseCase === REVENUE_BREAKDOWN) {
+        } else if (selectedDataUseCase === BOOKINGS_BREAKDOWN) {
         }
     }
 
