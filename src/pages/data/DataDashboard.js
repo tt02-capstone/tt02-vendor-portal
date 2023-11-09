@@ -28,6 +28,7 @@ import {TotalBookingsTimeSeries} from "./TotalBookingsTimeSeries.js";
 import {BookingBreakdown} from "./BookingBreakdown";
 import {TotalRevenueTimeSeries} from "./TotalRevenueTimeSeries";
 import {disabledDateChecker} from "../../helper/dateFormat";
+import moment from "moment";
 
 const { RangePicker } = DatePicker;
 
@@ -54,7 +55,10 @@ const DataDashboard = () => {
     const [isSubscribed, setIsSubscribed] = useState(true);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [data, setData] = useState([]);
-    const [selectedDataUseCase, setSelectedDataUseCase] = useState(BOOKINGS_BREAKDOWN);
+    const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME);
+    const [startDate, setStartDate] = useState(new Date(2023, 0, 1));
+    const [endDate, setEndDate] = useState( new Date(2023, 9, 31));
+
 
     const dataBreadCrumb = [
         {
@@ -152,12 +156,14 @@ const DataDashboard = () => {
                 }
 
 
-                const start_date =  new Date(2023, 0, 1)
-                const end_date = new Date(2023, 9, 31)
+                // const start_date =  new Date(2023, 0, 1)
+                // const end_date = new Date(2023, 9, 31)
 
                 console.log(dataUseCase)
+                console.log(startDate)
+                console.log(endDate)
                 // Replace this with your API call to fetch user subscription status
-                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, start_date, end_date);
+                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, startDate, endDate);
                 if (response.status) {
                     console.log(response.data)
                     setData(response.data)
@@ -173,7 +179,7 @@ const DataDashboard = () => {
         };
 
         callGetData();
-    }, [selectedDataUseCase]);
+    }, [selectedDataUseCase, startDate, endDate]);
 
 
     const items = [
@@ -214,6 +220,16 @@ const DataDashboard = () => {
 
     function onCalendarChange(dates) {
         console.log("onCalendarChange", dates);
+        if (dates[0] !== null) {
+            const start_time = moment(dates[0].$d);
+            setStartDate(new Date(start_time))
+
+        }
+
+        if (dates[1] !== null) {
+            const end_time = moment(dates[1].$d)
+            setEndDate(new Date(end_time))
+        }
     }
     const returnChart = () => {
         if(selectedDataUseCase === TOTAL_BOOKINGS_OVER_TIME) {
@@ -233,7 +249,7 @@ const DataDashboard = () => {
                 <div>
                     {isSubscribed ? (
                         <div>
-                            <Row style={{marginBottom: 100}}>
+                            <Row style={{marginBottom: 10}}>
                                 <Col>
                                     <div style={styles.container}>
                                         <Typography.Title level={5} style={{marginRight: '10px'}}>Chart Type: </Typography.Title>
@@ -248,18 +264,18 @@ const DataDashboard = () => {
                                 </Col>
 
                                 <Col>
+
                                     <CustomButton style= {{marginLeft: 1100}}text="Manage Subscription" icon={<DashboardOutlined/>} onClick={onClickViewSubButton}/>
+                                </Col>
+                                <Col>
+                                    <RangePicker
+                                        format="YYYY-MM-DD"
+                                        onCalendarChange={onCalendarChange}
+                                        // defaultValue={[moment('2023-01-01', 'YYYY-MM-DD'),moment('2023-01-15', 'YYYY-MM-DD')]}
+                                    />
                                 </Col>
                             </Row>
 
-
-                            {/*<RangePicker*/}
-                            {/*    format="YYYY-MM-DD"*/}
-                            {/*    onCalendarChange={onCalendarChange}*/}
-                            {/*/>*/}
-
-                            <br></br>
-                            <br></br>
                             {returnChart()}
                              <ToastContainer />
 
