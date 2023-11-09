@@ -2,10 +2,16 @@ import {dataApi} from "./api";
 import {handleApiErrors} from "../helper/errorCatching";
 
 
-export async function getData(data_usecase, type, vendor_id) {
+export async function getData(data_usecase, type, vendor_id, start_date, end_date) {
     try {
-        console.log(data_usecase, type, vendor_id)
-        const response = await dataApi.get(`/getData/${data_usecase}/${type}/${vendor_id}`);
+        console.log(data_usecase, type, vendor_id, start_date, end_date);
+
+        const requestBody = {
+            'start_date': start_date,
+            'end_date': end_date
+        };
+
+        const response = await dataApi.post(`/getData/${data_usecase}/${type}/${vendor_id}`, requestBody);
         return handleApiErrors(response);
     } catch (error) {
         console.error("Error : ", error);

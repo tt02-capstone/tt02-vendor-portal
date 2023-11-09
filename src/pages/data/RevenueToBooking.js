@@ -39,7 +39,7 @@ const TOTAL_REVENUE_BY_COUNTRY = "Total Revenue from  Country";
 
 
 
-export const TotalRevenueTimeSeries = (props) => {
+export const RevenueToBooking = (props) => {
     const chartRef = props.chartRef;
     const data = props.data
     const [selectedXAxis, setSelectedXAxis] = useState(MONTHLY);
@@ -174,7 +174,7 @@ export const TotalRevenueTimeSeries = (props) => {
         dataset = [
             {
                 label: 'Total Revenue',
-                data: aggregatedData.map(item => item.Revenue),
+                data: aggregatedData.map(item => item.Revenue/item.Count),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 fill: false,
@@ -186,7 +186,8 @@ export const TotalRevenueTimeSeries = (props) => {
               label: `Total Revenue from Local`,
               data: aggregatedData.map((item) => {
                 if (item.Countries && item.Countries.Singapore) {
-                  return item.Countries.Singapore.Revenue || 0; // Use 0 if Revenue is null or undefined
+
+                  return item.Countries.Singapore.Revenue/item.Countries.Singapore.Count || 0; // Use 0 if Revenue is null or undefined
                 } else {
                   return 0; // Handle the case where item.Countries.Singapore is null or undefined
                 }
@@ -203,9 +204,11 @@ export const TotalRevenueTimeSeries = (props) => {
               data: aggregatedData.map((item) => {
                 if (item.Countries && item.Countries.Singapore) {
                     const touristRevenue = item.Revenue - (item.Countries.Singapore.Revenue || 0);
-                  return touristRevenue; // Use 0 if Revenue is null or undefined
+                    const touristCount = item.Count - (item.Countries.Singapore.Count || 0);
+
+                  return touristRevenue/touristCount; // Use 0 if Revenue is null or undefined
                 } else {
-                  return item.Revenue; // Handle the case where item.Countries.Singapore is null or undefined
+                  return item.Revenue/item.Count; // Handle the case where item.Countries.Singapore is null or undefined
                 }
               }),
               borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
@@ -219,7 +222,7 @@ export const TotalRevenueTimeSeries = (props) => {
               label: `Total Revenue in ${country}`,
               data: aggregatedData.map((item) => {
                 const countryData = item.Countries[country];
-                return countryData ? countryData.Revenue : 0;
+                return countryData ? countryData.Revenue/countryData.Count : 0;
               }),
               borderColor: getRandomColor(uniqueCountries.indexOf(country)),
               borderWidth: 1,
