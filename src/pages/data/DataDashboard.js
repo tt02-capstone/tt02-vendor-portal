@@ -55,7 +55,7 @@ const DataDashboard = () => {
     const [isSubscribed, setIsSubscribed] = useState(true);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [data, setData] = useState([]);
-    const [selectedDataUseCase, setSelectedDataUseCase] = useState(REVENUE_OVER_TIME); //REVENUE_OVER_TIME
+    const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME); //REVENUE_OVER_TIME
     const chartRef = useRef(null);
 
     const dataBreadCrumb = [
