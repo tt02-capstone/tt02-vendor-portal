@@ -1,7 +1,7 @@
 import React, {useState, useEffect , useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {DownOutlined, SmileOutlined, DashboardOutlined} from '@ant-design/icons';
-import {Dropdown, Button, Menu, Layout, Typography, Select} from 'antd';
+import { Row, Col, Layout, Typography, Select, DatePicker} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 import SubscriptionModal from "./SubscriptionModal";
 import ExportModal from './ExportModal.js';
@@ -23,13 +23,19 @@ import {
     Legend,
     TimeScale
 } from 'chart.js';
+import { RevenueToBooking } from './RevenueToBooking.js';
+
 import {Bar, Line} from 'react-chartjs-2';
 import {getData, subscribe, getSubscription, getSubscriptionStatus} from "../../redux/dataRedux";
 import {set} from 'date-fns';
 import {ToastContainer, toast} from 'react-toastify';
 import {TotalBookingsTimeSeries} from "./TotalBookingsTimeSeries.js";
-import {TotalRevenueTimeSeries} from "./TotalRevenueTimeSeries.js";
-import { RevenueToBooking } from './RevenueToBooking.js';
+import {BookingBreakdown} from "./BookingBreakdown";
+import {TotalRevenueTimeSeries} from "./TotalRevenueTimeSeries";
+import moment from "moment";
+import {RevenueBreakdown} from "./RevenueBreakdown";
+
+const { RangePicker } = DatePicker;
 
 ChartJS.register(
     CategoryScale,
@@ -57,6 +63,10 @@ const DataDashboard = () => {
     const [data, setData] = useState([]);
     const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME); //REVENUE_OVER_TIME
     const chartRef = useRef(null);
+    const [startDate, setStartDate] = useState(new Date(2023, 0, 1));
+    const [endDate, setEndDate] = useState( new Date(2023, 9, 31));
+    const [loading, setLoading] = useState(true);
+
 
     const dataBreadCrumb = [
         {
@@ -153,9 +163,9 @@ const DataDashboard = () => {
         try {
 
             console.log(exportDetails);
-            
+
             if (exportDetails.fileType == "pdf") {
- 
+
                 html2canvas(chartRef.current).then((canvas) => {
                     const imgData = canvas.toDataURL("image/png");
                     const pdf = new jsPDF("landscape");
@@ -187,7 +197,7 @@ const DataDashboard = () => {
                     URL.revokeObjectURL(url);
                 }
 
-                
+
 
             } else if (exportDetails.fileType == "png") {
                 html2canvas(chartRef.current).then((canvas) => {
@@ -234,14 +244,15 @@ const DataDashboard = () => {
                 }
 
                 // Replace this with your API call to fetch user subscription status
-                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, new Date(2023, 0, 1) , new Date(2023, 9, 31));
+                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, startDate, endDate);
                 if (response.status) {
                     console.log(response.data)
                     setData(response.data)
+                    setLoading(false)
 
                 } else {
                     console.log("Wat");
-
+                    setLoading(false)
                 }
 
             } catch (error) {
@@ -250,7 +261,7 @@ const DataDashboard = () => {
         };
 
         callGetData();
-    }, [selectedDataUseCase]);
+    }, [selectedDataUseCase, startDate, endDate]);
 
 
     const items = [
@@ -288,11 +299,25 @@ const DataDashboard = () => {
     ];
 
     const handleChangeDataUseCase = (value) => {
+        setLoading(true)
         console.log(value); // { value: "lucy", label: "Lucy (101)" }
         setSelectedDataUseCase(value.value)
     };
     // Usage:
 
+    function onCalendarChange(dates) {
+        console.log("onCalendarChange", dates);
+        if (dates[0] !== null) {
+            const start_time = moment(dates[0].$d);
+            setStartDate(new Date(start_time))
+
+        }
+
+        if (dates[1] !== null) {
+            const end_time = moment(dates[1].$d)
+            setEndDate(new Date(end_time))
+        }
+    }
     const returnChart = () => {
         if(selectedDataUseCase === TOTAL_BOOKINGS_OVER_TIME) {
             return  <TotalBookingsTimeSeries chartRef={chartRef} data={data}/>
@@ -300,9 +325,12 @@ const DataDashboard = () => {
             return <TotalRevenueTimeSeries chartRef={chartRef} data={data}/>
         } else if (selectedDataUseCase === BOOKING_REVENUE_RATIO) {
             return <RevenueToBooking chartRef={chartRef} data={data}/>
-        } else if (selectedDataUseCase === REVENUE_BREAKDOWN) {
         } else if (selectedDataUseCase === BOOKINGS_BREAKDOWN) {
+            return <BookingBreakdown data={data[0][0]} />
+        } else if (selectedDataUseCase === REVENUE_BREAKDOWN) {
+            return <RevenueBreakdown data={data[0][0]} />
         }
+
     }
 
     return (
@@ -312,19 +340,27 @@ const DataDashboard = () => {
                 <div>
                     {isSubscribed ? (
                         <div>
-                            <CustomButton style= {{margin: '10px'}}text="Manage Subscription" icon={<DashboardOutlined/>} onClick={onClickViewSubButton}/>
-                            <CustomButton style= {{margin: '10px'}}text="Export Data" icon={<DashboardOutlined/>} onClick={onClickManageExportButton}/>
-                            <div style={styles.container}>
-                                <Typography.Title level={5} style={{marginRight: '10px'}}>Chart Type: </Typography.Title>
-                                <Select
-                                    labelInValue
-                                    defaultValue={items[0]}
-                                    style={{width: 400}}
-                                    onChange={handleChangeDataUseCase}
-                                    options={items}
-                                />
-                            </div>
-
+                            <Row justify="space-between" style={{ marginRight: 50, marginTop: 20 }}>
+                                <Col>
+                                    <div style={styles.container}>
+                                        <Typography.Title level={5} style={{ marginRight: 5}}>Chart Type : </Typography.Title>
+                                        <Select
+                                            labelInValue
+                                            defaultValue={items[0]}
+                                            style={{ width: 400 }}
+                                            onChange={handleChangeDataUseCase}
+                                            options={items}
+                                        />
+                                    </div>
+                                </Col>
+                                <Col style={{ marginLeft: 'auto', marginRight: 16 }}>
+                                    <CustomButton text="Export Data" icon={<DashboardOutlined />} onClick={onClickManageExportButton} />
+                                </Col>
+                                <Col>
+                                    <CustomButton text="Manage Subscription" icon={<DashboardOutlined />} onClick={onClickViewSubButton} />
+                                </Col>
+                            </Row>
+                            <Row style={{marginBottom: 50, marginTop: 10}}>
                             {isExportModalOpen &&
                                 <ExportModal
                                     isExportModalOpen={isExportModalOpen}
@@ -333,11 +369,22 @@ const DataDashboard = () => {
                                 />
                             }
 
+                                <Col>
+                                    <div style={styles.container}>
+                                        <Typography.Title level={5} style={{ marginRight: 5}} >Date Range : </Typography.Title>
+                                        <RangePicker
+                                            format="YYYY-MM-DD"
+                                            onCalendarChange={onCalendarChange}
+                                            // defaultValue={[moment('2023-01-01', 'YYYY-MM-DD'),moment('2023-01-15', 'YYYY-MM-DD')]}
+                                        />
+                                    </div>
+                                </Col>
+                            </Row>
+                            {/*<div style={{ backgroundColor: '#ffc069', padding: '30px' }}>*/}
+                                {loading? null: returnChart()}
+                            {/*</div>*/}
 
-                            <br></br>
-                            <br></br>
-                            {returnChart()}
-                             <ToastContainer />
+                            <ToastContainer />
 
                         </div>
                     ) : (
@@ -360,7 +407,7 @@ const DataDashboard = () => {
                                     onClickCancelManageSubButton={onClickCancelManageSubButton}
                                 />
                             }
-                            
+
                             <ToastContainer />
                         </div>
                     )}

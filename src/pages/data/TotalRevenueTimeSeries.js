@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Dropdown, Button, Menu, Layout, Select, Typography} from 'antd';
+import {Dropdown, Button, Menu, Layout, Select, Typography, Row, Col} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
 import {
@@ -15,6 +15,7 @@ import {
     TimeScale
 } from 'chart.js';
 import {Bar, Line} from 'react-chartjs-2';
+import moment from "moment/moment";
 
 
 ChartJS.register(
@@ -116,11 +117,15 @@ export const TotalRevenueTimeSeries = (props) => {
           const [date, country, revenue] = item; // ["2023-05-17", "CountryName"]
           let xAxisKey;
           if (selectedXAxis === MONTHLY) {
-            xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
+              xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
           } else if (selectedXAxis === YEARLY) {
-            xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
+              xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
+          } else if (selectedXAxis === WEEKLY) {
+              const currdate = moment(date)
+              xAxisKey= currdate.clone().startOf('week').format('YYYY-MM-DD').toString()
+              // console.log(xAxisKey)
           }
-      
+
           if (!aggregatedData.has(xAxisKey)) {
             // Initialize data for the date
             aggregatedData.set(xAxisKey, { Date: xAxisKey, Revenue: 0, Count: 0, Countries: {} });
@@ -250,7 +255,7 @@ export const TotalRevenueTimeSeries = (props) => {
                     unit: 'month',
                     displayFormats: {
                         month: 'yyyy-MM',
-                        week: 'YYYY [W]WW', // Adjust the format for weeks
+                        week: 'yyyy-MM-dd', // Adjust the format for weeks
                         year: 'yyyy',
                     },
                 },
@@ -299,30 +304,37 @@ export const TotalRevenueTimeSeries = (props) => {
     return (
         <>
 
-            <div style={styles.container}>
-                <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
-                <Select
-                    labelInValue
-                    defaultValue={itemsXAxis[0]}
-                    style={{width: 120}}
-                    onChange={handleChangeXAxis}
-                    options={itemsXAxis}
-                />
+            <Row style={{ marginRight: 50 }}>
+                <Col style={{ marginLeft: 'auto', marginRight: 16 }}>
+                    <div style={styles.container}>
+                        <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
+                        <Select
+                            labelInValue
+                            defaultValue={itemsXAxis[0]}
+                            style={{width: 120}}
+                            onChange={handleChangeXAxis}
+                            options={itemsXAxis}
+                        />
 
-            </div>
+                    </div>
+                </Col>
+                <Col>
+                    <div style={styles.container}>
+                        <Typography.Title level={5} style={{marginRight: '10px'}}>Y Axis: </Typography.Title>
+                        <Select
+                            labelInValue
+                            defaultValue={itemsYAxis[0]}
+                            style={{width: 300}}
+                            onChange={handleChangeYAxis}
+                            options={itemsYAxis}
+                        />
+                    </div>
+                </Col>
+
+            </Row>
+
             <br></br>
 
-            <div style={styles.container}>
-                <Typography.Title level={5} style={{marginRight: '10px'}}>Y Axis: </Typography.Title>
-                <Select
-                    labelInValue
-                    defaultValue={itemsYAxis[0]}
-                    style={{width: 400}}
-                    onChange={handleChangeYAxis}
-                    options={itemsYAxis}
-                />
-
-            </div>
 
 
             <div ref={chartRef}  style={styles.line}>
