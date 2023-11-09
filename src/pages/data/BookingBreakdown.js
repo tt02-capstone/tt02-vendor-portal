@@ -30,76 +30,8 @@ ChartJS.register(
     ArcElement
 );
 
-const NATIONALITY = 'Nationality';
-const AGE = 'Age';
-const STATUS = 'Status';
-const ACTIVITY = "Activity";
 export const BookingBreakdown = (props) => {
     const data = props.data
-    const [selectedItem, setSelectedItem] = useState(NATIONALITY);
-    const chartRef = useRef(null);
-
-
-    const itemsDropdown = [
-        {
-            value: NATIONALITY,
-            label: NATIONALITY,
-        },
-        {
-            value: AGE,
-            label: AGE,
-        },
-        {
-            value: STATUS,
-            label: STATUS,
-        },
-        {
-            value: ACTIVITY,
-            label: ACTIVITY,
-        },
-
-    ];
-
-    const aggregateDatafromDropdown = (data) => {
-        console.log(data)
-        const d = {
-            Status: {COMPLETED: 89},
-            Category: {DELUXE_SUITE: 89},
-            Country: {China: 23, Malaysia: 13, Australia: 16, Indonesia: 19, India: 18}
-        }
-
-        let aggregatedData = new Map(); // Use a Map to store aggregated data by month
-
-        if (selectedItem === NATIONALITY) {
-            aggregatedData = d.Country
-        } else if (selectedItem === STATUS) {
-            aggregatedData = d.Status
-        } else if (selectedItem === ACTIVITY) {
-            aggregatedData = d.Category
-        }
-
-        return aggregatedData
-    };
-
-    const aggregatedData = aggregateDatafromDropdown(data);
-
-    // const pieData = {
-    //     labels: Object.keys(aggregatedData),
-    //     datasets: [
-    //         {
-    //             data: Object.values(aggregatedData),
-    //             backgroundColor: [
-    //                 'red',
-    //                 'green',
-    //                 'blue',
-    //                 'orange',
-    //                 'purple',
-    //                 // Add more colors as needed
-    //             ],
-    //         },
-    //     ],
-    // };
-
     const getRandomColors = (count) => {
         // Generate random colors for the chart
         const colors = [];
@@ -107,21 +39,6 @@ export const BookingBreakdown = (props) => {
             colors.push(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
         }
         return colors;
-    };
-    console.log(data)
-    const defaultChartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: `Breakdown by ${selectedItem}`,
-                position: 'bottom'
-            },
-        },
     };
 
     const getChartOptions = (key) => {
@@ -143,65 +60,41 @@ export const BookingBreakdown = (props) => {
         return chartOptions;
     };
 
-    const handleChangeDropdown = (value) => {
-        console.log(value); // { value: "lucy", label: "Lucy (101)" }
-        setSelectedItem(value.value)
-
-        // Destroy the previous chart
-        // if (chartRef.current) {
-        //     chartRef.current.chartInstance.destroy();
-        // }
-    };
-
-    const renderCharts = () => {
-        Object.keys(data).map(key => {
-            console.log(key)
-        });
-    };
-
-
     return (
         <>
 
             <div style={styles.container}>
-                {/*<Typography.Title level={5} style={{marginRight: '10px'}}>Breakdown by: </Typography.Title>*/}
-                {/*<Select*/}
-                {/*    labelInValue*/}
-                {/*    defaultValue={itemsDropdown[0]}*/}
-                {/*    style={{width: 120}}*/}
-                {/*    onChange={handleChangeDropdown}*/}
-                {/*    options={itemsDropdown}*/}
-                {/*/>*/}
 
+                <br></br>
+
+                <Row style={styles.content}>
+                    {Object.keys(data).map((key) => {
+                        const labels = Object.keys(data[key]);
+                        const values = Object.values(data[key]);
+
+                        const pieData = {
+                            labels,
+                            datasets: [
+                                {
+                                    data: values,
+                                    backgroundColor: getRandomColors(values.length),
+                                },
+                            ],
+                        };
+
+                        return (
+                            <Col>
+                                <div key={key} style={styles.line}>
+                                    {/*<h3>{key}</h3>*/}
+                                    <Pie data={pieData} options={getChartOptions(key)}/>
+                                </div>
+                            </Col>
+                        );
+                    })}
+                </Row>
             </div>
-            <br></br>
 
-            <Row style={styles.content}>
-                {Object.keys(data).map((key) => {
-                    const labels = Object.keys(data[key]);
-                    const values = Object.values(data[key]);
-
-                    const pieData = {
-                        labels,
-                        datasets: [
-                            {
-                                data: values,
-                                backgroundColor: getRandomColors(values.length),
-                            },
-                        ],
-                    };
-
-                    return (
-                        <Col>
-                                                <div key={key} style={styles.line}>
-                            {/*<h3>{key}</h3>*/}
-                            <Pie data={pieData} options={getChartOptions(key)} />
-                        </div>
-                        </Col>
-                    );
-                })}
-            </Row>
-            </>
+        </>
     );
 };
 
