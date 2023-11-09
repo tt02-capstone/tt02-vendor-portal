@@ -167,41 +167,73 @@ export default function DeliveryManagement() {
             key: 'status',
             filters: [
                 {
-                    text: 'Upcoming',
-                    value: 'UPCOMING',
+                    text: 'Pending Vendor Delivery',
+                    value: 'PENDING_VENDOR_DELIVERY',
                 },
                 {
-                    text: 'Ongoing',
-                    value: 'ONGOING',
+                    text: 'Prepare for Shipment',
+                    value: 'PREPARE_FOR_SHIPMENT',
                 },
                 {
-                    text: 'Completed',
-                    value: 'COMPLETED',
+                    text: 'Shipped Out',
+                    value: 'SHIPPED_OUT',
                 },
                 {
-                    text: 'Cancelled',
-                    value: 'CANCELLED',
+                    text: 'Delivered',
+                    value: 'DELIVERED',
+                },
+                {
+                    text: 'Pending Vendor Pickup',
+                    value: 'PENDING_VENDOR_PICKUP',
+                },
+                {
+                    text: 'Prepare for Pickup',
+                    value: 'PREPARE_FOR_PICKUP',
+                },
+                {
+                    text: 'Ready for Pickup',
+                    value: 'READY_FOR_PICKUP',
+                },
+                {
+                    text: 'Picked Up',
+                    value: 'PICKED_UP',
                 },
             ],
             onFilter: (value, record) => record.status === value,
             render: (status) => {
                 let color = 'default';
                 switch (status) {
-                    case 'UPCOMING':
+                    case 'PENDING_VENDOR_DELIVERY':
                         color = 'processing';
                         break;
-                    case 'ONGOING':
-                        color = 'warning';
+                    case 'PREPARE_FOR_SHIPMENT':
+                        color = 'processing';
                         break;
-                    case 'COMPLETED':
+                    case 'SHIPPED_OUT':
+                        color = 'processing';
+                        break;
+                    case 'DELIVERED':
                         color = 'success';
                         break;
-                    case 'CANCELLED':
-                        color = 'error';
+                    case 'PENDING_VENDOR_PICKUP':
+                        color = 'processing';
                         break;
+                    case 'PREPARE_FOR_PICKUP':
+                        color = 'processing';
+                        break;
+                    case 'READY_FOR_PICKUP':
+                        color = 'processing';
+                        break;
+                    case 'PICKED_UP':
+                        color = 'success';
+                        break;
+                    default:
+                        color = 'default';
                 }
 
-                return <Tag color={color}>{status}</Tag>;
+                const displayName = statusDisplayNames[status] || status;
+
+                return <Tag color={color}>{displayName}</Tag>;
             },
         },
         {
@@ -347,7 +379,16 @@ export default function DeliveryManagement() {
     const [isViewItemBookingModalOpen, setIsViewItemBookingModalOpen] = useState(false);
     const [isEditItemBookingModalOpen, setIsEditItemBookingModalOpen] = useState(false);
 
-
+    const statusDisplayNames = {
+        PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
+        PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
+        SHIPPED_OUT: 'Shipped Out',
+        DELIVERED: 'Delivered',
+        PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
+        PREPARE_FOR_PICKUP: 'Prepare for Pickup',
+        READY_FOR_PICKUP: 'Ready for Pickup',
+        PICKED_UP: 'Picked Up',
+    };
     //view item booking modal open button
     function onClickOpenViewItemBookingModal(bookingId) {
         setSelectedBookingId(bookingId);

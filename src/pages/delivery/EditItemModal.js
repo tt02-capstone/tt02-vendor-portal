@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {Modal, Form, Input, Switch, Button, Select, InputNumber, Timeline} from "antd";
-import { getTelecomById } from "../../redux/telecomRedux";
 import {getBookingById} from "../../redux/bookingRedux";
-import moment from "moment/moment";
-import {SmileOutlined} from "@ant-design/icons";
+import {MehOutlined, SmileOutlined} from "@ant-design/icons";
 
 export default function EditItemModal(props) {
 
@@ -11,6 +9,20 @@ export default function EditItemModal(props) {
     const { Option } = Select;
 
     const [selectedBooking, setSelectedBooking] = useState();
+    const [deliveryStatus, setDeliveryStatus] = useState('PENDING_VENDOR_DELIVERY');
+    const deliveryStatusOrder = ['PENDING_VENDOR_DELIVERY', 'PREPARE_FOR_SHIPMENT', 'SHIPPED_OUT', 'DELIVERED'];
+    const pickupStatusOrder = ['PENDING_VENDOR_PICKUP', 'PREPARE_FOR_PICKUP', 'READY_FOR_PICKUP', 'PICKED_UP'];
+
+    const statusDisplayNames = {
+        PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
+        PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
+        SHIPPED_OUT: 'Shipped Out',
+        DELIVERED: 'Delivered',
+        PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
+        PREPARE_FOR_PICKUP: 'Prepare for Pickup',
+        READY_FOR_PICKUP: 'Ready for Pickup',
+        PICKED_UP: 'Picked Up',
+    };
 
 
     useEffect(() => {
@@ -20,6 +32,7 @@ export default function EditItemModal(props) {
                 if (response.status) {
                     console.log(response.data);
                     setSelectedBooking(response.data);
+                    setDeliveryStatus(response.data.status)
                 } else {
                     console.log("Booking not fetched!");
                 }
@@ -37,61 +50,39 @@ export default function EditItemModal(props) {
         }
     }, [selectedBooking])
 
+    const checkColour = (curr, rest) => {
+        if (rest < curr) {
+            return 'green'
+        } else if (curr === 3 ) {
+            return  'green'
+        } else if (curr === rest ) {
+            return  'blue'
+        } else {
+            return 'gray'
+        }
+    }
     const timelineItems = () => {
-       const list =  [
+        const itemPoints = deliveryStatusOrder.includes(deliveryStatus)? deliveryStatusOrder: pickupStatusOrder
+        const currIndex = itemPoints.indexOf(deliveryStatus)
+        const list = [
             {
-                color: 'green',
-                children: 'Create a services site 2015-09-01',
+                color: checkColour(currIndex, 0),
+                children: statusDisplayNames[itemPoints[0]],
             },
             {
-                color: 'green',
-                children: 'Create a services site 2015-09-01',
+                color: checkColour(currIndex, 1),
+                children: statusDisplayNames[itemPoints[1]],
             },
             {
-                color: 'red',
-                children: (
-                    <>
-                        <p>Solve initial network problems 1</p>
-                        <p>Solve initial network problems 2</p>
-                        <p>Solve initial network problems 3 2015-09-01</p>
-                    </>
-                ),
+                color: checkColour(currIndex, 2),
+                children: statusDisplayNames[itemPoints[2]],
             },
             {
-                children: (
-                    <>
-                        <p>Technical testing 1</p>
-                        <p>Technical testing 2</p>
-                        <p>Technical testing 3 2015-09-01</p>
-                    </>
-                ),
+                color: checkColour(currIndex, 3),
+                dot: currIndex === 3 ? <SmileOutlined /> : <MehOutlined />,
+                children: statusDisplayNames[itemPoints[3]],
             },
-            {
-                color: 'gray',
-                children: (
-                    <>
-                        <p>Technical testing 1</p>
-                        <p>Technical testing 2</p>
-                        <p>Technical testing 3 2015-09-01</p>
-                    </>
-                ),
-            },
-            {
-                color: 'gray',
-                children: (
-                    <>
-                        <p>Technical testing 1</p>
-                        <p>Technical testing 2</p>
-                        <p>Technical testing 3 2015-09-01</p>
-                    </>
-                ),
-            },
-            {
-                color: '#00CCFF',
-                dot: <SmileOutlined />,
-                children: <p>Custom color testing</p>,
-            },
-        ]
+        ];
         return list
     }
     return (
@@ -102,9 +93,11 @@ export default function EditItemModal(props) {
                 open={props.openViewModal}
                 onCancel={props.onClickCancelEditItemBookingModal}
                 style={{minWidth: 650}}
-                footer={[]} 
+                footer={[]}
             >
                 <Timeline
+                    style={{margin: 20}}
+                    mode={"alternate"}
                     items={timelineItems()}
                 />
                 <Form
@@ -124,16 +117,24 @@ export default function EditItemModal(props) {
                         rules={[{ required: true, message: 'Please select the Delivery status!' }]}
                     >
                         <Select placeholder="Delivered">
-                            <Option value="PENDING_VENDOR_DELIVERY">Pending Vendor Delivery</Option>
-                            <Option value="PENDING_VENDOR_PICKUP">Pending Vendor Pickup</Option>
-                            <Option value="PREPARE_FOR_SHIPMENT">Prepare for Shipment</Option>
-                            <Option value="PREPARE_FOR_PICKUP">Prepare for Pickup</Option>
-                            <Option value="SHIPPED_OUT">Shipped Out</Option>
-                            <Option value="READY_FOR_PICKUP">Ready for Pickup</Option>
-                            <Option value="DELIVERED">Delivered</Option>
-                            <Option value="PICKED_UP">Picked Up</Option>
+                            {deliveryStatusOrder.includes(deliveryStatus) ? (
+                                <>
+                                    <Option value="PENDING_VENDOR_DELIVERY">Pending Vendor Delivery</Option>
+                                    <Option value="PREPARE_FOR_SHIPMENT">Prepare for Shipment</Option>
+                                    <Option value="SHIPPED_OUT">Shipped Out</Option>
+                                    <Option value="DELIVERED">Delivered</Option>
+                                </>
+                            ) : (
+                                <>
+                                    <Option value="PENDING_VENDOR_PICKUP">Pending Vendor Pickup</Option>
+                                    <Option value="PREPARE_FOR_PICKUP">Prepare for Pickup</Option>
+                                    <Option value="READY_FOR_PICKUP">Ready for Pickup</Option>
+                                    <Option value="PICKED_UP">Picked Up</Option>
+                                </>
+                            )}
                         </Select>
                     </Form.Item>
+
 
                     <Form.Item wrapperCol={{ offset: 11, span: 16 }}>
                         <Button type="primary" htmlType="submit">
