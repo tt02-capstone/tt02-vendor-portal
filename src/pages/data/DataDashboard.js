@@ -58,6 +58,7 @@ const DataDashboard = () => {
     const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME);
     const [startDate, setStartDate] = useState(new Date(2023, 0, 1));
     const [endDate, setEndDate] = useState( new Date(2023, 9, 31));
+    const [loading, setLoading] = useState(true);
 
 
     const dataBreadCrumb = [
@@ -167,10 +168,11 @@ const DataDashboard = () => {
                 if (response.status) {
                     console.log(response.data)
                     setData(response.data)
+                    setLoading(false)
 
                 } else {
                     console.log("Wat");
-
+                    setLoading(false)
                 }
 
             } catch (error) {
@@ -213,6 +215,7 @@ const DataDashboard = () => {
     ];
 
     const handleChangeDataUseCase = (value) => {
+        setLoading(true)
         console.log(value); // { value: "lucy", label: "Lucy (101)" }
         setSelectedDataUseCase(value.value)
     };
@@ -237,7 +240,7 @@ const DataDashboard = () => {
         } else if (selectedDataUseCase === REVENUE_OVER_TIME) {
            return  <TotalRevenueTimeSeries data={data}/>
         } else if (selectedDataUseCase === BOOKINGS_BREAKDOWN) {
-            return <BookingBreakdown data={data} />
+            return <BookingBreakdown data={data[0][0]} />
         }
 
     }
@@ -276,7 +279,7 @@ const DataDashboard = () => {
                                 </Col>
                             </Row>
 
-                            {returnChart()}
+                            {loading? null: returnChart()}
                              <ToastContainer />
 
                         </div>

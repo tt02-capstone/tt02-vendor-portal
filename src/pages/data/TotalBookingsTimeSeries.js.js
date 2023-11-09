@@ -15,6 +15,7 @@ import {
     TimeScale
 } from 'chart.js';
 import {Bar, Line} from 'react-chartjs-2';
+import moment from "moment";
 
 
 ChartJS.register(
@@ -115,9 +116,13 @@ export const TotalBookingsTimeSeries = (props) => {
           const [date, country] = item; // ["2023-05-17", "CountryName"]
           let xAxisKey;
           if (selectedXAxis === MONTHLY) {
-            xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
+              xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
           } else if (selectedXAxis === YEARLY) {
-            xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
+              xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
+          } else if (selectedXAxis === WEEKLY) {
+              const currdate = moment(date)
+              xAxisKey= currdate.clone().startOf('week').format('YYYY-MM-DD').toString()
+              console.log(xAxisKey)
           }
       
           if (!aggregatedData.has(xAxisKey)) {
@@ -229,7 +234,7 @@ export const TotalBookingsTimeSeries = (props) => {
                     unit: 'month',
                     displayFormats: {
                         month: 'yyyy-MM',
-                        week: 'YYYY [W]WW', // Adjust the format for weeks
+                        week: 'yyyy-MM-dd', // Adjust the format for weeks
                         year: 'yyyy',
                     },
                 },

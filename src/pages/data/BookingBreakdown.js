@@ -35,12 +35,7 @@ const AGE = 'Age';
 const STATUS = 'Status';
 const ACTIVITY = "Activity";
 export const BookingBreakdown = (props) => {
-    const data = {
-        Status: {Completed: 89, Cancelled: 20, Upcoming: 35 , Ongoing: 50},
-        Category: {DeluxeSuite: 89, JuniorSuite: 20, Double: 20, Standard: 30},
-        Country: {China: 23, Malaysia: 13, Australia: 16, Indonesia: 19, India: 18}
-    }
-    // const data = props.data
+    const data = props.data
     const [selectedItem, setSelectedItem] = useState(NATIONALITY);
     const chartRef = useRef(null);
 
@@ -222,12 +217,10 @@ const styles = {
         justifyContent: 'center',
     },
     content: {
-        flex: 'calc(50% - 20px)', // Set each chart to take 50% width with spacing
         margin: '1vh 3vh 1vh 3vh',
         marginTop: -10,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 10,
         marginLeft: 0
     },
     line: {
