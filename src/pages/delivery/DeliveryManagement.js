@@ -1,23 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Layout, Input, Button, Space, Tag } from 'antd';
+import {Layout, Input, Button, Space, Tag, Form} from 'antd';
 import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { getBookingListByVendor, getBookingByVendor } from "../../redux/bookingRedux";
+import {
+    updateBookingItemStatus,
+    getAllItemBookingsByVendor
+} from "../../redux/bookingRedux";
 import CustomHeader from "../../components/CustomHeader";
-import ViewAttractionBookingModal from "./ViewAttractionBookingModal";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
-import ViewTelecomBookingModal from "./ViewTelecomBookingModal";
-import ViewRoomBookingModal from "./ViewRoomBookingModal";
-import ViewItemBookingModal from "../delivery/ViewItemBookingModal";
 
-export default function BookingManagement() {
+import ViewItemBookingModal from "./ViewItemBookingModal";
+import EditItemModal from "./EditItemModal";
+
+export default function DeliveryManagement() {
 
     const navigate = useNavigate();
     const vendor = JSON.parse(localStorage.getItem("user"));
@@ -25,24 +27,15 @@ export default function BookingManagement() {
     const [getBookingsData, setGetBookingsData] = useState(true);
     const [bookingsData, setBookingsData] = useState([]);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
+
+    const [editForm] = Form.useForm(); // create
     const [selectedBooking, setSelectedBooking] = useState();
 
     const viewBookingBreadCrumb = [
         {
-          title: 'Bookings',
+          title: 'Delivery',
         }
     ];
-
-    const statusDisplayNames = {
-        PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
-        PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
-        SHIPPED_OUT: 'Shipped Out',
-        DELIVERED: 'Delivered',
-        PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
-        PREPARE_FOR_PICKUP: 'Prepare for Pickup',
-        READY_FOR_PICKUP: 'Ready for Pickup',
-        PICKED_UP: 'Picked Up',
-    };
 
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -172,82 +165,10 @@ export default function BookingManagement() {
             },
         },
         {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-            filters: [
-                {
-                    text: 'Accommodation',
-                    value: 'ACCOMMODATION',
-                },
-                {
-                    text: 'Telecom',
-                    value: 'TELECOM',
-                },
-                {
-                    text: 'Attraction',
-                    value: 'ATTRACTION',
-                },
-                {
-                    text: 'Tour',
-                    value: 'TOUR',
-                },
-                {
-                    text: 'Item',
-                    value: 'ITEM',
-                },
-            ],
-            onFilter: (value, record) => record.type === value,
-            render: (text, record) => {
-                let color = '';
-                let value = '';
-                switch (text) {
-                    case 'ITEM':
-                        color = 'yellow';
-                        value = 'ITEM';
-                        break;
-                    case 'ACCOMMODATION':
-                        color = 'purple';
-                        value = 'ACCOMMODATION';
-                        break;
-                    case 'TELECOM':
-                        color = 'magenta';
-                        value = 'TELECOM';
-                        break;
-                    case 'ATTRACTION':
-                        color = 'volcano';
-                        value = 'ATTRACTION';
-                        break;
-                    case 'TOUR':
-                        color = 'geekblue';
-                        value = 'TOUR';
-                        break;
-                }
-
-                return <Tag color={color}>{value}</Tag>;
-            },
-        },
-        {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
             filters: [
-                {
-                    text: 'Upcoming',
-                    value: 'UPCOMING',
-                },
-                {
-                    text: 'Ongoing',
-                    value: 'ONGOING',
-                },
-                {
-                    text: 'Completed',
-                    value: 'COMPLETED',
-                },
-                {
-                    text: 'Cancelled',
-                    value: 'CANCELLED',
-                },
                 {
                     text: 'Pending Vendor Delivery',
                     value: 'PENDING_VENDOR_DELIVERY',
@@ -285,18 +206,6 @@ export default function BookingManagement() {
             render: (status) => {
                 let color = 'default';
                 switch (status) {
-                    case 'UPCOMING':
-                        color = 'processing';
-                        break;
-                    case 'ONGOING':
-                        color = 'warning';
-                        break;
-                    case 'COMPLETED':
-                        color = 'success';
-                        break;
-                    case 'CANCELLED':
-                        color = 'error';
-                        break;
                     case 'PENDING_VENDOR_DELIVERY':
                         color = 'processing';
                         break;
@@ -377,49 +286,30 @@ export default function BookingManagement() {
                 return <Tag color={color}>{payment ? (payment.is_paid ? 'PAID' : 'UNPAID') : 'N/A'}</Tag>;
             },
         },
-        {
-            title: 'Amount Earned',
-            dataIndex: 'payment_amount',
-            key: 'payment_amount',
-            sorter: (a, b) => a.payment_amount > b.payment_amount,
-            ...getColumnSearchProps('payment_amount'),
-        },
+        // {
+        //     title: 'Amount Earned',
+        //     dataIndex: 'payment_amount',
+        //     key: 'payment_amount',
+        //     sorter: (a, b) => a.payment_amount > b.payment_amount,
+        //     ...getColumnSearchProps('payment_amount'),
+        // },
         {
             title: 'Action(s)',
             dataIndex: 'type',
             key: 'type',
             align: 'center',
             render: (text, record) => {
-                if (text === 'ATTRACTION') {
-                    return <Space>
-                            <CustomButton
-                                text="View"
-                                style={{fontWeight: "bold"}}
-                                onClick={() => onClickOpenViewAttractionBookingModal(record.booking_id)}
-                            />
-                        </Space>
-                } else if (text === 'TELECOM') {
-                    return <Space>
-                            <CustomButton
-                                text="View"
-                                style={{fontWeight: "bold"}}
-                                onClick={() => onClickOpenViewTelecomBookingModal(record.booking_id)}
-                            />
-                        </Space>
-                } else if (text === 'ACCOMMODATION') {
-                    return <Space>
-                            <CustomButton
-                                text="View"
-                                style={{fontWeight: "bold"}}
-                                onClick={() => onClickOpenViewRoomBookingModal(record.booking_id)}
-                            />
-                        </Space>
-                } else if (text === 'ITEM') {
+                if (text === 'ITEM') {
                     return <Space>
                         <CustomButton
                             text="View"
                             style={{fontWeight: "bold"}}
                             onClick={() => onClickOpenViewItemBookingModal(record.booking_id)}
+                        />
+                        <CustomButton
+                            text="Edit Delivery Status"
+                            style={{fontWeight: "bold"}}
+                            onClick={() => onClickOpenEditItemBookingModal(record.booking_id)}
                         />
                     </Space>
                 }  else {
@@ -430,28 +320,28 @@ export default function BookingManagement() {
     ];
 
 
-    // async function onItemStatusSubmit(telecom) {
-    //     let obj = {
-    //         ...telecom,
-    //         telecom_id: editTelecomId,
-    //     }
-    //
-    //     const response = await updateTelecom(obj);
-    //     if (response.status) {
-    //         setFetchTelecomList(true); // update list
-    //         setEditTelecomId(undefined);
-    //         setEditTelecomModal(false);
-    //         toast.success('Telecom successfully updated!', {
-    //             position: toast.POSITION.TOP_RIGHT,
-    //             autoClose: 1500
-    //         });
-    //     } else {
-    //         toast.error(response.data.errorMessage, {
-    //             position: toast.POSITION.TOP_RIGHT,
-    //             autoClose: 1500
-    //         });
-    //     }
-    // }
+    async function onItemStatusSubmit(item) {
+        console.log(item)
+        console.log(selectedBookingId)
+
+        const response = await updateBookingItemStatus(selectedBookingId, item.status);
+        if (response.status) {
+            setGetBookingsData(true);
+            setIsEditItemBookingModalOpen(false)
+
+            toast.success('Booking Item Status updated successfully!', {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        } else {
+            setIsEditItemBookingModalOpen(false)
+            toast.error(response.data.errorMessage, {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 1500
+            });
+        }
+
+    }
 
     function formatDate(dateTime) {
         if (!dateTime) return '';
@@ -464,7 +354,7 @@ export default function BookingManagement() {
     useEffect(() => {
         if (getBookingsData) {
             const fetchData = async () => {
-                const response = await getBookingListByVendor(vendor.user_id);
+                const response = await getAllItemBookingsByVendor(vendor.user_id);
                 if (response.status) {
                     console.log(response.data);
                     var tempData = response.data.map((val) => ({
@@ -488,57 +378,38 @@ export default function BookingManagement() {
         }
     }, [getBookingsData]);
 
-    // view booking modal
-    const [isViewAttractionBookingModalOpen, setIsViewAttractionBookingModalOpen] = useState(false);
-    const [isViewTelecomBookingModalOpen, setIsViewTelecomBookingModalOpen] = useState(false);
-    const [isViewRoomBookingModalOpen, setIsViewRoomBookingModalOpen] = useState(false);
+
     const [isViewItemBookingModalOpen, setIsViewItemBookingModalOpen] = useState(false);
+    const [isEditItemBookingModalOpen, setIsEditItemBookingModalOpen] = useState(false);
 
-
+    const statusDisplayNames = {
+        PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
+        PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
+        SHIPPED_OUT: 'Shipped Out',
+        DELIVERED: 'Delivered',
+        PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
+        PREPARE_FOR_PICKUP: 'Prepare for Pickup',
+        READY_FOR_PICKUP: 'Ready for Pickup',
+        PICKED_UP: 'Picked Up',
+    };
     //view item booking modal open button
     function onClickOpenViewItemBookingModal(bookingId) {
         setSelectedBookingId(bookingId);
         setIsViewItemBookingModalOpen(true);
     }
 
-    // view attraction booking modal cancel button
+    function onClickOpenEditItemBookingModal(bookingId) {
+        setSelectedBookingId(bookingId);
+        setIsEditItemBookingModalOpen(true);
+    }
+
     function onClickCancelViewItemBookingModal() {
         setIsViewItemBookingModalOpen(false);
         setSelectedBookingId(null);
     }
 
-    //view attraction booking modal open button
-    function onClickOpenViewAttractionBookingModal(bookingId) {
-        setSelectedBookingId(bookingId);
-        setIsViewAttractionBookingModalOpen(true);
-    }
-
-    // view attraction booking modal cancel button
-    function onClickCancelViewAttractionBookingModal() {
-        setIsViewAttractionBookingModalOpen(false);
-        setSelectedBookingId(null);
-    }
-
-    //view telecom booking modal open button
-    function onClickOpenViewTelecomBookingModal(bookingId) {
-        setSelectedBookingId(bookingId);
-        setIsViewTelecomBookingModalOpen(true);
-    }
-
-    // view telecom booking modal cancel button
-    function onClickCancelViewTelecomBookingModal() {
-        setIsViewTelecomBookingModalOpen(false);
-        setSelectedBookingId(null);
-    }
-
-    function onClickOpenViewRoomBookingModal(bookingId) {
-        setSelectedBookingId(bookingId);
-        setIsViewRoomBookingModalOpen(true);
-    }
-
-    // view telecom booking modal cancel button
-    function onClickCancelViewRoomBookingModal() {
-        setIsViewRoomBookingModalOpen(false);
+    function onClickCancelEditItemBookingModal() {
+        setIsEditItemBookingModalOpen(false);
         setSelectedBookingId(null);
     }
 
@@ -557,28 +428,18 @@ export default function BookingManagement() {
                             tableLayout="fixed"
                         />
 
-                        <ViewAttractionBookingModal
-                            openViewModal={isViewAttractionBookingModalOpen}
-                            onClickCancelViewAttractionBookingModal={onClickCancelViewAttractionBookingModal}
-                            id={selectedBookingId}
-                        />
-
-                        <ViewTelecomBookingModal
-                            openViewModal={isViewTelecomBookingModalOpen}
-                            onClickCancelViewTelecomBookingModal={onClickCancelViewTelecomBookingModal}
-                            id={selectedBookingId}
-                        />
-
-                        <ViewRoomBookingModal
-                            openViewModal={isViewRoomBookingModalOpen}
-                            onClickCancelViewRoomBookingModal={onClickCancelViewRoomBookingModal}
-                            id={selectedBookingId}
-                        />
-
                         <ViewItemBookingModal
                             openViewModal={isViewItemBookingModalOpen}
                             onClickCancelViewItemBookingModal={onClickCancelViewItemBookingModal}
                             id={selectedBookingId}
+                        />
+
+                        <EditItemModal
+                            form={editForm}
+                            id={selectedBookingId}
+                            openViewModal={isEditItemBookingModalOpen}
+                            onEditSubmit={onItemStatusSubmit}
+                            onClickCancelEditItemBookingModal={onClickCancelEditItemBookingModal}
                         />
                     </Content>
                 </Layout>
