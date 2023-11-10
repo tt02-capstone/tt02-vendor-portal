@@ -11,6 +11,16 @@ export async function getBookingListByVendor(vendorStaffId) {
   }
 }
 
+export async function getAllItemBookingsByVendor(vendorStaffId) {
+  try {
+    const response = await bookingApi.get(`/getAllItemBookingsByVendor/${vendorStaffId}`);
+    return handleApiErrors(response);
+  } catch (error) {
+    console.error("bookingRedux getBookingListByVendor Error : ", error);
+    return {status: false, data: error.message};
+  }
+}
+
 export async function updateBookingItemStatus(bookingId, bookingStatus) {
   try {
     const response = await bookingApi.put(`/updateBookingItemStatus/${bookingId}?status=${bookingStatus}`);

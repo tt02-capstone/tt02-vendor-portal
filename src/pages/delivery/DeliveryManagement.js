@@ -4,7 +4,10 @@ import { Content } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import {getBookingListByVendor, getBookingByVendor, updateBookingItemStatus} from "../../redux/bookingRedux";
+import {
+    updateBookingItemStatus,
+    getAllItemBookingsByVendor
+} from "../../redux/bookingRedux";
 import CustomHeader from "../../components/CustomHeader";
 import CustomButton from "../../components/CustomButton";
 import CustomTablePagination from "../../components/CustomTablePagination";
@@ -351,7 +354,7 @@ export default function DeliveryManagement() {
     useEffect(() => {
         if (getBookingsData) {
             const fetchData = async () => {
-                const response = await getBookingListByVendor(vendor.user_id);
+                const response = await getAllItemBookingsByVendor(vendor.user_id);
                 if (response.status) {
                     console.log(response.data);
                     var tempData = response.data.map((val) => ({

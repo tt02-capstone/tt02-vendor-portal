@@ -112,6 +112,18 @@ export default function ViewItemBookingModal(props) {
         );
       }
 
+
+    const statusDisplayNames = {
+        PENDING_VENDOR_DELIVERY: 'Pending Vendor Delivery',
+        PREPARE_FOR_SHIPMENT: 'Prepare for Shipment',
+        SHIPPED_OUT: 'Shipped Out',
+        DELIVERED: 'Delivered',
+        PENDING_VENDOR_PICKUP: 'Pending Vendor Pickup',
+        PREPARE_FOR_PICKUP: 'Prepare for Pickup',
+        READY_FOR_PICKUP: 'Ready for Pickup',
+        PICKED_UP: 'Picked Up',
+    };
+
     return (
         <div>
             {selectedBooking && <Modal
@@ -126,7 +138,7 @@ export default function ViewItemBookingModal(props) {
                     {renderProperty('Customer Email', selectedBooking.email)}
                     {renderProperty('Customer Type', selectedBooking.booked_user === 'LOCAL' ? 'Local' : 'Tourist', getCustomerType(selectedBooking.booked_user))}
                     {renderProperty('Customer Contact', selectedBooking.contact)}
-                    {renderProperty('Booking Status', selectedBooking.status, getBookingStatusColor(selectedBooking.status))}
+                    {renderProperty('Booking Status', statusDisplayNames[selectedBooking.status], getBookingStatusColor(selectedBooking.status))}
                     {renderProperty('Last Updated', selectedBooking.last_update)}
                     {renderProperty('Start Date', selectedBooking.start_datetime)}
                     {renderProperty('End Date', selectedBooking.end_datetime)}
