@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
-import {Modal, Form, Input, Switch, Button, Select, InputNumber, Timeline} from "antd";
+import React, {useState, useEffect} from "react";
+import {Modal, Form, Input, Switch, Button, Select, InputNumber, Timeline, Typography, Alert, Space} from "antd";
 import {getBookingById} from "../../redux/bookingRedux";
 import {MehOutlined, SmileOutlined} from "@ant-design/icons";
 
+const {Title} = Typography;
+
 export default function EditItemModal(props) {
 
-    const { TextArea } = Input;
-    const { Option } = Select;
+    const {TextArea} = Input;
+    const {Option} = Select;
 
     const [selectedBooking, setSelectedBooking] = useState();
     const [deliveryStatus, setDeliveryStatus] = useState('PENDING_VENDOR_DELIVERY');
@@ -53,16 +55,16 @@ export default function EditItemModal(props) {
     const checkColour = (curr, rest) => {
         if (rest < curr) {
             return 'green'
-        } else if (curr === 3 ) {
-            return  'green'
-        } else if (curr === rest ) {
-            return  'blue'
+        } else if (curr === 3) {
+            return 'green'
+        } else if (curr === rest) {
+            return 'blue'
         } else {
             return 'gray'
         }
     }
     const timelineItems = () => {
-        const itemPoints = deliveryStatusOrder.includes(deliveryStatus)? deliveryStatusOrder: pickupStatusOrder
+        const itemPoints = deliveryStatusOrder.includes(deliveryStatus) ? deliveryStatusOrder : pickupStatusOrder
         const currIndex = itemPoints.indexOf(deliveryStatus)
         const list = [
             {
@@ -79,7 +81,7 @@ export default function EditItemModal(props) {
             },
             {
                 color: checkColour(currIndex, 3),
-                dot: currIndex === 3 ? <SmileOutlined /> : <MehOutlined />,
+                dot: currIndex === 3 ? <SmileOutlined/> : <MehOutlined/>,
                 children: statusDisplayNames[itemPoints[3]],
             },
         ];
@@ -92,7 +94,7 @@ export default function EditItemModal(props) {
                 centered
                 open={props.openViewModal}
                 onCancel={props.onClickCancelEditItemBookingModal}
-                style={{minWidth: 650}}
+                style={{minWidth: 650, justifyContent: 'center', alignItems: 'center' }}
                 footer={[]}
             >
                 <Timeline
@@ -100,48 +102,59 @@ export default function EditItemModal(props) {
                     mode={"alternate"}
                     items={timelineItems()}
                 />
-                <Form
-                    name="editForm"
-                    form={props.form}
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
-                    required={true}
-                    requiredMark={true}
-                    onFinish={props.onEditSubmit}
-                >
-                    <Form.Item
-                        label="Delivery Status"
-                        labelAlign="left"
-                        name="status"
-                        rules={[{ required: true, message: 'Please select the Delivery status!' }]}
+                {selectedBooking && (selectedBooking.status === 'DELIVERED' || selectedBooking.status === 'PICKED_UP') ?
+                    (  <Space direction="vertical" style={{ width: '100%' }}>
+                        <Alert
+                            message= {`Final Status:  ${statusDisplayNames[selectedBooking.status]}`}
+                            description= {`The Item was successfully ${statusDisplayNames[selectedBooking.status]} !`}
+                            type="success"
+                            showIcon
+                        />
+                    </Space>
+                    )
+                    :
+                    (<Form
+                        name="editForm"
+                        form={props.form}
+                        labelCol={{span: 8}}
+                        wrapperCol={{span: 16}}
+                        style={{maxWidth: 600}}
+                        required={true}
+                        requiredMark={true}
+                        onFinish={props.onEditSubmit}
                     >
-                        <Select placeholder="Delivered">
-                            {deliveryStatusOrder.includes(deliveryStatus) ? (
-                                <>
-                                    <Option value="PENDING_VENDOR_DELIVERY">Pending Vendor Delivery</Option>
-                                    <Option value="PREPARE_FOR_SHIPMENT">Prepare for Shipment</Option>
-                                    <Option value="SHIPPED_OUT">Shipped Out</Option>
-                                    <Option value="DELIVERED">Delivered</Option>
-                                </>
-                            ) : (
-                                <>
-                                    <Option value="PENDING_VENDOR_PICKUP">Pending Vendor Pickup</Option>
-                                    <Option value="PREPARE_FOR_PICKUP">Prepare for Pickup</Option>
-                                    <Option value="READY_FOR_PICKUP">Ready for Pickup</Option>
-                                    <Option value="PICKED_UP">Picked Up</Option>
-                                </>
-                            )}
-                        </Select>
-                    </Form.Item>
+                        <Form.Item
+                            label="Delivery Status"
+                            labelAlign="left"
+                            name="status"
+                            rules={[{required: true, message: 'Please select the Delivery status!'}]}
+                        >
+                            <Select placeholder="Delivered">
+                                {deliveryStatusOrder.includes(deliveryStatus) ? (
+                                    <>
+                                        <Option value="PENDING_VENDOR_DELIVERY">Pending Vendor Delivery</Option>
+                                        <Option value="PREPARE_FOR_SHIPMENT">Prepare for Shipment</Option>
+                                        <Option value="SHIPPED_OUT">Shipped Out</Option>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Option value="PENDING_VENDOR_PICKUP">Pending Vendor Pickup</Option>
+                                        <Option value="PREPARE_FOR_PICKUP">Prepare for Pickup</Option>
+                                        <Option value="READY_FOR_PICKUP">Ready for Pickup</Option>
+                                    </>
+                                )}
+                            </Select>
+                        </Form.Item>
 
 
-                    <Form.Item wrapperCol={{ offset: 11, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Update Delivery Status
-                        </Button>
-                    </Form.Item>
-                </Form>
+                        <Form.Item wrapperCol={{offset: 11, span: 16}}>
+                            <Button type="primary" htmlType="submit">
+                                Update Delivery Status
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                    )}
+
             </Modal>
         </div>
     )
