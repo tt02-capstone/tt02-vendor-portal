@@ -34,6 +34,7 @@ import {BookingBreakdown} from "./BookingBreakdown";
 import {TotalRevenueTimeSeries} from "./TotalRevenueTimeSeries";
 import moment from "moment";
 import {RevenueBreakdown} from "./RevenueBreakdown";
+import { CustomerRetention } from './CustomerRetention.js';
 
 const { RangePicker } = DatePicker;
 
@@ -329,6 +330,8 @@ const DataDashboard = () => {
             return <BookingBreakdown data={data[0][0]} />
         } else if (selectedDataUseCase === REVENUE_BREAKDOWN) {
             return <RevenueBreakdown data={data[0][0]} />
+        } else if (selectedDataUseCase === CUSTOMER_RETENTION) {
+            return <CustomerRetention chartRef={chartRef} data={data}/>
         }
 
     }
