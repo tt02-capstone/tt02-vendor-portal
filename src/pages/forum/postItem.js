@@ -330,32 +330,32 @@ export default function PostItems() {
         }  
 
         return (
-            <Comment>
+            <Comment style={{marginLeft: 1}}>
                 <Comment.Avatar src={commenter.profile_pic} />
                 <Comment.Content>
                     <Link onClick={() => viewProfile(commenter.user_id)}>
-                        <Comment.Author as="a">{commenter.name}</Comment.Author>
+                        <Comment.Author as="a" style={{fontSize:18}}>{commenter.name}</Comment.Author>
                     </Link>
-                    <Comment.Metadata>
+                    <Comment.Metadata style={{fontSize:18}}>
                         <div> {moment(comment.publish_time).format('L LT')}</div>
                         { comment.is_published && commenter.user_id !== user.user_id && commenter.user_type !== "INTERNAL_STAFF" && (   // user can report any comment except for theirs + admin 
                             <>
                             <Comment.Action
                                 onClick={() => { setSelectedReportComment(comment); setReportCommentModal(true) }}
-                                style={{ color:'#096dd9', marginLeft:4, fontWeight:'bold'}}>
+                                style={{ color:'#096dd9', marginLeft:5, fontWeight:'bold'}}>
                                 Report
                             </Comment.Action>
                             </>
                         )} 
                     </Comment.Metadata>
-                    <Comment.Text>
+                    <Comment.Text style={{fontSize:18 , }}>
                         {comment.content}
                     </Comment.Text>
                     <Comment.Actions>
                         <div style={{display:'flex'}}>
                         
                         { comment.is_published && ( // cnnt reply to a reported comment 
-                            <Comment.Action
+                            <Comment.Action style={{ color:'#096dd9', fontWeight:'bold'}}
                                 onClick={() => { setHideReply(!hideReply); setHideEdit(true);}}>
                                 Reply
                             </Comment.Action>
@@ -363,11 +363,11 @@ export default function PostItems() {
 
                         { commenter.user_id === user.user_id && comment.is_published && (  // only the user that commented can edit / delete if reported this wont appear
                             <>
-                            <Comment.Action
+                            <Comment.Action style={{ color:'#096dd9', fontWeight:'bold'}}
                                 onClick={() => { setHideEdit(!hideEdit); setHideReply(true);}}>
                                 Edit
                             </Comment.Action>
-                            <Comment.Action
+                            <Comment.Action style={{ color:'#096dd9', fontWeight:'bold'}}
                                 onClick={() => { remove_comment(comment.comment_id);}}>
                                 Delete
                             </Comment.Action>
@@ -392,7 +392,7 @@ export default function PostItems() {
                             </>
                         )}
 
-                        <div style={{marginLeft:2, color:'#096dd9', fontWeight:'bold'}}> {comment.child_comment_list.length} Replies </div>
+                        <div style={{marginLeft:2, color:'grey', fontWeight:'bold'}}> {comment.child_comment_list.length} Replies </div>
 
                         </div>
 
@@ -725,7 +725,7 @@ export default function PostItems() {
                         marginLeft: '-5px',
                         marginRight: '50px',
                         fontSize: 20,
-                        height: '26%'
+                        height: '30%'
                     }}
                     bordered={false}
                 >
@@ -734,18 +734,18 @@ export default function PostItems() {
                             avatar={<Avatar size="large" src={`${post.postUser.profile_pic ? post.postUser.profile_pic : 'http://tt02.s3-ap-southeast-1.amazonaws.com/user/default_profile.jpg'}`} />}
                             title={
                                 <div>
-                                     <Link style={{color:'black'}} onClick={() => viewProfile(post.postUser.user_id)}>
+                                     <Link style={{color:'black', fontSize:18}} onClick={() => viewProfile(post.postUser.user_id)}>
                                         {post.postUser.name}
                                         {postBadge && (
                                             <Tag color='green' style={{marginLeft:10, height:23, fontWeight:"bold", marginBottom:5, marginTop:2}}>{postBadge.badge_type}</Tag>
                                         )}
                                     </Link>                                
-                                    <div style={{ fontSize: '14px', color: '#666' }}>Posted on: {moment(post.publish_time).format('L')} {moment(post.publish_time).format('LT')}</div>
+                                    <div style={{ fontSize: '16px', color: '#666' }}>Posted on: {moment(post.publish_time).format('L')} {moment(post.publish_time).format('LT')}</div>
 
                                 </div>
                             }
                             description={
-                                <div style={{ fontSize: '16px', color: '#666', marginTop:'15px' }}>
+                                <div style={{ fontSize: '20px', color: '#666', marginTop:'15px' }}>
                                     {post.content}
                                 </div>
                             }
@@ -824,7 +824,7 @@ export default function PostItems() {
 
                         {post && comments &&
                             comments.map((comment) => 
-                            <div style={{ marginBottom: -20 }}>
+                            <div style={{ marginBottom: -20}}>
                                 <Comment.Group>
                                     <DataComment data={comment} />
                                 </Comment.Group>
