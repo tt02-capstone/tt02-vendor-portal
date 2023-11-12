@@ -39,7 +39,6 @@ const TOTAL_REVENUE_TOURIST = "Total Revenue from  Tourist";
 const TOTAL_REVENUE_BY_COUNTRY = "Total Revenue from  Country";
 
 
-
 export const TotalRevenueTimeSeries = (props) => {
     const chartRef = props.chartRef;
     const data = props.data
@@ -85,7 +84,7 @@ export const TotalRevenueTimeSeries = (props) => {
     ];
 
     const getRandomColor = (index) => {
-        
+
         const colors = [
             'rgba(255, 99, 132, 1)',
             'rgba(54, 162, 235, 1)',
@@ -106,48 +105,48 @@ export const TotalRevenueTimeSeries = (props) => {
         console.log(index)
         const randomIndex = Math.floor(Math.random() * colors.length);
         return colors[index];
-      };
+    };
 
 
-      const aggregateDatafromDropdown = (data) => {
+    const aggregateDatafromDropdown = (data) => {
         const aggregatedData = new Map(); // Use a Map to store aggregated data by date
-      
+
         // Loop through the data and aggregate by date
         data.forEach((item) => {
-          const [date, country, revenue] = item; // ["2023-05-17", "CountryName"]
-          let xAxisKey;
-          if (selectedXAxis === MONTHLY) {
-              xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
-          } else if (selectedXAxis === YEARLY) {
-              xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
-          } else if (selectedXAxis === WEEKLY) {
-              const currdate = moment(date)
-              xAxisKey= currdate.clone().startOf('week').format('YYYY-MM-DD').toString()
-              // console.log(xAxisKey)
-          }
+            const [date, country, revenue] = item; // ["2023-05-17", "CountryName"]
+            let xAxisKey;
+            if (selectedXAxis === MONTHLY) {
+                xAxisKey = date.substr(0, 7); // Extract yyyy-MM part of the date
+            } else if (selectedXAxis === YEARLY) {
+                xAxisKey = date.substr(0, 4); // Extract yyyy part of the date
+            } else if (selectedXAxis === WEEKLY) {
+                const currdate = moment(date)
+                xAxisKey = currdate.clone().startOf('week').format('YYYY-MM-DD').toString()
+                // console.log(xAxisKey)
+            }
 
-          if (!aggregatedData.has(xAxisKey)) {
-            // Initialize data for the date
-            aggregatedData.set(xAxisKey, { Date: xAxisKey, Revenue: 0, Count: 0, Countries: {} });
-          }
-      
-          // Increment the count for the date
-          aggregatedData.get(xAxisKey).Revenue += parseFloat(revenue);
-          aggregatedData.get(xAxisKey).Count++;
-      
-          // Increment the count for the country within the date
-          if (!aggregatedData.get(xAxisKey).Countries[country]) {
-            aggregatedData.get(xAxisKey).Countries[country] = { Count: 1, Revenue: parseFloat(revenue) };
-        } else {
-            aggregatedData.get(xAxisKey).Countries[country].Count++;
-            aggregatedData.get(xAxisKey).Countries[country].Revenue += parseFloat(revenue);
-        }
+            if (!aggregatedData.has(xAxisKey)) {
+                // Initialize data for the date
+                aggregatedData.set(xAxisKey, {Date: xAxisKey, Revenue: 0, Count: 0, Countries: {}});
+            }
+
+            // Increment the count for the date
+            aggregatedData.get(xAxisKey).Revenue += parseFloat(revenue);
+            aggregatedData.get(xAxisKey).Count++;
+
+            // Increment the count for the country within the date
+            if (!aggregatedData.get(xAxisKey).Countries[country]) {
+                aggregatedData.get(xAxisKey).Countries[country] = {Count: 1, Revenue: parseFloat(revenue)};
+            } else {
+                aggregatedData.get(xAxisKey).Countries[country].Count++;
+                aggregatedData.get(xAxisKey).Countries[country].Revenue += parseFloat(revenue);
+            }
         });
 
         console.log(Array.from(aggregatedData.values()))
 
         //console.log(Array.from(aggregatedData.values()).map((value) => []))
-      
+
         // Convert the aggregated Map back to an array of lists
         // const aggregatedArray = Array.from(aggregatedData.values()).map((value) => [
         //   value.Date,
@@ -155,16 +154,13 @@ export const TotalRevenueTimeSeries = (props) => {
         //   value.Revenue,
         //   Object.entries(value.Countries).map(([country, count]) => [country, count]),
         // ]);
-      
-        //console.log(aggregatedArray);
-      
-        return Array.from(aggregatedData.values());
-      };
 
-      
-      
-      
-      
+        //console.log(aggregatedArray);
+
+        return Array.from(aggregatedData.values());
+    };
+
+
     // Usage:
     console.log(data)
     const aggregatedData = aggregateDatafromDropdown(data);
@@ -184,62 +180,60 @@ export const TotalRevenueTimeSeries = (props) => {
                 borderWidth: 1,
                 fill: false,
             },
-        ]; 
-      } else if (selectedYAxis === TOTAL_REVENUE_LOCAL) {
+        ];
+    } else if (selectedYAxis === TOTAL_REVENUE_LOCAL) {
         dataset = [
             {
-              label: `Total Revenue from Local`,
-              data: aggregatedData.map((item) => {
-                if (item.Countries && item.Countries.Singapore) {
-                  return item.Countries.Singapore.Revenue || 0; // Use 0 if Revenue is null or undefined
-                } else {
-                  return 0; // Handle the case where item.Countries.Singapore is null or undefined
-                }
-              }),
-              borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
-              borderWidth: 1,
-              fill: false,
+                label: `Total Revenue from Local`,
+                data: aggregatedData.map((item) => {
+                    if (item.Countries && item.Countries.Singapore) {
+                        return item.Countries.Singapore.Revenue || 0; // Use 0 if Revenue is null or undefined
+                    } else {
+                        return 0; // Handle the case where item.Countries.Singapore is null or undefined
+                    }
+                }),
+                borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
+                borderWidth: 1,
+                fill: false,
             },
-          ];
-      } else if (selectedYAxis === TOTAL_REVENUE_TOURIST) {
+        ];
+    } else if (selectedYAxis === TOTAL_REVENUE_TOURIST) {
         dataset = [
             {
-              label: `Total Revenue from Tourist`,
-              data: aggregatedData.map((item) => {
-                if (item.Countries && item.Countries.Singapore) {
-                    const touristRevenue = item.Revenue - (item.Countries.Singapore.Revenue || 0);
-                  return touristRevenue; // Use 0 if Revenue is null or undefined
-                } else {
-                  return item.Revenue; // Handle the case where item.Countries.Singapore is null or undefined
-                }
-              }),
-              borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
-              borderWidth: 1,
-              fill: false,
+                label: `Total Revenue from Tourist`,
+                data: aggregatedData.map((item) => {
+                    if (item.Countries && item.Countries.Singapore) {
+                        const touristRevenue = item.Revenue - (item.Countries.Singapore.Revenue || 0);
+                        return touristRevenue; // Use 0 if Revenue is null or undefined
+                    } else {
+                        return item.Revenue; // Handle the case where item.Countries.Singapore is null or undefined
+                    }
+                }),
+                borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
+                borderWidth: 1,
+                fill: false,
             },
-          ];
-      } else if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
+        ];
+    } else if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
         dataset = uniqueCountries.map((country) => {
             return {
-              label: `Total Revenue in ${country}`,
-              data: aggregatedData.map((item) => {
-                const countryData = item.Countries[country];
-                return countryData ? countryData.Revenue : 0;
-              }),
-              borderColor: getRandomColor(uniqueCountries.indexOf(country)),
-              borderWidth: 1,
-              fill: false,
+                label: `Total Revenue in ${country}`,
+                data: aggregatedData.map((item) => {
+                    const countryData = item.Countries[country];
+                    return countryData ? countryData.Revenue : 0;
+                }),
+                borderColor: getRandomColor(uniqueCountries.indexOf(country)),
+                borderWidth: 1,
+                fill: false,
             };
-          });
-      }
-    
+        });
+    }
 
-    
 
     const lineData = {
         labels: aggregatedData.map((item) => item.Date), // Convert dates to strings
         datasets: dataset,
-        };
+    };
 
     console.log(data)
 
@@ -297,8 +291,8 @@ export const TotalRevenueTimeSeries = (props) => {
         const chart = chartRef.current;
 
         console.log(chart)
-    
-      }, []);
+
+    }, []);
 
 
     const expandedRowRender = (record) => {
@@ -355,7 +349,7 @@ export const TotalRevenueTimeSeries = (props) => {
         },
     ];
 
-    const tableData = aggregatedData.map(({ Date, Revenue, Count, Countries }, index) => ({
+    const tableData = aggregatedData.map(({Date, Revenue, Count, Countries}, index) => ({
         key: index,
         Date,
         Revenue,
@@ -367,8 +361,8 @@ export const TotalRevenueTimeSeries = (props) => {
     return (
         <>
 
-            <Row style={{ marginRight: 50 }}>
-                <Col style={{ marginLeft: 'auto', marginRight: 16 }}>
+            <Row style={{marginRight: 50}}>
+                <Col style={{marginLeft: 'auto', marginRight: 16}}>
                     <div style={styles.container}>
                         <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
                         <Select
@@ -399,8 +393,7 @@ export const TotalRevenueTimeSeries = (props) => {
             <br></br>
 
 
-
-            <div ref={chartRef}  style={styles.line}>
+            <div ref={chartRef} style={styles.line}>
                 <Line
                     data={lineData}
                     options={getChartOptions()}
@@ -413,7 +406,7 @@ export const TotalRevenueTimeSeries = (props) => {
                        style={{
                            width: '90%',
                        }}
-                       expandable={{ expandedRowRender }}
+                       expandable={{expandedRowRender}}
                        className="ant-table ant-table-bordered ant-table-striped"
                 />
             </Row>

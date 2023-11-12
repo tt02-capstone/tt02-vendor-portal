@@ -375,7 +375,7 @@ export const TotalBookingsTimeSeries = (props) => {
                        style={{
                            width: '90%',
                        }}
-                       expandable={{ expandedRowRender }}
+                       expandable={{expandedRowRender}}
                        className="ant-table ant-table-bordered ant-table-striped"
                 />
             </Row>
