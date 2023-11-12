@@ -59,7 +59,7 @@ const CUSTOMER_RETENTION = "Customer Retention (Number of Repeat Bookings Over T
 
 const DataDashboard = () => {
 
-    const [isSubscribed, setIsSubscribed] = useState(true);
+    const [isSubscribed, setIsSubscribed] = useState(false);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [data, setData] = useState([]);
     const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME); //REVENUE_OVER_TIME
@@ -80,7 +80,8 @@ const DataDashboard = () => {
     const navigate = useNavigate();
 
     const onClickViewSubButton = () => {
-        navigate('/datadashboard/subscription'); 
+        setIsSubModalOpen(true);
+        setOperation("VIEW");
     };
 
     // Subscription
@@ -101,6 +102,11 @@ const DataDashboard = () => {
     function onClickManageSubButton() {
         setIsSubModalOpen(true);
     }
+
+    function onClickUnsub() {
+        setIsSubModalOpen(false);
+        setIsSubscribed(false);
+    }
     
   
   useEffect(() => {
@@ -108,13 +114,26 @@ const DataDashboard = () => {
     const fetchSubscriptionStatus = async () => {
       try {
         // Replace this with your API call to fetch user subscription status
-        const response = await getSubscriptionStatus(user.vendor.vendor_id, "VENDOR");
+        let user_id;
 
+        let user_type;
+
+        if (user.user_type == "VENDOR_STAFF") {
+            user_type = "VENDOR"
+            user_id = user.vendor.vendor_id;
+        } else if (user.user_type == "LOCAL") {
+            user_type = "LOCAL"
+            user_id = user.user_id;
+        }
+
+        const response = await getSubscriptionStatus(user_id, user_type);
         if (response.status) {
-          const subscribed = response.data;
+          const status = response.data;
+          console.log(status);
           
-          if (subscribed) {
+          if (status == "active") {
             setIsSubscribed(true);
+            // Save to local user?
           }
           
         } else {
@@ -138,10 +157,26 @@ const DataDashboard = () => {
     async function onClickSubmitSubscription(subscriptionDetails) {
         try {
 
-            const response = await subscribe(user.vendor.vendor_id, "VENDOR", subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
+            let user_id;
+
+        let user_type;
+
+        if (user.user_type == "VENDOR_STAFF") {
+            user_type = "VENDOR"
+            user_id = user.vendor.vendor_id;
+        } else if (user.user_type == "LOCAL") {
+            user_type = "LOCAL"
+            user_id = user.user_id;
+        }
+
+            const response = await subscribe(user_id, user_type, subscriptionDetails.subscriptionType, subscriptionDetails.autoRenew);
             if (response.status) {
                 setIsSubscribed(true);
                 setIsSubModalOpen(false);
+                toast.success("Subscribed successfully", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 1500
+                });
             } else {
                 toast.error(response.data.errorMessage, {
                     position: toast.POSITION.TOP_RIGHT,
@@ -235,30 +270,33 @@ const DataDashboard = () => {
     useEffect(() => {
         // Fetch user subscription status here
         const callGetData = async () => {
-            try {
+            if (isSubscribed) {
+                try {
 
-                let dataUseCase = selectedDataUseCase
-
-                if (!dataUseCase) {
-                  dataUseCase = TOTAL_BOOKINGS_OVER_TIME;
-                  setSelectedDataUseCase(TOTAL_BOOKINGS_OVER_TIME);
+                    let dataUseCase = selectedDataUseCase
+    
+                    if (!dataUseCase) {
+                      dataUseCase = TOTAL_BOOKINGS_OVER_TIME;
+                      setSelectedDataUseCase(TOTAL_BOOKINGS_OVER_TIME);
+                    }
+    
+                    // Replace this with your API call to fetch user subscription status
+                    const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, startDate, endDate);
+                    if (response.status) {
+                        console.log(response.data)
+                        setData(response.data)
+                        setLoading(false)
+    
+                    } else {
+                        console.log("Wat");
+                        setLoading(false)
+                    }
+    
+                } catch (error) {
+                    console.error("Error fetching data:", error);
                 }
-
-                // Replace this with your API call to fetch user subscription status
-                const response = await getData(dataUseCase, user.vendor.vendor_type ,user.vendor.vendor_id, startDate, endDate);
-                if (response.status) {
-                    console.log(response.data)
-                    setData(response.data)
-                    setLoading(false)
-
-                } else {
-                    console.log("Wat");
-                    setLoading(false)
-                }
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
             }
+            
         };
 
         callGetData();
@@ -387,6 +425,17 @@ const DataDashboard = () => {
                                 {loading? null: returnChart()}
                             {/*</div>*/}
 
+                            {isSubModalOpen &&
+                                <SubscriptionModal
+                                    operation={operation}
+                                    isSubModalOpen={isSubModalOpen}
+                                    onClickSubmitSubscription={onClickSubmitSubscription}
+                                    onClickCancelManageSubButton={onClickCancelManageSubButton}
+                                    onClickUnsub={onClickUnsub}
+                                />
+                            }
+
+
                             <ToastContainer />
 
                         </div>
@@ -408,6 +457,7 @@ const DataDashboard = () => {
                                     isSubModalOpen={isSubModalOpen}
                                     onClickSubmitSubscription={onClickSubmitSubscription}
                                     onClickCancelManageSubButton={onClickCancelManageSubButton}
+                                    
                                 />
                             }
 
