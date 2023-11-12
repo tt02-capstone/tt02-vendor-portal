@@ -30,9 +30,9 @@ ChartJS.register(
     Legend
 );
 
-const WEEKLY = 'weekly';
-const YEARLY = 'yearly';
-const MONTHLY = 'monthly';
+const WEEKLY = 'Week';
+const YEARLY = 'Year';
+const MONTHLY = 'Month';
 const NUMBER_OF_BOOKINGS = "Number of Bookings";
 const NUMBER_OF_BOOKINGS_LOCAL = "Number of Bookings by Local";
 const NUMBER_OF_BOOKINGS_TOURIST = "Number of Bookings by Tourist";
@@ -244,7 +244,7 @@ export const TotalBookingsTimeSeries = (props) => {
 
     const columns = [
         {
-            title: 'Month',
+            title: selectedXAxis,
             dataIndex: 'month',
             key: 'month',
         },
@@ -253,45 +253,43 @@ export const TotalBookingsTimeSeries = (props) => {
             dataIndex: 'total',
             key: 'total',
         },
-        {
-            title: 'Bookings by Countries',
-            dataIndex: 'countries',
-            key: 'countries',
-            render: countries => <NestedTable countries={countries}/>,
-
-        },
     ];
 
-    const NestedTable = ({countries}) => {
-        const columns = [
+    const expandedRowRender = (record) => {
+        const nestedcolumns = [
             {
                 title: 'Country',
                 dataIndex: 'country',
                 key: 'country',
             },
             {
-                title: 'Number of Bookings',
+                title: 'Count',
                 dataIndex: 'count',
                 key: 'count',
             },
         ];
 
-        const data = countries.map(([country, count], index) => ({
+        const mappedNestedData = record.nestedData.map(([country, count], index) => ({
             key: index,
             country,
             count,
         }));
 
-        return <Table dataSource={data} columns={columns} pagination={false}
-                      size="small" // Set the size to 'small' to reduce cell padding
-                      style={{ margin: 0 }} // Set margin to 0 to eliminate any extra space
-        />;
+        return (
+            <Table
+                columns={nestedcolumns}
+                dataSource={mappedNestedData}
+                pagination={false}
+                size="small"
+            />
+        );
     };
+
     const tableData = aggregatedData.map(([month, total, countries], index) => ({
         key: index,
         month,
         total,
-        countries,
+        nestedData: countries,
     }));
 
     const getChartOptions = () => {
@@ -377,6 +375,7 @@ export const TotalBookingsTimeSeries = (props) => {
                        style={{
                            width: '90%',
                        }}
+                       expandable={{ expandedRowRender }}
                        className="ant-table ant-table-bordered ant-table-striped"
                 />
             </Row>
