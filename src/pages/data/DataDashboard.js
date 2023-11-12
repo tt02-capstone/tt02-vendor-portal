@@ -300,7 +300,7 @@ const DataDashboard = () => {
         };
 
         callGetData();
-    }, [selectedDataUseCase, startDate, endDate]);
+    }, [selectedDataUseCase, startDate, endDate, isSubscribed]);
 
 
     const items = [
@@ -346,10 +346,15 @@ const DataDashboard = () => {
 
     function onCalendarChange(dates) {
         console.log("onCalendarChange", dates);
+        if (dates === null) {
+            setStartDate(new Date(2023, 0, 1));
+            setEndDate(new Date(2023, 9, 31));
+            return
+        }
+
         if (dates[0] !== null) {
             const start_time = moment(dates[0].$d);
             setStartDate(new Date(start_time))
-
         }
 
         if (dates[1] !== null) {

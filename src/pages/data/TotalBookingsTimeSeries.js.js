@@ -30,9 +30,9 @@ ChartJS.register(
     Legend
 );
 
-const WEEKLY = 'weekly';
-const YEARLY = 'yearly';
-const MONTHLY = 'monthly';
+const WEEKLY = 'Week';
+const YEARLY = 'Year';
+const MONTHLY = 'Month';
 const NUMBER_OF_BOOKINGS = "Number of Bookings";
 const NUMBER_OF_BOOKINGS_LOCAL = "Number of Bookings by Local";
 const NUMBER_OF_BOOKINGS_TOURIST = "Number of Bookings by Tourist";
@@ -169,6 +169,8 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: 'rgba(75, 192, 192, 1)',
+
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
@@ -181,6 +183,7 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Local bookings
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
@@ -195,6 +198,7 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
@@ -206,6 +210,7 @@ export const TotalBookingsTimeSeries = (props) => {
             borderColor: getRandomColor(uniqueCountries.indexOf(country)),
             borderWidth: 1,
             fill: false,
+            backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
         }));
         console.log(dataset)
     }
@@ -241,18 +246,56 @@ export const TotalBookingsTimeSeries = (props) => {
         },
     };
 
+
     const columns = [
         {
-            title: 'Date',
-            dataIndex: 0,
-            key: 'date',
+            title: selectedXAxis,
+            dataIndex: 'month',
+            key: 'month',
         },
         {
-            title: 'Country',
-            dataIndex: 1,
-            key: 'country',
+            title: 'Total',
+            dataIndex: 'total',
+            key: 'total',
         },
     ];
+
+    const expandedRowRender = (record) => {
+        const nestedcolumns = [
+            {
+                title: 'Country',
+                dataIndex: 'country',
+                key: 'country',
+            },
+            {
+                title: 'Count',
+                dataIndex: 'count',
+                key: 'count',
+            },
+        ];
+
+        const mappedNestedData = record.nestedData.map(([country, count], index) => ({
+            key: index,
+            country,
+            count,
+        }));
+
+        return (
+            <Table
+                columns={nestedcolumns}
+                dataSource={mappedNestedData}
+                pagination={false}
+                size="small"
+            />
+        );
+    };
+
+    const tableData = aggregatedData.map(([month, total, countries], index) => ({
+        key: index,
+        month,
+        total,
+        nestedData: countries,
+    }));
 
     const getChartOptions = () => {
         const chartOptions = {
@@ -332,14 +375,14 @@ export const TotalBookingsTimeSeries = (props) => {
             </div>
 
             <br></br>
-            <Row style={{marginLeft: 30, marginTop: 20}}>
-                <Table
-                    dataSource={data.map((row, index) =>
-                        ({key: index, ...row})
-                    )}
-                    columns={columns}
-                    style={{ width: '90%' }} // Set the width to 100%
-                />;
+            <Row style={{marginLeft: 30, marginTop: 20, width: '100%'}}>
+                <Table dataSource={tableData} columns={columns} bordered
+                       style={{
+                           width: '90%',
+                       }}
+                       expandable={{expandedRowRender}}
+                       className="ant-table ant-table-bordered ant-table-striped"
+                />
             </Row>
         </>
     );

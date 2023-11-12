@@ -38,9 +38,9 @@ const WEEKLY = 'weekly';
 const YEARLY = 'yearly';
 const MONTHLY = 'monthly';
 const NUMBER_OF_REPEATED_BOOKINGS = "Number of Repeated Bookings";
-const NUMBER_OF_BOOKINGS_LOCAL = "Number of Bookings by Local";
-const NUMBER_OF_BOOKINGS_TOURIST = "Number of Bookings by Tourist";
-const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Bookings by Country";
+const NUMBER_OF_BOOKINGS_LOCAL = "Number of Repeated Bookings by Local";
+const NUMBER_OF_BOOKINGS_TOURIST = "Number of Repeated Bookings by Tourist";
+const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Repeated Bookings by Country";
 
 
 export const CustomerRetention = (props) => {
@@ -173,6 +173,7 @@ export const CustomerRetention = (props) => {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: 'rgba(75, 192, 192, 1)',
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
@@ -185,6 +186,7 @@ export const CustomerRetention = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Local bookings
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
@@ -199,6 +201,7 @@ export const CustomerRetention = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
@@ -210,6 +213,7 @@ export const CustomerRetention = (props) => {
             borderColor: getRandomColor(uniqueCountries.indexOf(country)),
             borderWidth: 1,
             fill: false,
+            backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
         }));
         console.log(dataset)
     }
