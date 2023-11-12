@@ -339,7 +339,6 @@ export const TotalRevenueTimeSeries = (props) => {
 
             <div ref={chartRef}  style={styles.line}>
                 <Line
-                    
                     data={lineData}
                     options={getChartOptions()}
                 />

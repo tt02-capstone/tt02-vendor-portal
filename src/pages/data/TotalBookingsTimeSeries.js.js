@@ -241,18 +241,58 @@ export const TotalBookingsTimeSeries = (props) => {
         },
     };
 
+
     const columns = [
         {
-            title: 'Date',
-            dataIndex: 0,
-            key: 'date',
+            title: 'Month',
+            dataIndex: 'month',
+            key: 'month',
         },
         {
-            title: 'Country',
-            dataIndex: 1,
-            key: 'country',
+            title: 'Total',
+            dataIndex: 'total',
+            key: 'total',
+        },
+        {
+            title: 'Bookings by Countries',
+            dataIndex: 'countries',
+            key: 'countries',
+            render: countries => <NestedTable countries={countries}/>,
+
         },
     ];
+
+    const NestedTable = ({countries}) => {
+        const columns = [
+            {
+                title: 'Country',
+                dataIndex: 'country',
+                key: 'country',
+            },
+            {
+                title: 'Number of Bookings',
+                dataIndex: 'count',
+                key: 'count',
+            },
+        ];
+
+        const data = countries.map(([country, count], index) => ({
+            key: index,
+            country,
+            count,
+        }));
+
+        return <Table dataSource={data} columns={columns} pagination={false}
+                      size="small" // Set the size to 'small' to reduce cell padding
+                      style={{ margin: 0 }} // Set margin to 0 to eliminate any extra space
+        />;
+    };
+    const tableData = aggregatedData.map(([month, total, countries], index) => ({
+        key: index,
+        month,
+        total,
+        countries,
+    }));
 
     const getChartOptions = () => {
         const chartOptions = {
@@ -332,14 +372,13 @@ export const TotalBookingsTimeSeries = (props) => {
             </div>
 
             <br></br>
-            <Row style={{marginLeft: 30, marginTop: 20}}>
-                <Table
-                    dataSource={data.map((row, index) =>
-                        ({key: index, ...row})
-                    )}
-                    columns={columns}
-                    style={{ width: '90%' }} // Set the width to 100%
-                />;
+            <Row style={{marginLeft: 30, marginTop: 20, width: '100%'}}>
+                <Table dataSource={tableData} columns={columns} bordered
+                       style={{
+                           width: '90%',
+                       }}
+                       className="ant-table ant-table-bordered ant-table-striped"
+                />
             </Row>
         </>
     );
