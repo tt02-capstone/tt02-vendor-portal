@@ -187,7 +187,7 @@ export default function SubscriptionManagement() {
                 }
                 </Descriptions.Item>
                 <Descriptions.Item label="Status">
-                <Badge status={subscriptionDetails.status === 'Active' ? 'success' : 'error'} text={subscriptionDetails.status} />
+                <Badge status={subscriptionDetails.status === 'active' ? 'success' : 'error'} text={subscriptionDetails.status} />
                 </Descriptions.Item>
             </Descriptions>
             <CustomButton text="Update Subscription" icon={<DashboardOutlined />} onClick={() => onClickManageSubButton("UPDATE")} />
