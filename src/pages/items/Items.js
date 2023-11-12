@@ -192,7 +192,7 @@ export default function Items() {
                 <div style={{ display: 'flex' }}>
                     <CustomButton
                         text="Add Item"
-                        style={{ marginLeft: '-5px', marginBottom: '10px' }}
+                        style={{ marginLeft: '-5px', marginBottom: '10px', marginTop:10 }}
                         icon={<PlusOutlined />}
                         onClick={() => handleCreate()}
                     />
@@ -207,18 +207,18 @@ export default function Items() {
 
                 <br /><br />
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', width: 1800 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', width: 1500 }}>
                     {items.map((item, index) => (
                         <Card
                             style={{
-                                width: 300,
-                                height: 450,
-                                marginLeft: '-5px',
+                                width: 400,
+                                height: 550,
+                                marginLeft: '15px',
                                 marginRight: '50px',
                                 marginBottom: '50px'
                             }}
                             cover={
-                                <img alt={item.name} src={item.image} style={{ width: 300, height: 300 }} />
+                                <img alt={item.name} src={item.image} style={{ width: 400, height: 400 }} />
                             }
                             bordered={false}
                             key={index}
