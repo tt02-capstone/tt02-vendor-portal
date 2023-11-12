@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Dropdown, Button, Menu, Layout, Select, Typography, Row, Col} from 'antd';
+import {Dropdown, Button, Menu, Layout, Select, Typography, Row, Col, Table} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
 import {
@@ -30,9 +30,9 @@ ChartJS.register(
     Legend
 );
 
-const WEEKLY = 'weekly';
-const YEARLY = 'yearly';
-const MONTHLY = 'monthly';
+const WEEKLY = 'Week';
+const YEARLY = 'Year';
+const MONTHLY = 'Month';
 const TOTAL_REVENUE = "Total Revenue";
 const TOTAL_REVENUE_LOCAL = "Total Revenue from Local";
 const TOTAL_REVENUE_TOURIST = "Total Revenue from  Tourist";
@@ -301,6 +301,69 @@ export const TotalRevenueTimeSeries = (props) => {
       }, []);
 
 
+    const expandedRowRender = (record) => {
+        const nestedColumns = [
+            {
+                title: 'Country',
+                dataIndex: 'country',
+                key: 'country',
+            },
+            {
+                title: 'Revenue',
+                dataIndex: 'revenue',
+                key: 'revenue',
+            },
+            {
+                title: 'Count',
+                dataIndex: 'count',
+                key: 'count',
+            },
+        ];
+
+        const mappedCountries = Object.entries(record.Countries).map(([country, data], index) => ({
+            key: index,
+            country,
+            count: data.Count,
+            revenue: data.Revenue,
+        }));
+
+        return (
+            <Table
+                columns={nestedColumns}
+                dataSource={mappedCountries}
+                pagination={false}
+                size="small"
+            />
+        );
+    };
+
+    const columns = [
+        {
+            title: selectedXAxis,
+            dataIndex: 'Date',
+            key: 'Date',
+        },
+        {
+            title: 'Revenue',
+            dataIndex: 'Revenue',
+            key: 'Revenue',
+        },
+        {
+            title: 'Count',
+            dataIndex: 'Count',
+            key: 'Count',
+        },
+    ];
+
+    const tableData = aggregatedData.map(({ Date, Revenue, Count, Countries }, index) => ({
+        key: index,
+        Date,
+        Revenue,
+        Count,
+        Countries,
+    }));
+
+
     return (
         <>
 
@@ -343,6 +406,17 @@ export const TotalRevenueTimeSeries = (props) => {
                     options={getChartOptions()}
                 />
             </div>
+
+            <br></br>
+            <Row style={{marginLeft: 30, marginTop: 20, width: '100%'}}>
+                <Table dataSource={tableData} columns={columns} bordered
+                       style={{
+                           width: '90%',
+                       }}
+                       expandable={{ expandedRowRender }}
+                       className="ant-table ant-table-bordered ant-table-striped"
+                />
+            </Row>
         </>
     );
 };
