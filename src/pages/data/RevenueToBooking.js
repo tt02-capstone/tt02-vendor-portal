@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Dropdown, Button, Menu, Layout, Select, Typography, Table, Row} from 'antd';
+import {Dropdown, Button, Menu, Layout, Select, Typography, Table, Row, Col} from 'antd';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
 import {
@@ -178,7 +178,8 @@ export const RevenueToBooking = (props) => {
                 data: aggregatedData.map(item => item.Revenue / item.Count),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
-                fill: true,
+                fill: false,
+                backgroundColor:'rgba(75, 192, 192, 1)',
             },
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_LOCAL) {
@@ -195,7 +196,8 @@ export const RevenueToBooking = (props) => {
                 }),
                 borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
                 borderWidth: 1,
-                fill: true,
+                fill: false,
+                backgroundColor: getRandomColor(0),
             },
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_TOURIST) {
@@ -214,7 +216,8 @@ export const RevenueToBooking = (props) => {
                 }),
                 borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
                 borderWidth: 1,
-                fill: true,
+                fill: false,
+                backgroundColor: getRandomColor(0),
             },
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
@@ -227,7 +230,8 @@ export const RevenueToBooking = (props) => {
                 }),
                 borderColor: getRandomColor(uniqueCountries.indexOf(country)),
                 borderWidth: 1,
-                fill: true,
+                fill: false,
+                backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
             };
         });
     }
@@ -364,30 +368,36 @@ export const RevenueToBooking = (props) => {
     return (
         <>
 
-            <div style={styles.container}>
-                <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
-                <Select
-                    labelInValue
-                    defaultValue={itemsXAxis[0]}
-                    style={{width: 120}}
-                    onChange={handleChangeXAxis}
-                    options={itemsXAxis}
-                />
+            <Row style={{marginRight: 50}}>
+                <Col style={{marginLeft: 'auto', marginRight: 16}}>
+                    <div style={styles.container}>
+                        <Typography.Title level={5} style={{marginRight: '10px'}}>X Axis: </Typography.Title>
+                        <Select
+                            labelInValue
+                            defaultValue={itemsXAxis[0]}
+                            style={{width: 120}}
+                            onChange={handleChangeXAxis}
+                            options={itemsXAxis}
+                        />
 
-            </div>
+                    </div>
+                </Col>
+                <Col>
+                    <div style={styles.container}>
+                        <Typography.Title level={5} style={{marginRight: '10px'}}>Y Axis: </Typography.Title>
+                        <Select
+                            labelInValue
+                            defaultValue={itemsYAxis[0]}
+                            style={{width: 300}}
+                            onChange={handleChangeYAxis}
+                            options={itemsYAxis}
+                        />
+                    </div>
+                </Col>
+
+            </Row>
+
             <br></br>
-
-            <div style={styles.container}>
-                <Typography.Title level={5} style={{marginRight: '10px'}}>Y Axis: </Typography.Title>
-                <Select
-                    labelInValue
-                    defaultValue={itemsYAxis[0]}
-                    style={{width: 400}}
-                    onChange={handleChangeYAxis}
-                    options={itemsYAxis}
-                />
-
-            </div>
 
 
             <div ref={chartRef} style={styles.line}>

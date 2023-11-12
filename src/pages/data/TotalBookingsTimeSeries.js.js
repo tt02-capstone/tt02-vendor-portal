@@ -169,6 +169,8 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: 'rgba(75, 192, 192, 1)',
+
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
@@ -181,6 +183,7 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Local bookings
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
@@ -195,6 +198,7 @@ export const TotalBookingsTimeSeries = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
@@ -206,6 +210,7 @@ export const TotalBookingsTimeSeries = (props) => {
             borderColor: getRandomColor(uniqueCountries.indexOf(country)),
             borderWidth: 1,
             fill: false,
+            backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
         }));
         console.log(dataset)
     }

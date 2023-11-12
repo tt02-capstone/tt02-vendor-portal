@@ -300,7 +300,7 @@ const DataDashboard = () => {
         };
 
         callGetData();
-    }, [selectedDataUseCase, startDate, endDate]);
+    }, [selectedDataUseCase, startDate, endDate, isSubscribed]);
 
 
     const items = [

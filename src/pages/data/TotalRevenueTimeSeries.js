@@ -179,6 +179,7 @@ export const TotalRevenueTimeSeries = (props) => {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: 'rgba(75, 192, 192, 1)',
             },
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_LOCAL) {
@@ -195,6 +196,8 @@ export const TotalRevenueTimeSeries = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Local bookings
+
             },
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_TOURIST) {
@@ -212,6 +215,8 @@ export const TotalRevenueTimeSeries = (props) => {
                 borderColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(0), // You can assign a specific color for Tourist bookings
+
             },
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
@@ -225,6 +230,8 @@ export const TotalRevenueTimeSeries = (props) => {
                 borderColor: getRandomColor(uniqueCountries.indexOf(country)),
                 borderWidth: 1,
                 fill: false,
+                backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
+
             };
         });
     }
