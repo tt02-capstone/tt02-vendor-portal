@@ -40,7 +40,7 @@ export default function ForumCategoryItems() {
              <CustomHeader items={forumBreadCrumb} />
              <Content style={styles.content}>
                 <div style={{ display: 'flex'}}>
-                    <div style={{ fontWeight: "bold", fontSize: 26}}> 
+                    <div style={{ fontWeight: "bold", fontSize: 26 , marginTop:10}}> 
                         {category_name} Category Items 
                     </div> 
                 </div>

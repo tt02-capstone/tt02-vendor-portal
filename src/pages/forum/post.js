@@ -233,7 +233,7 @@ export default function Post() {
             <CustomHeader items={forumBreadCrumb} />
             <Content style={styles.content}>
                 <div style={{ display: 'flex' }}>
-                    <div style={{ fontWeight: "bold", fontSize: 26 , marginBottom: 10}}>
+                    <div style={{ fontWeight: "bold", fontSize: 26 , marginBottom: 10, marginTop:10}}>
                         {category_item_name} Posts
                     </div>
 

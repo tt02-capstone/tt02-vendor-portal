@@ -378,7 +378,7 @@ export default function PostItems() {
                             <>
                                 <Comment.Action
                                         onClick={() => { onUpvoteComment(comment.comment_id);}}
-                                        style= {{ color: (comment.upvoted_user_id_list && comment.upvoted_user_id_list.includes(user.user_id) ? "#096dd9" : "black")}} >
+                                        style= {{ color: (comment.upvoted_user_id_list && comment.upvoted_user_id_list.includes(user.user_id) ? "red" : "black")}} >
                                         <ArrowUpOutlined/>
                                 </Comment.Action>
 
@@ -386,7 +386,7 @@ export default function PostItems() {
 
                                 <Comment.Action
                                     onClick={() => { onDownvoteComment(comment.comment_id); }}
-                                    style= {{ color: (comment.downvoted_user_id_list && comment.downvoted_user_id_list.includes(user.user_id) ? "#096dd9" : "black")}} >
+                                    style= {{ color: (comment.downvoted_user_id_list && comment.downvoted_user_id_list.includes(user.user_id) ? "red" : "black")}} >
                                     <ArrowDownOutlined/>
                                 </Comment.Action>
                             </>
@@ -721,11 +721,10 @@ export default function PostItems() {
                 <Card
                     style={{
                         width: '100%',
-                        height: 300,
                         marginLeft: '-5px',
                         marginRight: '50px',
                         fontSize: 20,
-                        height: '30%'
+                        height: '26%'
                     }}
                     bordered={false}
                 >
@@ -753,7 +752,7 @@ export default function PostItems() {
                     )}
                     
                     { post && (
-                        <div style={{display: 'flex'}}>
+                        <div style={{display: 'flex', marginTop:-26}}>
                             {/* display image attachment if there is any */}
                             { post.post_image && (
                                 <>
@@ -866,7 +865,7 @@ const styles = {
         alignItems: 'center',
     },
     layout: {
-        minHeight: '100vh',
+        minHeight: '110vh',
         minWidth: '90vw',
         backgroundColor: 'white'
     },
