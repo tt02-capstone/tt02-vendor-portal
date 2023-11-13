@@ -33,7 +33,7 @@ export default function ForumCategory() {
         <Layout style={styles.layout}>
              <CustomHeader items={forumBreadCrumb} />
              <Content style={styles.content}>
-                <div style={{ fontWeight: "bold", fontSize: 26, marginBottom: 10}}> Connect with Our Fellow Users </div> <br/>
+                <div style={{ fontWeight: "bold", fontSize: 26, marginBottom: 10, marginTop:10}}> Connect with Our Fellow Users </div> <br/>
 
                 <List
                     itemLayout="horizontal"
