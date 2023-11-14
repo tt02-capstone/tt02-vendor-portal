@@ -296,8 +296,8 @@ export const RevenueToBooking = (props) => {
     };
 
     useEffect(() => {
-        updateYaxisDropdown();
-    }, []);
+        updateYaxisDropdown(selectedYAxis);
+    }, [selectedXAxis]);
 
     const updateYaxisDropdown = (yaxis) => {
         console.log("In y axis", yaxis)
