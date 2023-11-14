@@ -19,7 +19,7 @@ export default function SubscriptionModal(props) {
     plan: "Monthly",
     expiry: "2023-12-31",
     nextBillingDate: "2023-12-31",
-    autoRenewal: true,
+    auto_renewal: true,
     status: "Active"
   });
 
@@ -56,7 +56,8 @@ function onClickCancelSubButton() {
       const response = await unsubscribe(subscriptionDetails.subscription_id);
       console.log(response.status)
       if (response.status) {
-        setIsSubscribed(false);
+        console.log(response.data)
+        setSubscriptionDetails(response.data);
         onClickCancelUnsubscribe();
         
         toast.success("Unsubscribed subscription successfully", {
@@ -64,7 +65,7 @@ function onClickCancelSubButton() {
             autoClose: 1500
         });
 
-        props.onClickUnsub();
+        //props.onClickUnsub();
         
       } else {
         console.log("trigger")
@@ -292,8 +293,8 @@ function onClickCancelSubButton() {
                 {subscriptionType === 'Yearly' ? `$250/year` : '$22/month'}
                 </Descriptions.Item>
                 <Descriptions.Item label="Auto-renewal">
-                {subscriptionDetails.autoRenewal ? 'Enabled' : 'Disabled'}
-                {!subscriptionDetails.autoRenewal &&
+                {subscriptionDetails.auto_renewal ? 'Enabled' : 'Disabled'}
+                {!subscriptionDetails.auto_renewal &&
                 <CustomButton text="Renew"  onClick={() => onClickManageSubButton("RENEW")} />
                 }
                 </Descriptions.Item>
@@ -303,9 +304,11 @@ function onClickCancelSubButton() {
             </Descriptions>
 
             <CustomButton text="Update Subscription" icon={<DashboardOutlined />} onClick={() => onClickManageSubButton("UPDATE")} />
+            {(subscriptionDetails.auto_renewal || (subscriptionDetails.current_period_start !== "-") )&&
             <Button type="primary" danger text="Unsubscribe" onClick={onClickCancelSubButton}>
                 Unsubscribe
             </Button>
+            }
             </div>
     }
 

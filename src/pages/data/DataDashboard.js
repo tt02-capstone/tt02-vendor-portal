@@ -205,14 +205,40 @@ const DataDashboard = () => {
                 html2canvas(chartRef.current).then((canvas) => {
                     const imgData = canvas.toDataURL("image/png");
                     const pdf = new jsPDF("landscape");
-                    pdf.addImage(imgData, "PNG", 10, 10, 190, 100);
+                    const chartAspectRatio = canvas.width / canvas.height;
+
+                    // Dimensions of the PDF page
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                    // Aspect ratio of the PDF page
+                    const pdfAspectRatio = pdfWidth / pdfHeight;
+                
+                    let imgWidth, imgHeight, x, y;
+                
+                    if (chartAspectRatio > pdfAspectRatio) {
+                        // Chart is wider than PDF page
+                        imgWidth = pdfWidth;
+                        imgHeight = imgWidth / chartAspectRatio;
+                        x = 0;
+                        y = (pdfHeight - imgHeight) / 2; // Center vertically
+                    } else {
+                        // Chart is taller than PDF page
+                        imgHeight = pdfHeight;
+                        imgWidth = imgHeight * chartAspectRatio;
+                        x = (pdfWidth - imgWidth) / 2; // Center horizontally
+                        y = 0;
+                    }
+                
+                    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
                     pdf.save(exportDetails.fileName + ".pdf");
                   });
 
             } else if (exportDetails.fileType == "csv") {
+                
 
                 if (selectedDataUseCase == TOTAL_BOOKINGS_OVER_TIME) {
-                    const header = "Date,Country";
+                    const header = "Booking Date, Country of Origin";
 
                     const csv = data.map((row) => row.join(",")).join("\n");
 
@@ -231,7 +257,153 @@ const DataDashboard = () => {
 
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
+
+                    
+                } else if (selectedDataUseCase == REVENUE_OVER_TIME) {
+                    const header = "Booking Date, Country of Origin, Revenue";
+
+                    const csv = data.map((row) => row.join(",")).join("\n");
+
+                    const csvContent = header + "\n" + csv;
+
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = `${exportDetails.fileName}.csv`;
+
+                    document.body.appendChild(a);
+                    a.click();
+
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    
+                } else if (selectedDataUseCase == BOOKING_REVENUE_RATIO) {
+                    const header = "Booking Date, Country of Tourist";
+
+                    const csv = data.map((row) => row.join(",")).join("\n");
+
+                    const csvContent = header + "\n" + csv;
+
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = `${exportDetails.fileName}.csv`;
+
+                    document.body.appendChild(a);
+                    a.click();
+
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    
+                } else if (selectedDataUseCase == BOOKINGS_BREAKDOWN) {
+                    try {
+                        const headers = "Category, Country, Status\n";
+
+                        const flattenDataForCSV = (data) => {
+                            return data.flatMap(item => {
+                                const rows = [];
+                                Object.entries(item.Category).forEach(([categoryKey, categoryValue]) => {
+                                    Object.entries(item.Country).forEach(([countryKey, countryValue]) => {
+                                        Object.entries(item.Status).forEach(([statusKey, statusValue]) => {
+                                            rows.push({
+                                                Category: `${categoryKey}: ${categoryValue}`,
+                                                Country: `${countryKey}: ${countryValue}`,
+                                                Status: `${statusKey}: ${statusValue}`
+                                            });
+                                        });
+                                    });
+                                });
+                                return rows;
+                            });
+                        };
+                        
+                        const flattenedData = flattenDataForCSV(data[0]);
+
+                        const csvRows = flattenedData.map(row => `${row.Category}, ${row.Country}, ${row.Status}`);
+
+                    const csvContent = headers + csvRows.join("\n");
+
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = `${exportDetails.fileName}.csv`;
+
+                    document.body.appendChild(a);
+                    a.click();
+
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    } catch (error) {
+                        console.log(error)
+                    }
+                    
+
+
+                    
+                } else if (selectedDataUseCase == REVENUE_BREAKDOWN) {
+                    try {
+                        const headers = "Category, Country, Status\n";
+
+                        const flattenDataForCSV = (data) => {
+                            return data.flatMap(item => {
+                                const rows = [];
+                                Object.entries(item.Category).forEach(([categoryKey, categoryValue]) => {
+                                    Object.entries(item.Country).forEach(([countryKey, countryValue]) => {
+                                        Object.entries(item.Status).forEach(([statusKey, statusValue]) => {
+                                            rows.push({
+                                                Category: `${categoryKey}: ${categoryValue}`,
+                                                Country: `${countryKey}: ${countryValue}`,
+                                                Status: `${statusKey}: ${statusValue}`
+                                            });
+                                        });
+                                    });
+                                });
+                                return rows;
+                            });
+                        };
+                        
+                        const flattenedData = flattenDataForCSV(data[0]);
+
+                        const csvRows = flattenedData.map(row => `${row.Category}, ${row.Country}, ${row.Status}`);
+
+                    const csvContent = headers + csvRows.join("\n");
+
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = `${exportDetails.fileName}.csv`;
+
+                    document.body.appendChild(a);
+                    a.click();
+
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    } catch (error) {
+                        console.log(error)
+                    }
+                    
+
+                    
                 }
+
+
+                
+
+                
 
 
 
