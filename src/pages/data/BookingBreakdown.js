@@ -31,6 +31,7 @@ ChartJS.register(
 );
 
 export const BookingBreakdown = (props) => {
+    const chartRef = props.chartRef;
     const data = props.data
     const getRandomColors = (count) => {
         // Generate random colors for the chart
@@ -60,10 +61,17 @@ export const BookingBreakdown = (props) => {
         return chartOptions;
     };
 
+    useEffect(() => {
+        const chart = chartRef.current;
+
+        console.log(chart)
+
+    }, []);
+
     return (
         <>
 
-            <div style={styles.container}>
+            <div style={styles.container} ref={chartRef}>
 
                 <br></br>
 

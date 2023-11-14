@@ -307,8 +307,8 @@ export default function DeliveryManagement() {
                             onClick={() => onClickOpenViewItemBookingModal(record.booking_id)}
                         />
                         <CustomButton
-                            text="Edit Delivery Status"
-                            style={{fontWeight: "bold"}}
+                            text="Edit Status"
+                            style={{fontWeight: "bold", width:'95%'}}
                             onClick={() => onClickOpenEditItemBookingModal(record.booking_id)}
                         />
                     </Space>
@@ -426,6 +426,7 @@ export default function DeliveryManagement() {
                             data={bookingsData}
                             rowKey="booking_id"
                             tableLayout="fixed"
+                            style={{width:'97%'}}
                         />
 
                         <ViewItemBookingModal

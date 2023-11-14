@@ -304,7 +304,7 @@ export const CustomerRetention = (props) => {
 
     return (
         <>
-
+        <div ref={chartRef}>
             <Row style={{marginRight: 50}}>
                 <Col style={{marginLeft: 'auto', marginRight: 16}}>
                     <div style={styles.container}>
@@ -336,7 +336,7 @@ export const CustomerRetention = (props) => {
 
             <br></br>
 
-            <div ref={chartRef} style={styles.line}>
+            <div style={styles.line}>
                 <Bar
                     data={barData}
                     options={getChartOptions()}
@@ -344,6 +344,7 @@ export const CustomerRetention = (props) => {
             </div>
 
             <br></br>
+            </div>
             <Row style={{marginLeft: 30, marginTop: 20}}>
                 <Table
                     dataSource={data.map((row, index) =>
