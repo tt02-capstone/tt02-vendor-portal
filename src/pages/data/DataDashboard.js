@@ -198,6 +198,32 @@ const DataDashboard = () => {
     async function onClickSubmitExport(exportDetails) {
         try {
 
+            const addHeaderToChart = () => {
+                // Create a header element
+                const header = document.createElement("div");
+                header.id = "export-header";
+                header.style.textAlign = "center";
+                header.style.marginBottom = "10px"; // Adjust as needed
+                header.style.fontSize = "16px"; // Adjust as needed
+                header.innerHTML = selectedDataUseCase; // Replace with your header text
+            
+                // Get the chart container and its first child
+                const chartContainer = chartRef.current;
+                const firstChild = chartContainer.firstChild;
+            
+                // Insert the header at the top of the chart container
+                chartContainer.insertBefore(header, firstChild);
+            };
+            
+            const removeHeaderFromChart = () => {
+                // Remove the header element
+                const header = document.getElementById("export-header");
+                if (header) {
+                    header.parentNode.removeChild(header);
+                }
+            };
+            
+
             console.log(exportDetails);
 
             if (exportDetails.fileType == "pdf") {
@@ -205,31 +231,37 @@ const DataDashboard = () => {
                 html2canvas(chartRef.current).then((canvas) => {
                     const imgData = canvas.toDataURL("image/png");
                     const pdf = new jsPDF("landscape");
+                    const header = selectedDataUseCase;
+                    const margin = 10;
+                    const headerHeight = 20; // Adjust this value as needed
+
+                    // Add header text
+                    pdf.setFontSize(12);
+                    const headerY = margin + headerHeight / 2;
+                    pdf.text(header, pdf.internal.pageSize.getWidth() / 2, headerY, { align: 'center' });
+
                     const chartAspectRatio = canvas.width / canvas.height;
 
                     // Dimensions of the PDF page
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = pdf.internal.pageSize.getHeight();
-                
-                    // Aspect ratio of the PDF page
-                    const pdfAspectRatio = pdfWidth / pdfHeight;
-                
+                    
                     let imgWidth, imgHeight, x, y;
-                
-                    if (chartAspectRatio > pdfAspectRatio) {
+
+                    if (chartAspectRatio > 1) {
                         // Chart is wider than PDF page
                         imgWidth = pdfWidth;
                         imgHeight = imgWidth / chartAspectRatio;
                         x = 0;
-                        y = (pdfHeight - imgHeight) / 2; // Center vertically
+                        y = margin + headerHeight; // Start image directly below the header
                     } else {
                         // Chart is taller than PDF page
-                        imgHeight = pdfHeight;
+                        imgHeight = pdfHeight - (margin * 2 + headerHeight); // Adjust height to account for header
                         imgWidth = imgHeight * chartAspectRatio;
                         x = (pdfWidth - imgWidth) / 2; // Center horizontally
-                        y = 0;
+                        y = margin + headerHeight; // Start image directly below the header
                     }
-                
+
                     pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
                     pdf.save(exportDetails.fileName + ".pdf");
                   });
@@ -401,13 +433,8 @@ const DataDashboard = () => {
                 }
 
 
-                
-
-                
-
-
-
             } else if (exportDetails.fileType == "png") {
+                addHeaderToChart()
                 html2canvas(chartRef.current).then((canvas) => {
                     const imgData = canvas.toDataURL(`image/${exportDetails.fileType}`);
                     const a = document.createElement("a");
@@ -415,7 +442,9 @@ const DataDashboard = () => {
                     a.download = `${exportDetails.fileName}.${exportDetails.fileType}`;
                     a.click();
                   });
+                  removeHeaderFromChart();
             } else if (exportDetails.fileType == "jpeg") {
+                addHeaderToChart()
                 html2canvas(chartRef.current).then((canvas) => {
                     const imgData = canvas.toDataURL(`image/${exportDetails.fileType}`);
                     const a = document.createElement("a");
@@ -423,6 +452,7 @@ const DataDashboard = () => {
                     a.download = `${exportDetails.fileName}.${exportDetails.fileType}`;
                     a.click();
                   });
+                removeHeaderFromChart();
 
             }
 
@@ -542,9 +572,9 @@ const DataDashboard = () => {
         } else if (selectedDataUseCase === BOOKING_REVENUE_RATIO) {
             return <RevenueToBooking chartRef={chartRef} data={data}/>
         } else if (selectedDataUseCase === BOOKINGS_BREAKDOWN) {
-            return <BookingBreakdown data={data[0][0]} />
+            return <BookingBreakdown chartRef={chartRef} data={data[0][0]} />
         } else if (selectedDataUseCase === REVENUE_BREAKDOWN) {
-            return <RevenueBreakdown data={data[0][0]} />
+            return <RevenueBreakdown chartRef={chartRef} data={data[0][0]} />
         } else if (selectedDataUseCase === CUSTOMER_RETENTION) {
             return <CustomerRetention chartRef={chartRef} data={data}/>
         }
