@@ -16,6 +16,7 @@ import {
 } from 'chart.js';
 import {Bar, Line} from 'react-chartjs-2';
 import moment from "moment";
+import {getDateFormat} from "../../helper/dateFormat";
 
 
 ChartJS.register(
@@ -44,7 +45,7 @@ export const TotalBookingsTimeSeries = (props) => {
     const data = props.data
     const [selectedXAxis, setSelectedXAxis] = useState(MONTHLY);
     const [selectedYAxis, setSelectedYAxis] = useState(NUMBER_OF_BOOKINGS);
-    const [selectedDataset, setSelectedDataset] = useState([{}]);
+    const [yData, setYData] = useState([]);
 
 
     const itemsXAxis = [
@@ -254,7 +255,7 @@ export const TotalBookingsTimeSeries = (props) => {
             key: 'month',
         },
         {
-            title: 'Total',
+            title: selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY? NUMBER_OF_BOOKINGS : selectedYAxis,
             dataIndex: 'total',
             key: 'total',
         },
@@ -268,7 +269,7 @@ export const TotalBookingsTimeSeries = (props) => {
                 key: 'country',
             },
             {
-                title: 'Count',
+                title: 'Number of Bookings',
                 dataIndex: 'count',
                 key: 'count',
             },
@@ -290,7 +291,7 @@ export const TotalBookingsTimeSeries = (props) => {
         );
     };
 
-    const tableData = aggregatedData.map(([month, total, countries], index) => ({
+    const tableData = yData.map(([month, total, countries], index) => ({
         key: index,
         month,
         total,
@@ -322,7 +323,40 @@ export const TotalBookingsTimeSeries = (props) => {
     const handleChangeYAxis = (value) => {
         console.log(value); // { value: "lucy", label: "Lucy (101)" }
         setSelectedYAxis(value.value)
+        updateYaxisDropdown(value.value)
     };
+
+    useEffect(() => {
+        updateYaxisDropdown();
+    }, []);
+
+    const updateYaxisDropdown = (yaxis) => {
+        console.log("In y axis", yaxis)
+        let newData = []
+        newData = aggregatedData
+        if (yaxis === NUMBER_OF_BOOKINGS) {
+            newData = aggregatedData
+        } else if (yaxis === NUMBER_OF_BOOKINGS_LOCAL) {
+            newData = aggregatedData.filter(item => {
+                console.log(item)
+                const countries = Object.keys(item[2]);
+                return countries.includes("Singapore");
+            });
+            console.log(newData)
+
+        } else if (yaxis === NUMBER_OF_BOOKINGS_TOURIST) {
+            newData = aggregatedData.filter(item => {
+                const countries = Object.keys(item[2]);
+                return !countries.includes("Singapore");
+            });
+        } else if (yaxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
+            newData = aggregatedData
+        }
+
+        setYData(newData)
+
+    }
+
 
     useEffect(() => {
         const chart = chartRef.current;

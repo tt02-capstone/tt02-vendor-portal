@@ -325,7 +325,7 @@ export const CustomerRetention = (props) => {
                         <Select
                             labelInValue
                             defaultValue={itemsYAxis[0]}
-                            style={{width: 300}}
+                            style={{width: 400}}
                             onChange={handleChangeYAxis}
                             options={itemsYAxis}
                         />
