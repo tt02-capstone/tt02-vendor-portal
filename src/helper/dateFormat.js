@@ -32,3 +32,16 @@ export const disabledDateChecker = (current) => {
     // Disable dates before the current date
     return current && current < moment().startOf('day');
 };
+
+const WEEKLY = 'Week';
+const YEARLY = 'Year';
+const MONTHLY = 'Month';
+export const getDateFormat = (date, selectedXAxis) => {
+    if (selectedXAxis === MONTHLY) {
+        return moment(date).format('MMMM');
+    } else if (selectedXAxis === YEARLY) {
+        return moment(date).format('YYYY');
+    } else if (selectedXAxis === WEEKLY) {
+        return moment(date).format('YYYY-MM-DD'); // Adjust the format for weeks
+    }
+};
