@@ -595,7 +595,7 @@ const DataDashboard = () => {
                                         <Select
                                             labelInValue
                                             defaultValue={items[0]}
-                                            style={{ width: 400 }}
+                                            style={{ width: 480 }}
                                             onChange={handleChangeDataUseCase}
                                             options={items}
                                         />

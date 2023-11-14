@@ -352,7 +352,7 @@ export const CustomerRetention = (props) => {
                     )}
                     columns={columns}
                     style={{ width: '90%' }} // Set the width to 100%
-                />;
+                />
             </Row>
         </>
     );

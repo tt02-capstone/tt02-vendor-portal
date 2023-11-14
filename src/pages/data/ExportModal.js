@@ -63,7 +63,7 @@ export default function ExportModal(props) {
                     <Form.Item wrapperCol={{offset: 10, span: 16}}>
 
                         <Button type="primary" htmlType="submit">
-                            Submit
+                            Export
                         </Button>
 
 
