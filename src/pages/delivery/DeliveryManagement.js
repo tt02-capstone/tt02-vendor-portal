@@ -306,11 +306,11 @@ export default function DeliveryManagement() {
                             style={{fontWeight: "bold"}}
                             onClick={() => onClickOpenViewItemBookingModal(record.booking_id)}
                         />
-                        <CustomButton
+                        {record.status !== 'CANCELLED' && <CustomButton
                             text="Edit Status"
                             style={{fontWeight: "bold", width:'95%'}}
                             onClick={() => onClickOpenEditItemBookingModal(record.booking_id)}
-                        />
+                        />}
                     </Space>
                 }  else {
                     return <p>'Bug</p>
