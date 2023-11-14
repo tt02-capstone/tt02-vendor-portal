@@ -406,6 +406,8 @@ export const RevenueToBooking = (props) => {
     return (
         <>
 
+        <div ref={chartRef}>
+
             <Row style={{marginRight: 50}}>
                 <Col style={{marginLeft: 'auto', marginRight: 16}}>
                     <div style={styles.container}>
@@ -447,6 +449,7 @@ export const RevenueToBooking = (props) => {
             </div>
 
             <br></br>
+            </div>
             <Row style={{marginLeft: 30, marginTop: 20, width: '100%'}}>
                 <Table dataSource={tableData} columns={columns} bordered
                        style={{

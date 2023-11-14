@@ -738,11 +738,11 @@ export default function PostItems() {
 
                 <Card
                     style={{
-                        width: '100%',
+                        width: '97%',
                         marginLeft: '-5px',
                         marginRight: '50px',
                         fontSize: 20,
-                        height: '26%'
+                        height: '23%'
                     }}
                     bordered={false}
                 >

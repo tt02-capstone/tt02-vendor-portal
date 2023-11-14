@@ -368,7 +368,7 @@ export const TotalBookingsTimeSeries = (props) => {
 
     return (
         <>
-
+        <div ref={chartRef}>
             <Row style={{marginRight: 50}}>
                 <Col style={{marginLeft: 'auto', marginRight: 16}}>
                     <div style={styles.container}>
@@ -400,7 +400,7 @@ export const TotalBookingsTimeSeries = (props) => {
 
             <br></br>
 
-            <div ref={chartRef} style={styles.line}>
+            <div  style={styles.line}>
                 <Line
 
                     data={lineData}
@@ -408,7 +408,11 @@ export const TotalBookingsTimeSeries = (props) => {
                 />
             </div>
 
+            
+
             <br></br>
+
+            </div>
             <Row style={{marginLeft: 30, marginTop: 20, width: '100%'}}>
                 <Table dataSource={tableData} columns={columns} bordered
                        style={{
