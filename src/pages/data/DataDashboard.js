@@ -203,8 +203,9 @@ const DataDashboard = () => {
                 const header = document.createElement("div");
                 header.id = "export-header";
                 header.style.textAlign = "center";
-                header.style.marginBottom = "10px"; // Adjust as needed
+                header.style.marginBottom = "70px"; // Adjust as needed
                 header.style.fontSize = "16px"; // Adjust as needed
+                header.style.fontWeight = "bold"
                 header.innerHTML = selectedDataUseCase; // Replace with your header text
             
                 // Get the chart container and its first child
