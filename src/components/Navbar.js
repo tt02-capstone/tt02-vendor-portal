@@ -26,6 +26,7 @@ function Navbar(props) {
                 setCollapsed(collapsed)
             }}
             collapsible collapsed={collapsed}
+            style={{height: "150vh"}}
         >
             {/*<div className="demo-logo-vertical" />*/}
             <Menu
