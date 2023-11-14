@@ -1,4 +1,4 @@
-import { Layout, Card, Avatar, Image, Input, Tag } from 'antd';
+import { Layout, Card, Avatar, Image, Input, Tag, Modal as AntdModal } from 'antd';
 import { React, useEffect, useState } from 'react';
 import CustomHeader from "../../components/CustomHeader";
 import { Content } from "antd/es/layout/layout";
@@ -194,7 +194,22 @@ export default function PostItems() {
         }
     }
 
-    async function remove_comment(commentIdToDelete) {
+    const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+    const [commentIdToDelete, setCommentIdToDelete] = useState('');
+    const handleDelete = (commentIdToDelete) => {
+        openDeleteConfirmation(commentIdToDelete);
+    }
+
+    const openDeleteConfirmation = (commentIdToDelete) => {
+        setCommentIdToDelete(commentIdToDelete);
+        setDeleteConfirmationVisible(true);
+    };
+
+    const closeDeleteConfirmation = () => {
+        setDeleteConfirmationVisible(false);
+    };
+
+    async function remove_comment() {
         let response = await deleteComment(commentIdToDelete);
         if (response.status) {
             toast.success('Comment Deleted!', {
@@ -228,6 +243,9 @@ export default function PostItems() {
                 });
             }
         }
+
+        setCommentIdToDelete('');
+        closeDeleteConfirmation();
     }
     
     async function edit_comment(values) {
@@ -368,7 +386,7 @@ export default function PostItems() {
                                 Edit
                             </Comment.Action>
                             <Comment.Action style={{ color:'#096dd9', fontWeight:'bold'}}
-                                onClick={() => { remove_comment(comment.comment_id);}}>
+                                onClick={() => { handleDelete(comment.comment_id);}}>
                                 Delete
                             </Comment.Action>
                             </>
@@ -752,7 +770,7 @@ export default function PostItems() {
                     )}
                     
                     { post && (
-                        <div style={{display: 'flex', marginTop:-26}}>
+                         <div style={{display: 'flex', marginTop:-26}}>
                             {/* display image attachment if there is any */}
                             { post.post_image && (
                                 <>
@@ -848,7 +866,17 @@ export default function PostItems() {
                                 
                     </Card>
                 )}
-                
+
+                <AntdModal
+                    title="Confirm Delete"
+                    visible={isDeleteConfirmationVisible}
+                    onOk={() => remove_comment()}
+                    onCancel={closeDeleteConfirmation}
+                    okButtonProps={{ style: { fontWeight:"bold" } }}
+                    cancelButtonProps={{ style: { fontWeight:"bold"} }}
+                >
+                    <p>Are you sure you want to delete this comment?</p>
+                </AntdModal>
                 <ToastContainer />
             </Content>
         </Layout>
