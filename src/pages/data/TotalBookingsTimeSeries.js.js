@@ -142,12 +142,16 @@ export const TotalBookingsTimeSeries = (props) => {
             }
         });
 
+        console.log(aggregatedData)
+
         // Convert the aggregated Map back to an array of lists
-        const aggregatedArray = Array.from(aggregatedData.values()).map((value) => [
-            value.Date,
-            value.Count,
-            Object.entries(value.Countries).map(([country, count]) => [country, count]),
-        ]);
+        const aggregatedArray = Array.from(aggregatedData.values()).map(value => {
+            return [
+                value.Date,
+                value.Count,
+                Object.entries(value.Countries).map(([country, count]) => [country, count])
+            ];
+        });
 
         console.log(aggregatedArray);
 
@@ -162,6 +166,8 @@ export const TotalBookingsTimeSeries = (props) => {
     let dataset = [];
 
     const uniqueCountries = [...new Set(aggregatedData.flatMap((item) => item[2].map(([country]) => country)))];
+    console.log(uniqueCountries)
+    console.log(aggregatedData)
     if (selectedYAxis === NUMBER_OF_BOOKINGS) {
         dataset = [
             {
@@ -203,7 +209,7 @@ export const TotalBookingsTimeSeries = (props) => {
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
-        dataset = aggregatedData[0][2].map(([country]) => ({
+        dataset = uniqueCountries.map((country) => ({
             label: `Number of Bookings in ${country}`,
             data: aggregatedData.map((item) =>
                 item[2].find(([c]) => c === country) ? item[2].find(([c]) => c === country)[1] : 0
@@ -213,7 +219,6 @@ export const TotalBookingsTimeSeries = (props) => {
             fill: false,
             backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
         }));
-        console.log(dataset)
     }
 
 
