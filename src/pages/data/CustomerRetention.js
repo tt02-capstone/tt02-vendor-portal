@@ -205,8 +205,8 @@ export const CustomerRetention = (props) => {
             },
         ];
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
-        dataset = aggregatedData[0][2].map(([country]) => ({
-            label: `Number of Repeated Bookings from ${country}`,
+        dataset = uniqueCountries.map((country) => ({
+            label: `Number of Bookings in ${country}`,
             data: aggregatedData.map((item) =>
                 item[2].find(([c]) => c === country) ? item[2].find(([c]) => c === country)[1] : 0
             ),
@@ -215,7 +215,6 @@ export const CustomerRetention = (props) => {
             fill: false,
             backgroundColor: getRandomColor(uniqueCountries.indexOf(country)),
         }));
-        console.log(dataset)
     }
 
 
