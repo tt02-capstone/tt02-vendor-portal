@@ -486,7 +486,7 @@ export const RevenueToBooking = (props) => {
                         <Select
                             labelInValue
                             defaultValue={itemsYAxis[0]}
-                            style={{width: 300}}
+                            style={{width: 370}}
                             onChange={handleChangeYAxis}
                             options={itemsYAxis}
                         />

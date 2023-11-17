@@ -122,6 +122,7 @@ export default function ViewItemBookingModal(props) {
         PREPARE_FOR_PICKUP: 'Prepare for Pickup',
         READY_FOR_PICKUP: 'Ready for Pickup',
         PICKED_UP: 'Picked Up',
+        CANCELLED: 'Cancelled',
     };
 
     return (
