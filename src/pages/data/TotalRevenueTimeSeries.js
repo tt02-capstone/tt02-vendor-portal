@@ -321,7 +321,7 @@ export const TotalRevenueTimeSeries = (props) => {
         newData = aggregatedData
         if (yaxis === TOTAL_REVENUE) {
             newData = aggregatedData
-        } else if (yaxis === TOTAL_REVENUE_LOCAL) {
+        } else if (yaxis === TOTAL_REVENUE_SEGMENT) {
             newData = aggregatedData.filter(item => {
                 console.log(item)
                 const countries = Object.keys(item.Countries);
