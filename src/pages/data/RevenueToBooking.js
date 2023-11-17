@@ -464,7 +464,7 @@ export const RevenueToBooking = (props) => {
             key: 'Date',
         },
         {
-            title: selectedYAxis === TOTAL_REVENUE_BY_COUNTRY? TOTAL_REVENUE: selectedYAxis,
+            title: 'Revenue',
             dataIndex: 'Revenue',
             key: 'Revenue',
         },
@@ -474,7 +474,7 @@ export const RevenueToBooking = (props) => {
             key: 'Count',
         },
         {
-            title: 'Revenue to Booking Ratio',
+            title: selectedYAxis === TOTAL_REVENUE_BY_COUNTRY? TOTAL_REVENUE: selectedYAxis,
             dataIndex: 'Ratio',
             key: 'Ratio',
         },
