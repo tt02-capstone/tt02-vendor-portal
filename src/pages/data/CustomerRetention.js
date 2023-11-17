@@ -34,11 +34,11 @@ ChartJS.register(
     Legend
 );
 
-const WEEKLY = 'weekly';
-const YEARLY = 'yearly';
-const MONTHLY = 'monthly';
+const WEEKLY = 'Week';
+const YEARLY = 'Year';
+const MONTHLY = 'Month';
 const NUMBER_OF_REPEATED_BOOKINGS = "Number of Repeated Bookings";
-const NUMBER_OF_BOOKINGS_LOCAL = "Number of Repeated Bookings by Local";
+const NUMBER_OF_BOOKINGS_SEGMENT = "Number of Repeated Bookings by Customer Segment";
 const NUMBER_OF_BOOKINGS_TOURIST = "Number of Repeated Bookings by Tourist";
 const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Repeated Bookings by Country";
 
@@ -73,12 +73,8 @@ export const CustomerRetention = (props) => {
             label: NUMBER_OF_REPEATED_BOOKINGS,
         },
         {
-            value: NUMBER_OF_BOOKINGS_LOCAL,
-            label: NUMBER_OF_BOOKINGS_LOCAL,
-        },
-        {
-            value: NUMBER_OF_BOOKINGS_TOURIST,
-            label: NUMBER_OF_BOOKINGS_TOURIST,
+            value: NUMBER_OF_BOOKINGS_SEGMENT,
+            label: NUMBER_OF_BOOKINGS_SEGMENT,
         },
         {
             value: NUMBER_OF_BOOKINGS_BY_COUNTRY,
@@ -176,19 +172,35 @@ export const CustomerRetention = (props) => {
                 backgroundColor: 'rgba(75, 192, 192, 1)',
             },
         ];
-    } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
-        dataset = [
-            {
-                label: `Number of Repeated Bookings by Local`,
-                data: aggregatedData.map((item) =>
-                    item[2].find(([c]) => c === 'Singapore') ? item[2].find(([c]) => c === 'Singapore')[1] : 0
-                ),
-                borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
-                borderWidth: 1,
-                fill: false,
-                backgroundColor: getRandomColor(0), // You can assign a specific color for Local bookings
-            },
-        ];
+    } else if (selectedYAxis === NUMBER_OF_BOOKINGS_SEGMENT) {
+        let localDataset = {
+            label: `Number of Repeated Bookings by Local`,
+            data: aggregatedData.map((item) =>
+                item[2].find(([c]) => c === 'Singapore') ? item[2].find(([c]) => c === 'Singapore')[1] : 0
+            ),
+            borderColor: getRandomColor(0), 
+            borderWidth: 1,
+            fill: false,
+            backgroundColor: getRandomColor(0), 
+        };
+        
+        let touristDataset = {
+            label: `Number of Repeated Bookings by Tourist`,
+            data: aggregatedData.map((item) => {
+                const singaporeCount = item[2].find(([c]) => c === 'Singapore');
+                const totalTouristCount = item[1] - (singaporeCount ? singaporeCount[1] : 0);
+                return totalTouristCount > 0 ? totalTouristCount : 0;
+            }),
+            borderColor: getRandomColor(1), 
+            borderWidth: 1,
+            fill: false,
+            backgroundColor: getRandomColor(1), 
+        };
+        
+
+        let combinedDataset = [localDataset, touristDataset];
+
+        dataset = combinedDataset
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
         dataset = [
             {
@@ -250,21 +262,107 @@ export const CustomerRetention = (props) => {
 
     const columns = [
         {
-            title: 'Date',
-            dataIndex: 0,
-            key: 'date',
+            title: selectedXAxis,
+            dataIndex: 'month',
+            key: 'month',
         },
         {
-            title: 'Total Number of Repeat Bookings',
-            dataIndex: 1,
-            key: 'nth_booking',
-        },
-        {
-            title: 'Country',
-            dataIndex: 3,
-            key: 'country',
+            title: selectedYAxis,
+            dataIndex: 'total',
+            key: 'total',
         },
     ];
+
+    const expandedRowRender = (record) => {
+        if (selectedYAxis == NUMBER_OF_BOOKINGS_BY_COUNTRY) {
+            const nestedcolumns = [
+                {
+                    title: 'Country',
+                    dataIndex: 'country',
+                    key: 'country',
+                },
+                {
+                    title: 'Number of Repeated Bookings',
+                    dataIndex: 'count',
+                    key: 'count',
+                },
+            ];
+    
+            const mappedNestedData = record.nestedData.map(([country, count], index) => ({
+                key: index,
+                country,
+                count,
+            }));
+    
+            return (
+                <Table
+                    columns={nestedcolumns}
+                    dataSource={mappedNestedData}
+                    pagination={false}
+                    size="small"
+                />
+            );
+        } else if (selectedYAxis == NUMBER_OF_BOOKINGS_SEGMENT) {
+            console.log(record.nestedData)
+            const nestedcolumns = [
+                {
+                    title: 'Customer Segment',
+                    dataIndex: 'country',
+                    key: 'country',
+                },
+                {
+                    title: 'Number of Repeated Bookings',
+                    dataIndex: 'count',
+                    key: 'count',
+                },
+            ];
+    
+            const mappedNestedData = record.nestedData.map(([country, count], index) => ({
+                key: index,
+                country,
+                count,
+            }));
+    
+            return (
+                <Table
+                    columns={nestedcolumns}
+                    dataSource={mappedNestedData}
+                    pagination={false}
+                    size="small"
+                />
+            );
+        }
+    }
+
+    const tableData = aggregatedData.map(([month, total, countries], index) => {
+        let nestedData;
+    
+ 
+        if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY ) {
+            console.log(countries);
+            nestedData = countries;
+        } else if (selectedYAxis === NUMBER_OF_BOOKINGS_SEGMENT) {
+            const aggregatedData = countries.reduce((acc, [country, count]) => {
+                const category = country === 'Singapore' ? 'Local' : 'Tourist';
+                acc[category] = (acc[category] || 0) + count;
+                return acc;
+            }, {});
+            
+            nestedData = Object.entries(aggregatedData).map(([category, count]) => {
+                return [category, count];
+            });
+        }
+
+    
+        return {
+            key: index,
+            month,
+            total,
+            nestedData, 
+        };
+    });
+
+
 
     const getChartOptions = () => {
         const chartOptions = {
@@ -324,7 +422,7 @@ export const CustomerRetention = (props) => {
                         <Select
                             labelInValue
                             defaultValue={itemsYAxis[0]}
-                            style={{width: 300}}
+                            style={{width: 400}}
                             onChange={handleChangeYAxis}
                             options={itemsYAxis}
                         />
@@ -346,12 +444,10 @@ export const CustomerRetention = (props) => {
             </div>
             <Row style={{marginLeft: 30, marginTop: 20}}>
                 <Table
-                    dataSource={data.map((row, index) =>
-                        ({key: index, ...row})
-                    )}
-                    columns={columns}
-                    style={{ width: '90%' }} // Set the width to 100%
-                />;
+                    dataSource={tableData} columns={columns} bordered
+                    expandable={!(selectedYAxis == NUMBER_OF_REPEATED_BOOKINGS)  ? { expandedRowRender } : undefined}
+                    style={{ width: '90%' }} 
+                />
             </Row>
         </>
     );

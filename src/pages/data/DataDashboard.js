@@ -53,9 +53,9 @@ ChartJS.register(
 const TOTAL_BOOKINGS_OVER_TIME = "Total Bookings Over Time";
 const REVENUE_OVER_TIME = "Revenue Over Time";
 const BOOKING_REVENUE_RATIO = "Revenue to Bookings Ratio Over Time";
-const BOOKINGS_BREAKDOWN = "Bookings Breakdown by Activity, Nationality, Age";
-const REVENUE_BREAKDOWN = "Revenue Breakdown by Activity, Nationality, Age";
-const CUSTOMER_RETENTION = "Customer Retention (Number of Repeat Bookings Over Time)";
+const BOOKINGS_BREAKDOWN = "Bookings Breakdown";
+const REVENUE_BREAKDOWN = "Revenue Breakdown";
+const CUSTOMER_RETENTION = "Customer Retention Over Time";
 
 const DataDashboard = () => {
 
@@ -65,7 +65,7 @@ const DataDashboard = () => {
     const [selectedDataUseCase, setSelectedDataUseCase] = useState(TOTAL_BOOKINGS_OVER_TIME); //REVENUE_OVER_TIME
     const chartRef = useRef(null);
     const [startDate, setStartDate] = useState(new Date(2023, 0, 1));
-    const [endDate, setEndDate] = useState( new Date(2023, 9, 31));
+    const [endDate, setEndDate] = useState( new Date());
     const [loading, setLoading] = useState(true);
 
 
@@ -233,33 +233,32 @@ const DataDashboard = () => {
                     const pdf = new jsPDF("landscape");
                     const header = selectedDataUseCase;
                     const margin = 10;
-                    const headerHeight = 20; // Adjust this value as needed
+                    const headerHeight = 20; 
 
-                    // Add header text
+
                     pdf.setFontSize(12);
                     const headerY = margin + headerHeight / 2;
                     pdf.text(header, pdf.internal.pageSize.getWidth() / 2, headerY, { align: 'center' });
 
                     const chartAspectRatio = canvas.width / canvas.height;
 
-                    // Dimensions of the PDF page
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = pdf.internal.pageSize.getHeight();
                     
                     let imgWidth, imgHeight, x, y;
 
                     if (chartAspectRatio > 1) {
-                        // Chart is wider than PDF page
+
                         imgWidth = pdfWidth;
                         imgHeight = imgWidth / chartAspectRatio;
                         x = 0;
-                        y = margin + headerHeight; // Start image directly below the header
+                        y = margin + headerHeight; 
                     } else {
-                        // Chart is taller than PDF page
-                        imgHeight = pdfHeight - (margin * 2 + headerHeight); // Adjust height to account for header
+
+                        imgHeight = pdfHeight - (margin * 2 + headerHeight); 
                         imgWidth = imgHeight * chartAspectRatio;
-                        x = (pdfWidth - imgWidth) / 2; // Center horizontally
-                        y = margin + headerHeight; // Start image directly below the header
+                        x = (pdfWidth - imgWidth) / 2; 
+                        y = margin + headerHeight; 
                     }
 
                     pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
