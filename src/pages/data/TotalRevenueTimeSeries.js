@@ -385,7 +385,7 @@ export const TotalRevenueTimeSeries = (props) => {
                     size="small"
                 />
             );
-        } else if (TOTAL_REVENUE_SEGMENT) {
+        } else if (selectedYAxis == TOTAL_REVENUE_SEGMENT) {
             const nestedColumns = [
                 {
                     title: 'Customer Segment',
@@ -436,6 +436,8 @@ export const TotalRevenueTimeSeries = (props) => {
                     revenue: touristData.revenue.toFixed(2),
                 });
             }
+
+            console.log(nestedData)
             
     
             return (
@@ -468,7 +470,7 @@ export const TotalRevenueTimeSeries = (props) => {
         },
     ];
 
-    const tableData = yData.map(({Date, Revenue, Count, Countries}, index) => ({
+    const tableData = aggregatedData.map(({Date, Revenue, Count, Countries}, index) => ({
         key: index,
         Date,
         Revenue: Revenue.toFixed(2),
