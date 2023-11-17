@@ -33,10 +33,10 @@ ChartJS.register(
 const WEEKLY = 'Week';
 const YEARLY = 'Year';
 const MONTHLY = 'Month';
-const TOTAL_REVENUE = "Total Revenue";
-const TOTAL_REVENUE_LOCAL = "Total Revenue from Local";
-const TOTAL_REVENUE_TOURIST = "Total Revenue from  Tourist";
-const TOTAL_REVENUE_BY_COUNTRY = "Total Revenue from  Country";
+const TOTAL_REVENUE = "Total Revenue to Booking Ratio";
+const TOTAL_REVENUE_SEGMENT = "Revenue to Booking Ratio by Customer Segment";
+const TOTAL_REVENUE_TOURIST = "Revenue to Booking Ratio from  Tourist";
+const TOTAL_REVENUE_BY_COUNTRY = "Revenue to Booking Ratio by Country";
 
 
 export const RevenueToBooking = (props) => {
@@ -69,12 +69,8 @@ export const RevenueToBooking = (props) => {
             label: TOTAL_REVENUE,
         },
         {
-            value: TOTAL_REVENUE_LOCAL,
-            label: TOTAL_REVENUE_LOCAL,
-        },
-        {
-            value: TOTAL_REVENUE_TOURIST,
-            label: TOTAL_REVENUE_TOURIST,
+            value: TOTAL_REVENUE_SEGMENT,
+            label: TOTAL_REVENUE_SEGMENT,
         },
         {
             value: TOTAL_REVENUE_BY_COUNTRY,
@@ -182,24 +178,47 @@ export const RevenueToBooking = (props) => {
                 backgroundColor:'rgba(75, 192, 192, 1)',
             },
         ];
-    } else if (selectedYAxis === TOTAL_REVENUE_LOCAL) {
-        dataset = [
-            {
-                label: `Total Revenue from Local`,
-                data: aggregatedData.map((item) => {
-                    if (item.Countries && item.Countries.Singapore) {
+    } else if (selectedYAxis === TOTAL_REVENUE_SEGMENT) {
+        let localDataset = {
+            label: `Total Revenue from Local`,
+            data: aggregatedData.map((item) => {
+                if (item.Countries && item.Countries.Singapore) {
+                    return item.Countries.Singapore.Revenue / item.Countries.Singapore.Count || 0; 
+                } else {
+                    return 0; 
+                }
+                }
+                
+            ),
+            borderColor: getRandomColor(0), 
+            borderWidth: 1,
+            fill: false,
+            backgroundColor: getRandomColor(0), 
+        };
+        
+        let touristDataset = {
+            label: `Total Revenue from Tourist`,
+            data: aggregatedData.map((item) => {
+                if (item.Countries && item.Countries.Singapore) {
+                    const touristRevenue = item.Revenue - (item.Countries.Singapore.Revenue || 0);
+                    const touristCount = item.Count - (item.Countries.Singapore.Count || 0);
 
-                        return item.Countries.Singapore.Revenue / item.Countries.Singapore.Count || 0; // Use 0 if Revenue is null or undefined
-                    } else {
-                        return 0; // Handle the case where item.Countries.Singapore is null or undefined
-                    }
-                }),
-                borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
-                borderWidth: 1,
-                fill: false,
-                backgroundColor: getRandomColor(0),
-            },
-        ];
+                    return touristRevenue / touristCount; 
+                } else {
+                    return item.Revenue / item.Count; 
+                }
+            }),
+            borderColor: getRandomColor(1), 
+            borderWidth: 1,
+            fill: false,
+            backgroundColor: getRandomColor(1), 
+        };
+        
+
+        let combinedDataset = [localDataset, touristDataset];
+
+        dataset = combinedDataset
+       
     } else if (selectedYAxis === TOTAL_REVENUE_TOURIST) {
         dataset = [
             {
@@ -335,39 +354,78 @@ export const RevenueToBooking = (props) => {
 
 
     const expandedRowRender = (record) => {
-        const nestedColumns = [
-            {
-                title: 'Country',
-                dataIndex: 'country',
-                key: 'country',
-            },
-            {
-                title: 'Revenue',
-                dataIndex: 'revenue',
-                key: 'revenue',
-            },
-            {
-                title: 'Number of Bookings',
-                dataIndex: 'count',
-                key: 'count',
-            },
-        ];
 
-        const mappedCountries = Object.entries(record.Countries).map(([country, data], index) => ({
-            key: index,
-            country,
-            count: data.Count,
-            revenue: data.Revenue,
-        }));
+        if (selectedYAxis == TOTAL_REVENUE_BY_COUNTRY) {
+            const nestedColumns = [
+                {
+                    title: 'Country',
+                    dataIndex: 'country',
+                    key: 'country',
+                },
+                {
+                    title: 'Revenue',
+                    dataIndex: 'revenue',
+                    key: 'revenue',
+                },
+                {
+                    title: 'Count',
+                    dataIndex: 'count',
+                    key: 'count',
+                },
+            ];
+    
+            const mappedCountries = Object.entries(record.Countries).map(([country, data], index) => ({
+                key: index,
+                country,
+                count: data.Count,
+                revenue: data.Revenue,
+            }));
+    
+            return (
+                <Table
+                    columns={nestedColumns}
+                    dataSource={mappedCountries}
+                    pagination={false}
+                    size="small"
+                />
+            );
+        } else if (selectedYAxis == TOTAL_REVENUE_SEGMENT) {
+            const nestedColumns = [
+                {
+                    title: 'Customer Segment',
+                    dataIndex: 'segment',
+                    key: 'segment',
+                },
+                {
+                    title: 'Revenue',
+                    dataIndex: 'revenue',
+                    key: 'revenue',
+                },
+                {
+                    title: 'Count',
+                    dataIndex: 'count',
+                    key: 'count',
+                },
+            ];
+    
+            const mappedCountries = Object.entries(record.Countries).map(([country, data], index) => ({
+                key: index,
+                segment: country,
+                count: data.Count,
+                revenue: data.Revenue,
+            }));
+    
+            return (
+                <Table
+                    columns={nestedColumns}
+                    dataSource={mappedCountries}
+                    pagination={false}
+                    size="small"
+                />
+            );
+        }
+        
 
-        return (
-            <Table
-                columns={nestedColumns}
-                dataSource={mappedCountries}
-                pagination={false}
-                size="small"
-            />
-        );
     };
 
     const columns = [
@@ -396,7 +454,7 @@ export const RevenueToBooking = (props) => {
     const tableData = yData.map(({Date, Revenue, Count, Countries}, index) => ({
         key: index,
         Date,
-        Revenue,
+        Revenue: Revenue.toFixed(2),
         Count,
         Countries,
         Ratio: (Revenue / Count).toFixed(2)
@@ -455,7 +513,7 @@ export const RevenueToBooking = (props) => {
                        style={{
                            width: '90%',
                        }}
-                       expandable={{expandedRowRender}}
+                       expandable={!(selectedYAxis == TOTAL_REVENUE)  ? { expandedRowRender } : undefined}
                        className="ant-table ant-table-bordered ant-table-striped"
                 />
             </Row>

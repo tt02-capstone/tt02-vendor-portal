@@ -35,7 +35,7 @@ const WEEKLY = 'Week';
 const YEARLY = 'Year';
 const MONTHLY = 'Month';
 const NUMBER_OF_BOOKINGS = "Number of Bookings";
-const NUMBER_OF_BOOKINGS_LOCAL = "Number of Bookings by Local";
+const NUMBER_OF_BOOKINGS_SEGMENT = "Number of Bookings by Customer Segment";
 const NUMBER_OF_BOOKINGS_TOURIST = "Number of Bookings by Tourist";
 const NUMBER_OF_BOOKINGS_BY_COUNTRY = "Number of Bookings by Country";
 
@@ -70,12 +70,8 @@ export const TotalBookingsTimeSeries = (props) => {
             label: NUMBER_OF_BOOKINGS,
         },
         {
-            value: NUMBER_OF_BOOKINGS_LOCAL,
-            label: NUMBER_OF_BOOKINGS_LOCAL,
-        },
-        {
-            value: NUMBER_OF_BOOKINGS_TOURIST,
-            label: NUMBER_OF_BOOKINGS_TOURIST,
+            value: NUMBER_OF_BOOKINGS_SEGMENT,
+            label: NUMBER_OF_BOOKINGS_SEGMENT,
         },
         {
             value: NUMBER_OF_BOOKINGS_BY_COUNTRY,
@@ -180,19 +176,35 @@ export const TotalBookingsTimeSeries = (props) => {
 
             },
         ];
-    } else if (selectedYAxis === NUMBER_OF_BOOKINGS_LOCAL) {
-        dataset = [
-            {
-                label: `Number of Bookings by Local`,
-                data: aggregatedData.map((item) =>
-                    item[2].find(([c]) => c === 'Singapore') ? item[2].find(([c]) => c === 'Singapore')[1] : 0
-                ),
-                borderColor: getRandomColor(0), // You can assign a specific color for Local bookings
-                borderWidth: 1,
-                fill: false,
-                backgroundColor: getRandomColor(0), // You can assign a specific color for Local bookings
-            },
-        ];
+    } else if (selectedYAxis === NUMBER_OF_BOOKINGS_SEGMENT) {
+        let localDataset = {
+            label: `Number of Bookings by Local`,
+            data: aggregatedData.map((item) =>
+                item[2].find(([c]) => c === 'Singapore') ? item[2].find(([c]) => c === 'Singapore')[1] : 0
+            ),
+            borderColor: getRandomColor(0), 
+            borderWidth: 1,
+            fill: false,
+            backgroundColor: getRandomColor(0), 
+        };
+        
+        let touristDataset = {
+            label: `Number of Bookings by Tourist`,
+            data: aggregatedData.map((item) => {
+                const singaporeCount = item[2].find(([c]) => c === 'Singapore');
+                const totalTouristCount = item[1] - (singaporeCount ? singaporeCount[1] : 0);
+                return totalTouristCount > 0 ? totalTouristCount : 0;
+            }),
+            borderColor: getRandomColor(1), 
+            borderWidth: 1,
+            fill: false,
+            backgroundColor: getRandomColor(1), 
+        };
+        
+
+        let combinedDataset = [localDataset, touristDataset];
+
+        dataset = combinedDataset
     } else if (selectedYAxis === NUMBER_OF_BOOKINGS_TOURIST) {
         dataset = [
             {
@@ -267,48 +279,102 @@ export const TotalBookingsTimeSeries = (props) => {
     ];
 
     const expandedRowRender = (record) => {
-        const nestedcolumns = [
-            {
-                title: 'Country',
-                dataIndex: 'country',
-                key: 'country',
-            },
-            {
-                title: 'Number of Bookings',
-                dataIndex: 'count',
-                key: 'count',
-            },
-        ];
 
-        const mappedNestedData = record.nestedData.map(([country, count], index) => ({
-            key: index,
-            country,
-            count,
-        }));
-
-        return (
-            <Table
-                columns={nestedcolumns}
-                dataSource={mappedNestedData}
-                pagination={false}
-                size="small"
-            />
-        );
+        if (selectedYAxis == NUMBER_OF_BOOKINGS_BY_COUNTRY) {
+            const nestedcolumns = [
+                {
+                    title: 'Country',
+                    dataIndex: 'country',
+                    key: 'country',
+                },
+                {
+                    title: 'Count',
+                    dataIndex: 'count',
+                    key: 'count',
+                },
+            ];
+    
+            const mappedNestedData = record.nestedData.map(([country, count], index) => ({
+                key: index,
+                country,
+                count,
+            }));
+    
+            return (
+                <Table
+                    columns={nestedcolumns}
+                    dataSource={mappedNestedData}
+                    pagination={false}
+                    size="small"
+                />
+            );
+        } else if (selectedYAxis == NUMBER_OF_BOOKINGS_SEGMENT) {
+            const nestedcolumns = [
+                {
+                    title: 'Customer Segment',
+                    dataIndex: 'country',
+                    key: 'country',
+                },
+                {
+                    title: 'Number of Bookings',
+                    dataIndex: 'count',
+                    key: 'count',
+                },
+            ];
+    
+            const mappedNestedData = record.nestedData.map(([country, count], index) => ({
+                key: index,
+                country,
+                count,
+            }));
+    
+            return (
+                <Table
+                    columns={nestedcolumns}
+                    dataSource={mappedNestedData}
+                    pagination={false}
+                    size="small"
+                />
+            );
+        }
+        
     };
 
-    const tableData = yData.map(([month, total, countries], index) => ({
-        key: index,
-        month,
-        total,
-        nestedData: countries,
-    }));
+
+    const tableData = aggregatedData.map(([month, total, countries], index) => {
+        let nestedData;
+
+        if (selectedYAxis === NUMBER_OF_BOOKINGS_BY_COUNTRY) {
+            nestedData = countries;
+        } else if (selectedYAxis === NUMBER_OF_BOOKINGS_SEGMENT) {
+            const aggregatedData = countries.reduce((acc, [country, count]) => {
+                const category = country === 'Singapore' ? 'Local' : 'Tourist';
+                acc[category] = (acc[category] || 0) + count;
+                return acc;
+            }, {});
+            
+            nestedData = Object.entries(aggregatedData).map(([category, count]) => {
+                return [category, count];
+            });
+        }
+
+
+
+        return {
+            key: index,
+            month,
+            total,
+            nestedData, 
+        };
+    });
+
 
     const getChartOptions = () => {
         const chartOptions = {
-            ...defaultChartOptions, // Start with the default options
+            ...defaultChartOptions, 
         };
 
-        // Adjust time unit-specific settings
+
         if (selectedXAxis === WEEKLY) {
             chartOptions.scales.x.time.unit = 'week';
         } else if (selectedXAxis === YEARLY) {
@@ -394,7 +460,7 @@ export const TotalBookingsTimeSeries = (props) => {
                         <Select
                             labelInValue
                             defaultValue={itemsYAxis[0]}
-                            style={{width: 300}}
+                            style={{width: 400}}
                             onChange={handleChangeYAxis}
                             options={itemsYAxis}
                         />
@@ -423,7 +489,7 @@ export const TotalBookingsTimeSeries = (props) => {
                        style={{
                            width: '90%',
                        }}
-                       expandable={{expandedRowRender}}
+                       expandable={!(selectedYAxis == NUMBER_OF_BOOKINGS)  ? { expandedRowRender } : undefined}
                        className="ant-table ant-table-bordered ant-table-striped"
                 />
             </Row>
