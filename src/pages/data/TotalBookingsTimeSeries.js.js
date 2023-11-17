@@ -288,7 +288,7 @@ export const TotalBookingsTimeSeries = (props) => {
                     key: 'country',
                 },
                 {
-                    title: 'Count',
+                    title: 'Number of Bookings',
                     dataIndex: 'count',
                     key: 'count',
                 },
