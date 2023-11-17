@@ -30,7 +30,8 @@ import {
     ExclamationCircleOutlined,
     BarChartOutlined,
     SolutionOutlined,
-    ShopOutlined
+    ShopOutlined,
+    ShoppingOutlined
 } from '@ant-design/icons';
 import {LocalShippingRounded, Logout} from "@mui/icons-material";
 import {loadStripe} from '@stripe/stripe-js';
@@ -69,10 +70,10 @@ function AppLayout() {
         {key: '/vendorStaff', label: 'Users', icon: <UsergroupAddOutlined/>},
         {key: '/forum', label: 'Forum', icon: <FormOutlined />,},
         {key: '/attraction', label: 'Attractions', icon: <BankOutlined/>,},
-        {key: '/accommodation', label: 'Accommodations', icon: <BankOutlined/>,},
+        {key: '/accommodation', label: 'Accommodations', icon: <HomeOutlined/>,},
         {key: '/telecom', label: 'Telecoms', icon: <PhoneOutlined/>,},
-        {key: '/restaurant', label: 'Restaurants', icon: <HomeOutlined/>,},
-        {key: '/item', label: 'Items', icon: <ShopOutlined />,},
+        {key: '/restaurant', label: 'Restaurants', icon: <ShopOutlined/>,},
+        {key: '/item', label: 'Items', icon: <ShoppingOutlined />,},
         {key: '/deal', label: 'Deals', icon: <MoneyCollectOutlined />,},
         {key: '/bookingmanagement', label: 'Bookings', icon: <CalendarOutlined/>,},
         {key: '/deliverymanagement', label: 'Delivery', icon: <LocalShippingRounded/>,},
