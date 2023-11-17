@@ -170,7 +170,7 @@ export const RevenueToBooking = (props) => {
     if (selectedYAxis === TOTAL_REVENUE) {
         dataset = [
             {
-                label: 'Total Revenue',
+                label: 'Total Revenue to Booking Ratio',
                 data: aggregatedData.map(item => item.Revenue / item.Count),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
@@ -180,7 +180,7 @@ export const RevenueToBooking = (props) => {
         ];
     } else if (selectedYAxis === TOTAL_REVENUE_SEGMENT) {
         let localDataset = {
-            label: `Total Revenue from Local`,
+            label: `Revenue to Booking Ratio for Local`,
             data: aggregatedData.map((item) => {
                 if (item.Countries && item.Countries.Singapore) {
                     return item.Countries.Singapore.Revenue / item.Countries.Singapore.Count || 0; 
@@ -197,7 +197,7 @@ export const RevenueToBooking = (props) => {
         };
         
         let touristDataset = {
-            label: `Total Revenue from Tourist`,
+            label: `Revenue to Booking Ratio for Tourist`,
             data: aggregatedData.map((item) => {
                 if (item.Countries && item.Countries.Singapore) {
                     const touristRevenue = item.Revenue - (item.Countries.Singapore.Revenue || 0);
@@ -242,7 +242,7 @@ export const RevenueToBooking = (props) => {
     } else if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
         dataset = uniqueCountries.map((country) => {
             return {
-                label: `Total Revenue in ${country}`,
+                label: `Revenue to Booking Ratio for ${country}`,
                 data: aggregatedData.map((item) => {
                     const countryData = item.Countries[country];
                     return countryData ? countryData.Revenue / countryData.Count : 0;
@@ -408,17 +408,46 @@ export const RevenueToBooking = (props) => {
                 },
             ];
     
-            const mappedCountries = Object.entries(record.Countries).map(([country, data], index) => ({
-                key: index,
-                segment: country,
-                count: data.Count,
-                revenue: data.Revenue,
-            }));
+            let localData = { count: 0, revenue: 0 };
+            let touristData = { count: 0, revenue: 0 };
+
+            Object.entries(record.Countries).forEach(([country, data]) => {
+                if (country === 'Singapore') {
+                    // Aggregate data for Local
+                    localData.count += data.Count;
+                    localData.revenue += data.Revenue;
+                } else {
+                    // Aggregate data for Tourist
+                    touristData.count += data.Count;
+                    touristData.revenue += data.Revenue;
+                }
+            });
+
+            const nestedData = [];
+            if (localData.count > 0) {
+                nestedData.push({
+                    key: 'local',
+                    segment: 'Local',
+                    count: localData.count,
+                    revenue: localData.revenue.toFixed(2),
+                });
+            }
+            if (touristData.count > 0) {
+                nestedData.push({
+                    key: 'tourist',
+                    segment: 'Tourist',
+                    count: touristData.count,
+                    revenue: touristData.revenue.toFixed(2),
+                });
+            }
+
+            console.log(nestedData)
+            
     
             return (
                 <Table
                     columns={nestedColumns}
-                    dataSource={mappedCountries}
+                    dataSource={nestedData}
                     pagination={false}
                     size="small"
                 />
@@ -486,7 +515,7 @@ export const RevenueToBooking = (props) => {
                         <Select
                             labelInValue
                             defaultValue={itemsYAxis[0]}
-                            style={{width: 300}}
+                            style={{width: 370}}
                             onChange={handleChangeYAxis}
                             options={itemsYAxis}
                         />
