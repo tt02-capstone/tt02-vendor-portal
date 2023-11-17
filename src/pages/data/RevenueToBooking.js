@@ -355,7 +355,7 @@ export const RevenueToBooking = (props) => {
 
     const expandedRowRender = (record) => {
 
-        if (selectedYAxis == TOTAL_REVENUE_BY_COUNTRY) {
+        if (selectedYAxis === TOTAL_REVENUE_BY_COUNTRY) {
             const nestedColumns = [
                 {
                     title: 'Country',
@@ -389,7 +389,7 @@ export const RevenueToBooking = (props) => {
                     size="small"
                 />
             );
-        } else if (selectedYAxis == TOTAL_REVENUE_SEGMENT) {
+        } else if (selectedYAxis === TOTAL_REVENUE_SEGMENT) {
             const nestedColumns = [
                 {
                     title: 'Customer Segment',
@@ -542,7 +542,7 @@ export const RevenueToBooking = (props) => {
                        style={{
                            width: '90%',
                        }}
-                       expandable={!(selectedYAxis == TOTAL_REVENUE)  ? { expandedRowRender } : undefined}
+                       expandable={!(selectedYAxis === TOTAL_REVENUE)  ? { expandedRowRender } : undefined}
                        className="ant-table ant-table-bordered ant-table-striped"
                 />
             </Row>
