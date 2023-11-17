@@ -407,7 +407,7 @@ export const TotalBookingsTimeSeries = (props) => {
         newData = aggregatedData
         if (yaxis === NUMBER_OF_BOOKINGS) {
             newData = aggregatedData
-        } else if (yaxis === NUMBER_OF_BOOKINGS_LOCAL) {
+        } else if (yaxis === NUMBER_OF_BOOKINGS_SEGMENT) {
             newData = aggregatedData.filter(item => {
                 console.log(item)
                 const countries = Object.keys(item[2]);
