@@ -444,9 +444,11 @@ export const CustomerRetention = (props) => {
             </div>
             <Row style={{marginLeft: 30, marginTop: 20}}>
                 <Table
+
                     dataSource={tableData} columns={columns} bordered
                     expandable={!(selectedYAxis == NUMBER_OF_REPEATED_BOOKINGS)  ? { expandedRowRender } : undefined}
                     style={{ width: '90%' }} 
+
                 />
             </Row>
         </>

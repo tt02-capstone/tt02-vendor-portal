@@ -201,6 +201,10 @@ export default function DeliveryManagement() {
                     text: 'Picked Up',
                     value: 'PICKED_UP',
                 },
+                {
+                    text: 'Cancelled',
+                    value: 'CANCELLED',
+                },
             ],
             onFilter: (value, record) => record.status === value,
             render: (status) => {
@@ -229,6 +233,8 @@ export default function DeliveryManagement() {
                         break;
                     case 'PICKED_UP':
                         color = 'success';
+                        break;
+                    case 'CANCELLED':
                         break;
                     default:
                         color = 'default';
@@ -306,11 +312,11 @@ export default function DeliveryManagement() {
                             style={{fontWeight: "bold"}}
                             onClick={() => onClickOpenViewItemBookingModal(record.booking_id)}
                         />
-                        <CustomButton
+                        {record.status !== 'CANCELLED' && <CustomButton
                             text="Edit Status"
                             style={{fontWeight: "bold", width:'95%'}}
                             onClick={() => onClickOpenEditItemBookingModal(record.booking_id)}
-                        />
+                        />}
                     </Space>
                 }  else {
                     return <p>'Bug</p>
@@ -391,6 +397,7 @@ export default function DeliveryManagement() {
         PREPARE_FOR_PICKUP: 'Prepare for Pickup',
         READY_FOR_PICKUP: 'Ready for Pickup',
         PICKED_UP: 'Picked Up',
+        CANCELLED: 'Cancelled',
     };
     //view item booking modal open button
     function onClickOpenViewItemBookingModal(bookingId) {

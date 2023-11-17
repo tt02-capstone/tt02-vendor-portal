@@ -44,7 +44,7 @@ export const RevenueToBooking = (props) => {
     const data = props.data
     const [selectedXAxis, setSelectedXAxis] = useState(MONTHLY);
     const [selectedYAxis, setSelectedYAxis] = useState(TOTAL_REVENUE);
-    const [selectedDataset, setSelectedDataset] = useState([{}]);
+    const [yData, setYData] = useState([]);
 
 
     const itemsXAxis = [
@@ -311,7 +311,39 @@ export const RevenueToBooking = (props) => {
     const handleChangeYAxis = (value) => {
         console.log(value); // { value: "lucy", label: "Lucy (101)" }
         setSelectedYAxis(value.value)
+        updateYaxisDropdown(value.value)
     };
+
+    useEffect(() => {
+        updateYaxisDropdown(selectedYAxis);
+    }, [selectedXAxis]);
+
+    const updateYaxisDropdown = (yaxis) => {
+        console.log("In y axis", yaxis)
+        let newData = []
+        newData = aggregatedData
+        if (yaxis === TOTAL_REVENUE) {
+            newData = aggregatedData
+        } else if (yaxis === TOTAL_REVENUE_LOCAL) {
+            newData = aggregatedData.filter(item => {
+                console.log(item)
+                const countries = Object.keys(item.Countries);
+                return countries.includes("Singapore");
+            });
+            console.log(newData)
+
+        } else if (yaxis === TOTAL_REVENUE_TOURIST) {
+            newData = aggregatedData.filter(item => {
+                const countries = Object.keys(item.Countries);
+                return !countries.includes("Singapore");
+            });
+        } else if (yaxis === TOTAL_REVENUE_BY_COUNTRY) {
+            newData = aggregatedData
+        }
+
+        setYData(newData)
+
+    }
 
     useEffect(() => {
         const chart = chartRef.current;
@@ -322,6 +354,7 @@ export const RevenueToBooking = (props) => {
 
 
     const expandedRowRender = (record) => {
+
         if (selectedYAxis == TOTAL_REVENUE_BY_COUNTRY) {
             const nestedColumns = [
                 {
@@ -392,6 +425,7 @@ export const RevenueToBooking = (props) => {
             );
         }
         
+
     };
 
     const columns = [
@@ -401,23 +435,29 @@ export const RevenueToBooking = (props) => {
             key: 'Date',
         },
         {
-            title: 'Revenue',
+            title: selectedYAxis === TOTAL_REVENUE_BY_COUNTRY? TOTAL_REVENUE: selectedYAxis,
             dataIndex: 'Revenue',
             key: 'Revenue',
         },
         {
-            title: 'Count',
+            title: 'Number of Bookings',
             dataIndex: 'Count',
             key: 'Count',
         },
+        {
+            title: 'Revenue to Booking Ratio',
+            dataIndex: 'Ratio',
+            key: 'Ratio',
+        },
     ];
 
-    const tableData = aggregatedData.map(({Date, Revenue, Count, Countries}, index) => ({
+    const tableData = yData.map(({Date, Revenue, Count, Countries}, index) => ({
         key: index,
         Date,
         Revenue: Revenue.toFixed(2),
         Count,
         Countries,
+        Ratio: (Revenue / Count).toFixed(2)
     }));
 
 
