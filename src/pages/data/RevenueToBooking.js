@@ -451,7 +451,7 @@ export const RevenueToBooking = (props) => {
         },
     ];
 
-    const tableData = yData.map(({Date, Revenue, Count, Countries}, index) => ({
+    const tableData = aggregatedData.map(({Date, Revenue, Count, Countries}, index) => ({
         key: index,
         Date,
         Revenue: Revenue.toFixed(2),
